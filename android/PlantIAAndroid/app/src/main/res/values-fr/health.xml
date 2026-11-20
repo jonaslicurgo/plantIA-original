@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">Santé des plantes</string>
+    <string name="health_unavailable">L’évaluation phytosanitaire est temporairement indisponible.</string>
+</resources>

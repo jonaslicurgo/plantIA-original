@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">पौधों का स्वास्थ्य</string>
+    <string name="health_unavailable">पादप स्वास्थ्य मूल्यांकन अस्थायी रूप से अनुपलब्ध है।</string>
+</resources>

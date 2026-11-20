@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">植物の健康</string>
+    <string name="health_unavailable">植物の健康状態の評価は一時的に利用できません。</string>
+</resources>

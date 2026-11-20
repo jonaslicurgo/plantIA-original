@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">Saúde da planta</string>
+    <string name="health_unavailable">A avaliação de saúde vegetal está temporariamente indisponível.</string>
+</resources>

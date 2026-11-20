@@ -2168,3 +2168,11 @@ nav {
 .botany-group small { display: block; padding-block-end: .25rem; }
 .botany-results { padding: 0; list-style-type: none; overflow-wrap: anywhere; }
 .botany-results a { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem; padding: .85rem 1rem; }
+
+.plant-health form { display: grid; gap: .7rem; padding: 0 1rem 1rem; }
+.plant-health label { overflow-wrap: anywhere; }
+.plant-health input, .plant-health select, .plant-health textarea { max-width: 100%; color: inherit; }
+.plant-health textarea { display: block; width: 100%; background: var(--surface); }
+.health-event { padding: 1rem; overflow-wrap: anywhere; }
+.health-event ul { padding-inline-start: 1.3rem; }
+.health-event img { display: block; max-width: 100%; max-height: 24rem; margin-block-start: .5rem; }

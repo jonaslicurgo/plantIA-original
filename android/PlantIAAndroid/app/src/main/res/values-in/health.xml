@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">Kesehatan tanaman</string>
+    <string name="health_unavailable">Penilaian kesehatan tanaman untuk sementara tidak tersedia.</string>
+</resources>

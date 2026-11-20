@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">Sanidad vegetal</string>
+    <string name="health_unavailable">La evaluación fitosanitaria no está disponible temporalmente.</string>
+</resources>

@@ -1,6 +1,7 @@
 """Request boundary for account isolation, throttling and browser security."""
 
 import os
+import re
 from urllib.parse import urlsplit
 
 from starlette.concurrency import run_in_threadpool
@@ -52,9 +53,12 @@ async def enforce_security(request, call_next):
             referer = urlsplit(request.headers.get("referer", ""))
             if f"{referer.scheme}://{referer.netloc}" != expected:
                 return _reject(request, "Request blocked", 403)
+        health_upload = re.fullmatch(r"/(?:api/)?plantas/[0-9]+/saude/(?:avaliar|acompanhar)", path)
         cap = MAX_IMAGE_SIZE_BYTES + 64 * 1024 if path in UPLOAD_ROUTES else 64 * 1024
+        if health_upload:
+            cap += 2 * 1024 * 1024
         length = request.headers.get("content-length", "")
-        if (length or request.headers.get("transfer-encoding") or path in UPLOAD_ROUTES) and (not length.isdecimal() or len(length) > 12):
+        if (length or request.headers.get("transfer-encoding") or path in UPLOAD_ROUTES or health_upload) and (not length.isdecimal() or len(length) > 12):
             return _reject(request, "Content-Length required", 411)
         if length and int(length) > cap:
             return _reject(request, "File or request too large", 413)

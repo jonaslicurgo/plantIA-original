@@ -76,6 +76,7 @@ def get_engine():
         @event.listens_for(_engine, "connect")
         def configure_sqlite(connection, _record):
             connection.create_function("planet_normalize", 1, normalize, deterministic=True)
+            connection.execute("PRAGMA foreign_keys=ON")
 
         Base.metadata.create_all(_engine)
         _migrate_plantas_columns(_engine)

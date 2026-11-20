@@ -38,11 +38,15 @@ import com.plantia.ui.screens.CameraScreen
 import com.plantia.ui.screens.EncyclopediaScreen
 import com.plantia.ui.screens.DetailScreen
 import com.plantia.ui.screens.PlantsScreen
+import com.plantia.ui.screens.PlantHealthScreen
 import com.plantia.ui.screens.SettingsScreen
 
 sealed class Screen(val route: String, val label: Int) {
     data object Plants : Screen("plants", R.string.planet_plants)
     data object Camera : Screen("camera", R.string.planet_identify)
+    data object Health : Screen("health/{id}", R.string.health_title) {
+        fun route(id: Int) = "health/$id"
+    }
     data object Encyclopedia : Screen("encyclopedia", R.string.botany_title)
     data object BotanicalProfile : Screen("botanical/{id}", R.string.botany_open) {
         fun route(id: Int) = "botanical/$id"
@@ -128,6 +132,10 @@ fun PlantIAApp(
                     onOpenDetail = { id -> navController.navigate(Screen.Detail.route(id)) },
                 )
             }
+            composable(Screen.Health.route, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
+                val id = entry.arguments?.getInt("id") ?: return@composable
+                PlantHealthScreen(id) { navController.popBackStack() }
+            }
             composable(Screen.Encyclopedia.route) {
                 EncyclopediaScreen { id -> navController.navigate(Screen.BotanicalProfile.route(id)) }
             }
@@ -161,6 +169,7 @@ fun PlantIAApp(
                     plantaId = id,
                     onBack = { navController.popBackStack() },
                     onReIdentify = { navController.navigate("camera/refine/$id") },
+                    onOpenHealth = { navController.navigate(Screen.Health.route(id)) },
                     onOpenBotany = { navController.navigate(Screen.BotanicalProfile.route(id)) },
                 )
             }

@@ -3,10 +3,13 @@ package com.plantia.api
 import com.plantia.api.models.BotanyFavorite
 import com.plantia.api.models.BotanyList
 import com.plantia.api.models.BotanyProfile
+import com.plantia.api.models.PlantHealthEvent
+import com.plantia.api.models.PlantHealthHistory
 import com.plantia.api.models.PlantaListResponse
 import com.plantia.api.models.PlantaResponse
 import com.plantia.api.models.PlantaUpdateRequest
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.Field
@@ -43,6 +46,30 @@ interface PlantIAApi {
 
     @PATCH("api/enciclopedia/{id}/favorito")
     suspend fun botanicalFavorite(@Path("id") id: Int, @Body favorite: BotanyFavorite): BotanyFavorite
+
+    @GET("api/plantas/{id}/saude")
+    suspend fun healthHistory(@Path("id") id: Int, @Query("before") before: Int? = null): PlantHealthHistory
+
+    @Multipart
+    @POST("api/plantas/{id}/saude/avaliar")
+    suspend fun assessHealth(
+        @Path("id") id: Int,
+        @Part photo: MultipartBody.Part,
+        @Part("leaf_change") leafChange: RequestBody,
+        @Part("spreading") spreading: RequestBody,
+        @Part("insects_seen") insects: RequestBody,
+        @Part("moisture") moisture: RequestBody,
+    ): PlantHealthEvent
+
+    @Multipart
+    @POST("api/plantas/{id}/saude/acompanhar")
+    suspend fun followHealth(
+        @Path("id") id: Int,
+        @Part("trend") trend: RequestBody,
+        @Part("action") action: RequestBody,
+        @Part("note") note: RequestBody,
+        @Part photo: MultipartBody.Part?,
+    ): PlantHealthEvent
 
     @Multipart
     @POST("api/plantas/identificar")

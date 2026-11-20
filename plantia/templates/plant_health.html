@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("health.title") }} · PLANET-IA{% endblock %}
+{% block content %}
+<a href="/plantas/{{ plant_id }}">{{ name }}</a>
+<h1>{{ tr("health.title") }}</h1>
+<p>{{ tr("health.notice") }}</p>
+<div class="plant-health">
+    <details class="botany-group" open>
+        <summary>{{ tr("health.assess") }}</summary>
+        <form method="post" enctype="multipart/form-data" action="/plantas/{{ plant_id }}/saude/avaliar">
+            <label>{{ tr("health.photo") }} <input required name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            {% for key in ["leaf_change", "spreading", "insects_seen"] %}
+            <label><input type="checkbox" name="{{ key }}" value="true"> {{ tr("health." ~ key) }}</label>
+            {% endfor %}
+            <label>{{ tr("health.moisture") }}
+                <select name="moisture">
+                {% for option in ["unknown", "dry", "moist", "saturated"] %}
+                    <option value="{{ option }}">{{ tr("health.moisture." ~ option) }}</option>
+                {% endfor %}
+                </select>
+            </label>
+            <button class="btn btn-primary">{{ tr("health.assess") }}</button>
+        </form>
+    </details>
+    <details class="botany-group">
+        <summary>{{ tr("health.follow") }}</summary>
+        <form method="post" enctype="multipart/form-data" action="/plantas/{{ plant_id }}/saude/acompanhar">
+            <label>{{ tr("health.trend") }}
+                <select name="trend">
+                {% for option in ["baseline", "improving", "stable", "worsening"] %}
+                    <option value="{{ option }}">{{ tr("health.trend." ~ option) }}</option>
+                {% endfor %}
+                </select>
+            </label>
+            <label>{{ tr("health.action") }}
+                <select name="action">
+                {% for option in ["observe", "separate", "inspect", "check_moisture", "specialist"] %}
+                    <option value="{{ option }}">{{ tr("health.action." ~ option) }}</option>
+                {% endfor %}
+                </select>
+            </label>
+            <label>{{ tr("health.note") }} <textarea name="note" maxlength="1000" rows="3"></textarea></label>
+            <label>{{ tr("health.photo") }} <input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <button class="btn btn-primary">{{ tr("health.save") }}</button>
+        </form>
+    </details>
+</div>
+<h2>{{ tr("health.history") }}</h2>
+{% for event in events %}
+<section class="botany-group health-event" id="event-{{ event.id }}">
+    {% if event.kind == "triage" %}
+    <h3>{{ tr("health.status." ~ event.data.status) }}</h3>
+    <p>{{ tr("health.concern." ~ event.data.concern) }}</p>
+    {% if event.data.findings %}
+    <ul>{% for finding in event.data.findings %}<li>{{ tr("health.finding." ~ finding) }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if event.data.signs %}
+    <ul>{% for sign in event.data.signs %}<li>{{ tr("health.sign." ~ sign) }}</li>{% endfor %}</ul>
+    {% endif %}
+    <ul>{% for action in event.actions %}<li>{{ tr("health.action." ~ action) }}</li>{% endfor %}</ul>
+    {% else %}
+    <h3>{{ tr("health.trend." ~ event.data.trend) }}</h3>
+    <p>{{ tr("health.action." ~ event.data.action) }}</p>
+    {% if event.data.note %}<p>{{ event.data.note }}</p>{% endif %}
+    {% endif %}
+    <time datetime="{{ event.date }}" data-health-time="{{ event.created_at }}">{{ event.date }}</time>
+    {% if event.has_photo %}
+    <img loading="lazy" src="/api/plantas/{{ plant_id }}/saude/fotos/{{ event.id }}" alt="{{ tr('health.photo') }}">
+    {% endif %}
+</section>
+{% else %}
+<p>{{ tr("health.empty") }}</p>
+{% endfor %}
+{% if next_before %}<a href="?before={{ next_before }}">{{ tr("health.older") }}</a>{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+for (const element of document.querySelectorAll("time[data-health-time]")) {
+    const date = new Date(Number(element.dataset.healthTime) * 1000);
+    element.dateTime = date.toISOString();
+    element.textContent = new Intl.DateTimeFormat(document.documentElement.lang, {dateStyle: "medium", timeStyle: "short"}).format(date);
+}
+</script>
+{% endblock %}

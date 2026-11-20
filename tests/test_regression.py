@@ -31,6 +31,7 @@ from plantia.database import get_engine
 from plantia.config import UPLOADS_DIR
 from plantia.i18n import LANGUAGES, catalog
 from plantia.schemas.planta import IdentificacionGemini
+from plantia.services.health import Triage
 from plantia.services.botany import GROUPS, SPECIES, _fetch_taxon
 from plantia.services.gemini_service import GeminiService
 
@@ -266,6 +267,63 @@ class Regression(unittest.TestCase):
             for invalid in ({"matchType": "FUZZY"}, {"status": "SYNONYM"}, {"kingdom": "Fungi"}, {"canonicalName": "Lavandula latifolia"}):
                 response.read.return_value = dumps({**sample, **invalid}).encode()
                 self.assertEqual(_fetch_taxon("lavandula angustifolia"), {})
+
+    def test_health_assessment_and_followup_are_private(self):
+        a = self.account(self.a, "health-owner@example.com")
+        b = self.account(self.b, "health-other@example.com")
+        plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+        path = f"/api/plantas/{plant}/saude"
+        upload = {"photo": photo()["file"]}
+        result = Triage(status="possible", concern="high", signs=["webbing"], findings=["mites"])
+        with patch("plantia.services.health.analyze", return_value=result) as diagnose:
+            self.assertEqual(self.b.post(path + "/avaliar", files=upload, headers=b).status_code, 404)
+            diagnose.assert_not_called()
+            created = self.a.post(path + "/avaliar", data={"spreading": "true"}, files=upload, headers=a)
+            self.assertEqual(created.status_code, 201, created.text)
+        event = created.json()
+        self.assertIn("specialist", event["actions"])
+        self.assertEqual(event["data"]["findings"], ["mites"])
+        self.assertNotIn("mime", event["data"])
+        image_url = f"{path}/fotos/{event['id']}"
+        self.assertEqual(self.a.get(image_url, headers=a).status_code, 200)
+        self.assertEqual(self.a.get(image_url, headers=a).headers["cache-control"], "private, no-store")
+        self.assertEqual(self.a.get(image_url).status_code, 401)
+        self.assertEqual(self.b.get(image_url, headers=b).status_code, 404)
+        self.assertEqual(self.b.get(path, headers=b).status_code, 404)
+        self.assertEqual(self.b.post(path + "/acompanhar", data={"trend":"stable"}, headers=b).status_code, 404)
+        note = "<script>alert(1)</script>"
+        follow = self.a.post(path + "/acompanhar", data={"trend":"improving", "note":note}, headers=a)
+        self.assertEqual(follow.status_code, 201, follow.text)
+        self.assertEqual(self.a.get(path, headers=a).json()["events"][0]["data"]["trend"], "improving")
+        web = self.a.get(f"/plantas/{plant}/saude", headers={**a, "Accept-Language":"ar"})
+        self.assertEqual(web.status_code, 200, web.text)
+        self.assertIn('dir="rtl"', web.text)
+        self.assertNotIn(note, web.text)
+        self.assertIn("&lt;script&gt;", web.text)
+        self.assertEqual(self.a.delete(f"/api/plantas/{plant}", headers=a).status_code, 204)
+        self.assertEqual(self.a.get(image_url, headers=a).status_code, 404)
+        with get_engine().connect() as db:
+            self.assertEqual(db.execute(text("SELECT count(*) FROM plant_health_events WHERE plant_id=:id"), {"id":plant}).scalar(), 0)
+
+    def test_health_rejects_invalid_input_and_unsafe_provider_output(self):
+        a = self.account(self.a, "health-validation@example.com")
+        plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+        path = f"/api/plantas/{plant}/saude/avaliar"
+        bad = {"photo": ("sample.jpg", b"not an image", "image/jpeg")}
+        self.assertEqual(self.a.post(path, files=bad, headers=a).status_code, 400)
+        self.assertEqual(self.a.post(path, files={"photo": photo()["file"]}, data={"moisture":"unknown-other"}, headers=a).status_code, 422)
+        oversize = {"photo": ("sample.jpg", b"x"*(2*1024*1024+100000), "image/jpeg")}
+        self.assertEqual(self.a.post(path, files=oversize, headers=a).status_code, 413)
+        with patch.object(GeminiService, "_get_client") as client:
+            generate = client.return_value.models.generate_content
+            generate.return_value.text = '{"status":"possible","concern":"high","signs":["spots"],"findings":["fungal"],"advice":"unsafe"}'
+            self.assertEqual(self.a.post(path, files={"photo": photo()["file"]}, headers=a).status_code, 503)
+            generate.return_value.text = '{"status":"inconclusive","concern":"high","signs":["spots"],"findings":["fungal"]}'
+            response = self.a.post(path, files={"photo": photo()["file"]}, headers=a)
+            self.assertEqual(response.status_code, 201, response.text)
+            self.assertEqual(response.json()["data"]["findings"], [])
+            self.assertEqual(response.json()["data"]["concern"], "unknown")
+            self.assertEqual(response.json()["actions"], ["observe"])
 
     def test_gemini_request_uses_selected_model_and_language(self):
         self.mock.stop()

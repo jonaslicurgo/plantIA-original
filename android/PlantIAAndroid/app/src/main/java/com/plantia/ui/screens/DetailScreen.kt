@@ -91,6 +91,7 @@ fun DetailScreen(
     plantaId: Int,
     onBack: () -> Unit,
     onReIdentify: () -> Unit = {},
+    onOpenHealth: () -> Unit = {},
     onOpenBotany: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -292,6 +293,9 @@ fun DetailScreen(
                         ErrorBanner(message = error!!)
                     }
 
+                    OutlinedButton(onClick = onOpenHealth, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.health_title))
+                    }
                     OutlinedButton(onClick = onOpenBotany, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.botany_open))
                     }

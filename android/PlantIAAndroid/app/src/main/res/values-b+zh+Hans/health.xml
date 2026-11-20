@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="health_title">植物健康</string>
+    <string name="health_unavailable">暂时无法进行植物健康评估。</string>
+</resources>

@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="botany-entry">
+    <a class="btn btn-outline" href="/plantas/{{ planta.id }}/saude">{{ tr("health.title") }}</a>
     <a class="btn btn-outline" href="/enciclopedia/{{ planta.id }}">{{ tr("botany.open") }}</a>
     <p>{{ tr("botany.notice.risk") }}</p>
 </div>

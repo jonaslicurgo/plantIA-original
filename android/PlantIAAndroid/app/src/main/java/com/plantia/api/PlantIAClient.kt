@@ -33,7 +33,7 @@ object PlantIAClient {
         val builder = ImageRequest.Builder(context).data(url)
             .diskCachePolicy(CachePolicy.DISABLED)
             .memoryCachePolicy(CachePolicy.DISABLED)
-        session?.takeIf { url.startsWith(it.url + "uploads/") }?.let {
+        session?.takeIf { url.startsWith(it.url + "uploads/") || url.startsWith(it.url + "api/plantas/") }?.let {
             builder.addHeader("Authorization", "Bearer ${it.value.access_token}")
         }
         return builder.build()

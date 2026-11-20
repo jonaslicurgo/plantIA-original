@@ -1,5 +1,14 @@
 # Changelog
 
+## Etapa 3 · Saúde vegetal
+
+- Triagem fotográfica de doenças, pragas e fatores ambientais com contexto informado pelo usuário, hipóteses estruturadas, indicação visual de gravidade e saída inconclusiva.
+- A resposta do Gemini passa por validação estrita de categorias. Os cuidados sugeridos vêm de um catálogo fixo de ações conservadoras, sem prescrição de defensivos, misturas ou dosagens.
+- Histórico privado por exemplar, ações registradas, evolução, notas, fotos opcionais e paginação. A exclusão da planta remove o histórico e as fotos da etapa. Limites de 2 MB por foto, 32 MB de imagens por conta e cota de análises.
+- Fluxos web e Android e alertas em 12 idiomas, incluindo árabe RTL. O Android usa o seletor de imagens do sistema. O catálogo de termos está disponível na API autenticada de saúde.
+- Testes de regressão com Gemini simulado. A implantação e o Gemini real ficam sujeitos à validação em homologação.
+
+
 ## Etapa 2 · Enciclopédia botânica
 
 - Enciclopédia privada na web e no Android, com 31 campos em seis grupos expansíveis, busca por nomes populares ou científicos, filtros de evidência por categoria e favoritos.

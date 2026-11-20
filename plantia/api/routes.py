@@ -19,6 +19,7 @@ from fastapi.templating import Jinja2Templates
 
 from plantia import accounts
 from plantia.api.auth import router as auth_router
+from plantia.api.health import router as health_router
 from plantia.api.encyclopedia import router as encyclopedia_router
 from plantia.config import ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES, PAGE_SIZE, UPLOADS_DIR, ensure_directories, get_gemini_model
 from plantia.i18n import LANGUAGES, catalog, locale_for, translations
@@ -112,7 +113,7 @@ def set_language(request: Request, language: str = Form(...), page: str = Form("
     if language not in LANGUAGES:
         raise HTTPException(400, "Invalid language")
     allowed = {"/", "/plantas", "/enciclopedia", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir"}
-    response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:plantas|enciclopedia)/[0-9]+", page) else "/", 303)
+    response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:(?:plantas|enciclopedia)/[0-9]+|plantas/[0-9]+/saude)", page) else "/", 303)
     response.set_cookie("planet_language", language, max_age=31536000, httponly=True,
                         secure=secure_cookie(), samesite="lax")
     return response
@@ -349,6 +350,7 @@ def create_app():
     app.add_exception_handler(RequestValidationError, error_handler)
     app.middleware("http")(enforce_security)
     app.include_router(auth_router)
+    app.include_router(health_router)
     app.include_router(encyclopedia_router)
     app.include_router(router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
