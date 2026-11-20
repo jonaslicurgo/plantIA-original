@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -48,27 +49,46 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 private val observations = listOf("leaf_change", "spreading", "insects_seen")
-private val moistureStates = listOf("unknown", "dry", "moist", "saturated")
+private val conditions = linkedMapOf(
+    "moisture" to listOf("unknown", "dry", "moist", "saturated"),
+    "watering" to listOf("unknown", "daily", "weekly", "as_needed", "less_often"),
+    "lighting" to listOf("unknown", "direct", "indirect", "low"),
+    "location" to listOf("unknown", "inside", "outside", "greenhouse"),
+    "soil" to listOf("unknown", "well_drained", "compacted", "standing_water"),
+    "temperature" to listOf("unknown", "cold", "stable", "hot", "variable"),
+)
 private val trends = listOf("baseline", "improving", "stable", "worsening")
-private val actions = listOf("observe", "inspect", "separate", "check_moisture", "specialist")
+private val actions = listOf("observe", "inspect", "separate", "check_moisture", "specialist",
+    "drain", "review_watering", "review_light", "stable_temperature", "review_soil", "prevention", "retake", "physical_removal")
 
 @Composable
-fun PlantHealthScreen(id: Int, onBack: () -> Unit) {
+fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
+    val date = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        .withLocale(context.resources.configuration.locales[0]).withZone(ZoneId.systemDefault())
     val api = PlantIAClient.api(context)
     val failure = stringResource(R.string.health_unavailable)
     var history by remember(id) { mutableStateOf<PlantHealthHistory?>(null) }
     var error by remember(id) { mutableStateOf<String?>(null) }
     var revision by remember(id) { mutableStateOf(0) }
     var busy by remember(id) { mutableStateOf(false) }
-    var assessment by remember(id) { mutableStateOf(true) }
-    var upload by remember(id, assessment) { mutableStateOf<Uri?>(null) }
+    var mode by remember(id) { mutableStateOf("assess") }
+    var upload by remember(id, mode) { mutableStateOf<Uri?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { upload = it }
     var checks by remember(id) { mutableStateOf(setOf<String>()) }
-    var moisture by remember(id) { mutableStateOf("unknown") }
+    var contextFields by remember(id) { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var symptoms by remember(id) { mutableStateOf("") }
+    var environment by remember(id) { mutableStateOf("") }
+    var confirmed by remember(id) { mutableStateOf("") }
+    var question by remember(id) { mutableStateOf("") }
     var trend by remember(id) { mutableStateOf("baseline") }
     var action by remember(id) { mutableStateOf("observe") }
     var note by remember(id) { mutableStateOf("") }
@@ -95,43 +115,68 @@ fun PlantHealthScreen(id: Int, onBack: () -> Unit) {
                 item {
                     Text(current.name, style = MaterialTheme.typography.titleLarge)
                     Text(tr("notice"))
+                    Text("${tr("usage")} ${current.usage.attempts} / ${current.usage.hourly_limit}")
+                    OutlinedButton(onClick = onOpenBotany) { Text(tr("encyclopedia")) }
+                    OutlinedButton(onClick = { mode = "assistant" }, enabled = !busy && mode != "assistant") { Text(tr("assistant")) }
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        OutlinedButton(onClick = { assessment = true }, enabled = !busy && !assessment, modifier = Modifier.weight(1f)) { Text(tr("assess")) }
-                        OutlinedButton(onClick = { assessment = false }, enabled = !busy && assessment, modifier = Modifier.weight(1f)) { Text(tr("follow")) }
+                        OutlinedButton(onClick = { mode = "assess" }, enabled = !busy && mode != "assess", modifier = Modifier.weight(1f)) { Text(tr("assess")) }
+                        OutlinedButton(onClick = { mode = "follow" }, enabled = !busy && mode != "follow", modifier = Modifier.weight(1f)) { Text(tr("follow")) }
                     }
-                    if (assessment) {
+                    if (mode == "assess") {
                         observations.forEach { key ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(key in checks, { checks = if (it) checks + key else checks - key })
                                 Text(tr(key))
                             }
                         }
-                        HealthChoice("moisture", moistureStates, moisture, ::tr) { moisture = it }
-                    } else {
+                        conditions.forEach { (key, options) ->
+                            HealthChoice(key, options, contextFields[key] ?: "unknown", ::tr) {
+                                contextFields = contextFields + (key to it)
+                            }
+                        }
+                        OutlinedTextField(symptoms, { symptoms = it.take(300) }, label = { Text(tr("symptoms")) }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(environment, { environment = it.take(300) }, label = { Text(tr("environment")) }, modifier = Modifier.fillMaxWidth())
+                    } else if (mode == "follow") {
                         HealthChoice("trend", trends, trend, ::tr) { trend = it }
                         HealthChoice("action", actions, action, ::tr) { action = it }
                         OutlinedTextField(note, { note = it.take(1000) }, label = { Text(tr("note")) }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(confirmed, { confirmed = it.take(300) }, label = { Text(tr("confirmed_input")) }, modifier = Modifier.fillMaxWidth())
+                    } else {
+                        OutlinedTextField(question, { question = it.take(400) }, label = { Text(tr("question")) }, modifier = Modifier.fillMaxWidth())
                     }
-                    OutlinedButton(onClick = { picker.launch("image/*") }, enabled = !busy) {
+                    if (mode != "assistant") OutlinedButton(onClick = { picker.launch("image/*") }, enabled = !busy) {
                         Text((if (upload != null) "✓ " else "") + tr("photo"))
                     }
-                    Button(enabled = !busy && (!assessment || upload != null), onClick = {
+                    val valid = when (mode) {
+                        "assess" -> upload != null
+                        "assistant" -> question.isNotBlank()
+                        else -> true
+                    }
+                    Button(enabled = !busy && valid, onClick = {
                         busy = true
                         error = null
+                        val submittedMode = mode
+                        val submittedPhoto = upload
+                        val submittedQuestion = question
+                        val submittedTrend = trend
+                        val submittedAction = action
+                        val submittedNote = note
+                        val submittedConfirmation = confirmed
+                        val fields = contextFields + observations.associateWith { (it in checks).toString() } +
+                            mapOf("symptoms" to symptoms, "environment" to environment)
                         scope.launch {
                             try {
-                                val photo = upload?.let { prepareUpload(context, it) }
-                                if (assessment && photo != null) {
-                                    api.assessHealth(id, photo,
-                                        ("leaf_change" in checks).toString().toRequestBody(),
-                                        ("spreading" in checks).toString().toRequestBody(),
-                                        ("insects_seen" in checks).toString().toRequestBody(),
-                                        moisture.toRequestBody())
-                                } else if (!assessment) {
-                                    api.followHealth(id, trend.toRequestBody(), action.toRequestBody(), note.toRequestBody(), photo)
+                                val photo = submittedPhoto?.let { prepareUpload(context, it) }
+                                when (submittedMode) {
+                                    "assess" -> api.assessHealth(id, requireNotNull(photo), fields.mapValues { it.value.toRequestBody() })
+                                    "assistant" -> api.askHealth(id, submittedQuestion)
+                                    else -> api.followHealth(id, submittedTrend.toRequestBody(), submittedAction.toRequestBody(),
+                                        submittedNote.toRequestBody(), submittedConfirmation.toRequestBody(), photo)
                                 }
                                 upload = null
                                 note = ""
+                                confirmed = ""
+                                question = ""
                                 revision++
                             } catch (e: CancellationException) {
                                 throw e
@@ -141,7 +186,39 @@ fun PlantHealthScreen(id: Int, onBack: () -> Unit) {
                                 busy = false
                             }
                         }
-                    }) { Text(tr(if (assessment) "assess" else "save")) }
+                    }) { Text(tr(when (mode) { "assess" -> "assess"; "assistant" -> "ask"; else -> "save" })) }
+                    if (current.comparison.assessments.size == 2 || current.comparison.photos.size == 2) {
+                        HealthSection(tr("compare")) {
+                            if (current.comparison.assessments.size == 2) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    current.comparison.assessments.forEachIndexed { index, event ->
+                                        Column(Modifier.weight(1f)) {
+                                            Text(tr(if (index == 0) "previous" else "current"))
+                                            Text(tr("status.${event.data["status"]}"))
+                                            Text(tr("concern.${event.data["concern"]}"))
+                                            (event.data["findings"] as? List<*>)?.forEach { Text(tr("finding.$it")) }
+                                        }
+                                    }
+                                }
+                            }
+                            if (current.comparison.photos.size == 2) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    current.comparison.photos.forEachIndexed { index, event ->
+                                        Column(Modifier.weight(1f)) {
+                                            Text(tr(if (index == 0) "previous" else "current"))
+                                            val url = PlantIAClient.baseUrl(context) + "api/plantas/$id/saude/fotos/${event.id}"
+                                            AsyncImage(PlantIAClient.imageRequest(context, url), tr("photo"), Modifier.fillMaxWidth().heightIn(max = 160.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    HealthSection(tr("sources")) {
+                        current.sources.forEach { source ->
+                            OutlinedButton(onClick = { uriHandler.openUri(source.url) }) { Text(source.name) }
+                        }
+                    }
                     Text(tr("history"), style = MaterialTheme.typography.titleLarge)
                     if (current.events.isEmpty()) Text(tr("empty"))
                 }
@@ -150,16 +227,26 @@ fun PlantHealthScreen(id: Int, onBack: () -> Unit) {
                         if (event.kind == "triage") {
                             Text(tr("status.${event.data["status"]}"), style = MaterialTheme.typography.titleMedium)
                             Text(tr("concern.${event.data["concern"]}"))
-                            for ((key, prefix) in listOf("signs" to "sign", "findings" to "finding")) {
-                                (event.data[key] as? List<*>)?.filterIsInstance<String>()?.forEach { Text(tr("$prefix.$it")) }
+                            for ((key, prefix, label) in listOf(Triple("signs", "sign", "signs"), Triple("findings", "finding", "causes"))) {
+                                val values = event.data[key] as? List<*>
+                                if (!values.isNullOrEmpty()) HealthSection(tr(label)) { values.forEach { Text(tr("$prefix.$it")) } }
                             }
+                            HealthSection(tr("recovery"), initiallyOpen = true) {
+                                event.actions.forEach { Text(tr("action.$it")) }
+                                event.review_at?.let { Text(tr("review") + " " + date.format(Instant.ofEpochSecond(it))) }
+                            }
+                        } else if (event.kind == "assistant") {
+                            Text(tr("assistant"), style = MaterialTheme.typography.titleMedium)
+                            Text(event.data["question"] as? String ?: "")
+                            Text(tr("assistant.${event.data["status"]}"))
                             event.actions.forEach { Text(tr("action.$it")) }
                         } else {
                             Text(tr("trend.${event.data["trend"]}"), style = MaterialTheme.typography.titleMedium)
                             Text(tr("action.${event.data["action"]}"))
+                            (event.data["confirmed_by_specialist"] as? String)?.takeIf(String::isNotBlank)?.let { Text(tr("confirmed_label") + " · " + it) }
                             (event.data["note"] as? String)?.takeIf(String::isNotBlank)?.let { Text(it) }
                         }
-                        Text(event.date, style = MaterialTheme.typography.bodySmall)
+                        Text(date.format(Instant.parse(event.date)), style = MaterialTheme.typography.bodySmall)
                         if (event.has_photo) {
                             val url = PlantIAClient.baseUrl(context) + "api/plantas/$id/saude/fotos/${event.id}"
                             AsyncImage(PlantIAClient.imageRequest(context, url), tr("photo"), Modifier.fillMaxWidth().heightIn(max = 250.dp))
@@ -187,6 +274,17 @@ fun PlantHealthScreen(id: Int, onBack: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun HealthSection(title: String, initiallyOpen: Boolean = false, content: @Composable () -> Unit) {
+    var expanded by remember { mutableStateOf(initiallyOpen) }
+    Column {
+        OutlinedButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
+            Text(title + if (expanded) " −" else " +")
+        }
+        if (expanded) content()
     }
 }
 

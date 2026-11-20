@@ -134,7 +134,7 @@ fun PlantIAApp(
             }
             composable(Screen.Health.route, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
                 val id = entry.arguments?.getInt("id") ?: return@composable
-                PlantHealthScreen(id) { navController.popBackStack() }
+                PlantHealthScreen(id, onOpenBotany = { navController.navigate(Screen.BotanicalProfile.route(id)) }) { navController.popBackStack() }
             }
             composable(Screen.Encyclopedia.route) {
                 EncyclopediaScreen { id -> navController.navigate(Screen.BotanicalProfile.route(id)) }

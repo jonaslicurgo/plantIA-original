@@ -20,6 +20,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.PartMap
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -55,10 +56,7 @@ interface PlantIAApi {
     suspend fun assessHealth(
         @Path("id") id: Int,
         @Part photo: MultipartBody.Part,
-        @Part("leaf_change") leafChange: RequestBody,
-        @Part("spreading") spreading: RequestBody,
-        @Part("insects_seen") insects: RequestBody,
-        @Part("moisture") moisture: RequestBody,
+        @PartMap fields: Map<String, @JvmSuppressWildcards RequestBody>,
     ): PlantHealthEvent
 
     @Multipart
@@ -68,8 +66,13 @@ interface PlantIAApi {
         @Part("trend") trend: RequestBody,
         @Part("action") action: RequestBody,
         @Part("note") note: RequestBody,
+        @Part("confirmed_by_specialist") confirmed: RequestBody,
         @Part photo: MultipartBody.Part?,
     ): PlantHealthEvent
+
+    @FormUrlEncoded
+    @POST("api/plantas/{id}/saude/assistente")
+    suspend fun askHealth(@Path("id") id: Int, @Field("question") question: String): PlantHealthEvent
 
     @Multipart
     @POST("api/plantas/identificar")

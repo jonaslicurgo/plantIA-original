@@ -16,3 +16,20 @@ class HealthEvent(Base):
     kind: Mapped[str]
     payload: Mapped[str] = mapped_column(Text)
     photo: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
+
+
+class HealthAIUsage(Base):
+    __tablename__ = "health_ai_usage"
+    __table_args__ = (
+        Index("ix_health_ai_owner_time", "owner_id", "created_at"),
+        Index("ix_health_ai_cache", "owner_id", "plant_id", "fingerprint", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    owner_id: Mapped[int]
+    plant_id: Mapped[int]
+    event_id: Mapped[int | None] = mapped_column(ForeignKey("plant_health_events.id", ondelete="SET NULL"))
+    created_at: Mapped[int]
+    operation: Mapped[str]
+    fingerprint: Mapped[str]
+    state: Mapped[str]

@@ -31,7 +31,7 @@ from plantia.database import get_engine
 from plantia.config import UPLOADS_DIR
 from plantia.i18n import LANGUAGES, catalog
 from plantia.schemas.planta import IdentificacionGemini
-from plantia.services.health import Triage
+from plantia.services.health import Action, AssistantReply, Finding, Sign, Triage
 from plantia.services.botany import GROUPS, SPECIES, _fetch_taxon
 from plantia.services.gemini_service import GeminiService
 
@@ -323,7 +323,94 @@ class Regression(unittest.TestCase):
             self.assertEqual(response.status_code, 201, response.text)
             self.assertEqual(response.json()["data"]["findings"], [])
             self.assertEqual(response.json()["data"]["concern"], "unknown")
-            self.assertEqual(response.json()["actions"], ["observe"])
+            self.assertEqual(response.json()["actions"], ["observe", "retake"])
+
+    def test_health_comparison_context_and_assistant_usage(self):
+        a = self.account(self.a, "p3-owner@example.com")
+        b = self.account(self.b, "p3-other@example.com")
+        plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+        path = f"/api/plantas/{plant}/saude"
+        upload = {"photo": photo()["file"]}
+        first = Triage(status="possible", concern="high", signs=["dry_leaves"], findings=["temperature_stress"])
+        second = Triage(status="possible", concern="moderate", signs=["spots"], findings=["soil_stress", "caterpillars"])
+        with patch("plantia.services.health.analyze", side_effect=[first, second]) as provider:
+            context = {"temperature":"variable", "watering":"daily", "location":"outside", "environment":"wind"}
+            old = self.a.post(path + "/avaliar", data=context, files=upload, headers=a)
+            self.assertEqual(old.status_code, 201, old.text)
+            duplicate = self.a.post(path + "/avaliar", data=context, files=upload, headers=a)
+            self.assertEqual(duplicate.json()["id"], old.json()["id"])
+            new = self.a.post(path + "/avaliar", data={**context, "soil":"compacted"}, files=upload, headers=a)
+            self.assertEqual(new.status_code, 201, new.text)
+            self.assertEqual(provider.call_count, 2)
+            self.assertEqual(provider.call_args.args[-1].soil, "compacted")
+        self.assertIn("stable_temperature", old.json()["actions"])
+        self.assertIn("physical_removal", new.json()["actions"])
+        self.assertEqual(new.json()["review_at"] - new.json()["created_at"], 2 * 86400)
+        follow = self.a.post(path + "/acompanhar", files=upload, data={
+            "trend":"improving", "action":"review_soil", "confirmed_by_specialist":"Recorded by local extension"
+        }, headers=a)
+        self.assertEqual(follow.status_code, 201, follow.text)
+        with patch("plantia.services.health.assist", return_value=AssistantReply(status="guidance", actions=["inspect"])) as ai:
+            question = {"question":"What should I check next?"}
+            self.assertEqual(self.b.post(path + "/assistente", data=question, headers=b).status_code, 404)
+            ai.assert_not_called()
+            answer = self.a.post(path + "/assistente", data=question, headers=a)
+            duplicate = self.a.post(path + "/assistente", data=question, headers=a)
+            self.assertEqual(answer.status_code, 201, answer.text)
+            self.assertEqual(duplicate.json()["id"], answer.json()["id"])
+            self.assertEqual(ai.call_count, 1)
+            self.assertEqual(ai.call_args.args[1]["findings"], ["soil_stress", "caterpillars"])
+            self.assertNotIn("context", ai.call_args.args[1])
+        history = self.a.get(path, headers=a).json()
+        self.assertEqual(history["usage"]["attempts"], 3)
+        self.assertEqual(history["usage"]["assessments"], 2)
+        self.assertEqual(history["usage"]["assistant"], 1)
+        self.assertEqual([item["id"] for item in history["comparison"]["assessments"]], [old.json()["id"], new.json()["id"]])
+        self.assertEqual([item["id"] for item in history["comparison"]["photos"]], [new.json()["id"], follow.json()["id"]])
+        self.assertEqual(self.b.get(path, headers=b).status_code, 404)
+        self.assertEqual(self.a.delete(f"/api/plantas/{plant}", headers=a).status_code, 204)
+        from plantia.services.health_usage import totals
+        account_id = accounts.account_for(a["Authorization"].split()[1])
+        self.assertEqual(totals(account_id)["attempts"], 3)
+
+    def test_health_localization_catalogs_and_assistant_schema(self):
+        required = {"health.assistant.out_of_scope", "health.status.no_visible_problem", "health.compare", "health.review",
+                    "health.confirmed_label", "health.sources"}
+        required |= {"health.finding." + item.value for item in Finding}
+        required |= {"health.sign." + item.value for item in Sign}
+        required |= {"health.action." + item.value for item in Action}
+        for code in LANGUAGES:
+            self.assertTrue(required <= catalog(code).keys(), code)
+        from plantia.services.health import assist
+        with patch.object(GeminiService, "_get_client") as client:
+            response = client.return_value.models.generate_content.return_value
+            response.text = '{"status":"out_of_scope","actions":["drain"]}'
+            self.assertEqual(assist("out of scope", None).actions, [])
+
+    def test_health_ai_single_reservation_and_image_optimization(self):
+        from plantia.services import health_usage
+
+        a = self.account(self.a, "p3-reserve@example.com")
+        owner = accounts.account_for(a["Authorization"].split()[1])
+        plant_id = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+        key = health_usage.fingerprint("assess", "gemini-3.1-flash-lite", {"watering":"weekly"}, b"photo")
+        usage_id, cached = health_usage.reserve(owner, plant_id, "assess", key)
+        self.assertIsNone(cached)
+        with self.assertRaises(health_usage.Busy):
+            health_usage.reserve(owner, plant_id, "assess", key)
+        health_usage.finish(usage_id, "rejected")
+        self.assertEqual(health_usage.totals(owner)["attempts"], 0)
+        buffer = BytesIO()
+        Image.new("RGB", (1920, 960), "green").save(buffer, "PNG")
+        path = f"/api/plantas/{plant_id}/saude/avaliar"
+        good = Triage(status="no_visible_problem", concern="low", signs=[], findings=[])
+        with patch("plantia.services.health.analyze", return_value=good) as provider:
+            result = self.a.post(path, files={"photo":("large.png", buffer.getvalue(), "image/png")}, headers=a)
+        self.assertEqual(result.status_code, 201, result.text)
+        encoded, mime, _ = provider.call_args.args
+        self.assertEqual(mime, "image/jpeg")
+        self.assertEqual(Image.open(BytesIO(encoded)).size, (1440, 720))
+        self.assertIn("prevention", result.json()["actions"])
 
     def test_gemini_request_uses_selected_model_and_language(self):
         self.mock.stop()

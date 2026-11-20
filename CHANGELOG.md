@@ -1,13 +1,16 @@
 # Changelog
 
-## Etapa 3 · Saúde vegetal
+## Etapa 3 · Diagnóstico, recuperação e acompanhamento
 
-- Triagem fotográfica de doenças, pragas e fatores ambientais com contexto informado pelo usuário, hipóteses estruturadas, indicação visual de gravidade e saída inconclusiva.
-- A resposta do Gemini passa por validação estrita de categorias. Os cuidados sugeridos vêm de um catálogo fixo de ações conservadoras, sem prescrição de defensivos, misturas ou dosagens.
-- Histórico privado por exemplar, ações registradas, evolução, notas, fotos opcionais e paginação. A exclusão da planta remove o histórico e as fotos da etapa. Limites de 2 MB por foto, 32 MB de imagens por conta e cota de análises.
-- Fluxos web e Android e alertas em 12 idiomas, incluindo árabe RTL. O Android usa o seletor de imagens do sistema. O catálogo de termos está disponível na API autenticada de saúde.
-- Testes de regressão com Gemini simulado. A implantação e o Gemini real ficam sujeitos à validação em homologação.
-
+- Web e Android oferecem triagem fotográfica com sinais visíveis, hipóteses de doenças fúngicas, bacterianas e virais, pragas e fatores ambientais. O formulário recebe sintomas, rega, luz, local, solo, umidade, temperatura e contexto. Folhas secas, lagartas, problemas de substrato e temperatura têm códigos próprios.
+- Avaliações preliminares indicam gravidade visual, ausência de sinais evidentes ou resultado inconclusivo com pedido de novas imagens. Uma confirmação recebida de especialista pode ser registrada pelo usuário em evento separado e é identificada como declaração externa.
+- Plano de recuperação com ações conservadoras selecionadas por sinais, hipótese, contexto e gravidade. Inclui inspeção, manejo físico/cultural de baixo risco, prevenção e data sugerida de reavaliação. Orientações e referências são controladas no servidor. O provedor não gera dosagens, produtos, receitas, misturas ou instruções de aplicação.
+- Linha do tempo privada por exemplar para várias avaliações, fotos, medidas tomadas, notas e evolução. Comparação das duas últimas avaliações e das duas últimas fotos. A ficha de saúde abre a enciclopédia do mesmo exemplar. O vínculo por ID e os eventos datados permitem integração futura com o jardim.
+- Assistente contextual de cuidados vegetais, com perguntas e respostas privadas por exemplar. O Gemini seleciona ações de um catálogo controlado. Perguntas fora do escopo ou com dados insuficientes retornam estados específicos. A foto de avaliação e os dados privados de outra conta não entram nas conversas.
+- Cache privado de 24 h por conta, exemplar, operação, contexto e modelo. Solicitações idênticas em andamento são bloqueadas antes de chamar o provedor. Fotos são validadas, normalizadas em JPEG de até 1.440 px e armazenadas com acesso restrito. Mantida a configuração do Gemini no servidor, incluindo `gemini-3.1-flash-lite`.
+- Registro de uso de IA por conta e operação, cota horária e fronteira de política para integração futura com assinaturas e créditos. A exclusão do exemplar remove fotos e eventos, enquanto o contador de uso permanece, sem cópia das fotos, notas ou perguntas. Compras e faturamento seguem fora deste módulo.
+- Interface, alertas, hipóteses e orientações controladas nos 12 idiomas, incluindo árabe com RTL. As datas de reavaliação são exibidas dentro do aplicativo. A etapa não adiciona notificações push.
+- Testes de regressão com Gemini simulado e validação em ambiente isolado. O Android usa o seletor de fotos do sistema. Consulte `RESULTADOS-TESTES.txt` no pacote desta etapa.
 
 ## Etapa 2 · Enciclopédia botânica
 

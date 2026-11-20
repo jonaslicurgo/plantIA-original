@@ -159,7 +159,9 @@ class GeminiService:
         return genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=12000))
 
     @staticmethod
-    def preparar_imagen(image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
+    def preparar_imagen(image_bytes: bytes, mime_type: str, *,
+                       max_dimension: int = MAX_IMAGE_DIMENSION,
+                       jpeg_only: bool = False, quality: int = 90) -> tuple[bytes, str]:
         """Valida, redimensiona y normaliza la imagen para la API."""
         if len(image_bytes) > MAX_IMAGE_SIZE_BYTES:
             raise ValueError(
@@ -184,22 +186,22 @@ class GeminiService:
         img.info.clear()
 
         max_dim = max(img.size)
-        if max_dim > MAX_IMAGE_DIMENSION:
-            ratio = MAX_IMAGE_DIMENSION / max_dim
+        if max_dim > max_dimension:
+            ratio = max_dimension / max_dim
             new_size = (max(1, int(img.width * ratio)), max(1, int(img.height * ratio)))
             img = img.resize(new_size, Image.Resampling.LANCZOS)
 
         output = BytesIO()
         fmt = "JPEG"
         out_mime = "image/jpeg"
-        if mime_type == "image/png":
+        if not jpeg_only and mime_type == "image/png":
             fmt = "PNG"
             out_mime = "image/png"
-        elif mime_type == "image/webp":
+        elif not jpeg_only and mime_type == "image/webp":
             fmt = "WEBP"
             out_mime = "image/webp"
 
-        img.save(output, format=fmt, quality=90)
+        img.save(output, format=fmt, quality=quality)
         return output.getvalue(), out_mime
 
     @staticmethod

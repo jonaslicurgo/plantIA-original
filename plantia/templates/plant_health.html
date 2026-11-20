@@ -19,6 +19,21 @@
                 {% endfor %}
                 </select>
             </label>
+            {% for field, options in [
+                ("watering", ["unknown","daily","weekly","as_needed","less_often"]),
+                ("lighting", ["unknown","direct","indirect","low"]),
+                ("location", ["unknown","inside","outside","greenhouse"]),
+                ("soil", ["unknown","well_drained","compacted","standing_water"]),
+                ("temperature", ["unknown","cold","stable","hot","variable"])
+            ] %}
+            <label>{{ tr("health." ~ field) }}
+                <select name="{{ field }}">
+                {% for option in options %}<option value="{{ option }}">{{ tr("health." ~ field ~ "." ~ option) }}</option>{% endfor %}
+                </select>
+            </label>
+            {% endfor %}
+            <label>{{ tr("health.symptoms") }} <textarea name="symptoms" maxlength="300" rows="2"></textarea></label>
+            <label>{{ tr("health.environment") }} <textarea name="environment" maxlength="300" rows="2"></textarea></label>
             <button class="btn btn-primary">{{ tr("health.assess") }}</button>
         </form>
     </details>
@@ -34,17 +49,55 @@
             </label>
             <label>{{ tr("health.action") }}
                 <select name="action">
-                {% for option in ["observe", "separate", "inspect", "check_moisture", "specialist"] %}
+                {% for option in action_choices %}
                     <option value="{{ option }}">{{ tr("health.action." ~ option) }}</option>
                 {% endfor %}
                 </select>
             </label>
+            <label>{{ tr("health.confirmed_input") }} <input name="confirmed_by_specialist" maxlength="300"></label>
             <label>{{ tr("health.note") }} <textarea name="note" maxlength="1000" rows="3"></textarea></label>
             <label>{{ tr("health.photo") }} <input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
             <button class="btn btn-primary">{{ tr("health.save") }}</button>
         </form>
     </details>
+    <details class="botany-group">
+        <summary>{{ tr("health.assistant") }}</summary>
+        <form method="post" action="/plantas/{{ plant_id }}/saude/assistente">
+            <label>{{ tr("health.question") }} <textarea required name="question" maxlength="400" rows="3"></textarea></label>
+            <button class="btn btn-primary">{{ tr("health.ask") }}</button>
+        </form>
+    </details>
 </div>
+<p>{{ tr("health.usage") }} {{ usage.attempts }} / {{ usage.hourly_limit }}</p>
+<p><a href="/enciclopedia/{{ plant_id }}">{{ tr("health.encyclopedia") }}</a></p>
+{% if comparison.assessments | length == 2 or comparison.photos | length == 2 %}
+<details class="botany-group">
+    <summary>{{ tr("health.compare") }}</summary>
+    {% if comparison.assessments | length == 2 %}
+    <div class="health-comparison">
+        {% for assessment in comparison.assessments %}
+        <div>
+            <strong>{{ tr("health.previous" if loop.first else "health.current") }}</strong>
+            <p>{{ tr("health.concern." ~ assessment.data.concern) }}</p>
+            <p>{{ tr("health.status." ~ assessment.data.status) }}</p>
+            {% for finding in assessment.data.findings %}<p>{{ tr("health.finding." ~ finding) }}</p>{% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if comparison.photos | length == 2 %}
+    <div class="health-comparison">
+        {% for image in comparison.photos %}
+        <figure>
+            <img loading="lazy" src="/api/plantas/{{ plant_id }}/saude/fotos/{{ image.id }}" alt="{{ tr('health.photo') }}">
+            <figcaption>{{ tr("health.previous" if loop.first else "health.current") }} ·
+                <time datetime="{{ image.date }}" data-health-time="{{ image.created_at }}">{{ image.date }}</time></figcaption>
+        </figure>
+        {% endfor %}
+    </div>
+    {% endif %}
+</details>
+{% endif %}
 <h2>{{ tr("health.history") }}</h2>
 {% for event in events %}
 <section class="botany-group health-event" id="event-{{ event.id }}">
@@ -52,16 +105,25 @@
     <h3>{{ tr("health.status." ~ event.data.status) }}</h3>
     <p>{{ tr("health.concern." ~ event.data.concern) }}</p>
     {% if event.data.findings %}
-    <ul>{% for finding in event.data.findings %}<li>{{ tr("health.finding." ~ finding) }}</li>{% endfor %}</ul>
+    <details><summary>{{ tr("health.causes") }}</summary><ul>{% for finding in event.data.findings %}<li>{{ tr("health.finding." ~ finding) }}</li>{% endfor %}</ul></details>
     {% endif %}
     {% if event.data.signs %}
-    <ul>{% for sign in event.data.signs %}<li>{{ tr("health.sign." ~ sign) }}</li>{% endfor %}</ul>
+    <details><summary>{{ tr("health.signs") }}</summary><ul>{% for sign in event.data.signs %}<li>{{ tr("health.sign." ~ sign) }}</li>{% endfor %}</ul></details>
     {% endif %}
+    <details open><summary>{{ tr("health.recovery") }}</summary>
+    <ul>{% for action in event.actions %}<li>{{ tr("health.action." ~ action) }}</li>{% endfor %}</ul>
+    {% if event.review_at %}<p>{{ tr("health.review") }} <time data-health-time="{{ event.review_at }}"></time></p>{% endif %}
+    </details>
+    {% elif event.kind == "assistant" %}
+    <h3>{{ tr("health.assistant") }}</h3>
+    <p>{{ event.data.question }}</p>
+    <p>{{ tr("health.assistant." ~ event.data.status) }}</p>
     <ul>{% for action in event.actions %}<li>{{ tr("health.action." ~ action) }}</li>{% endfor %}</ul>
     {% else %}
     <h3>{{ tr("health.trend." ~ event.data.trend) }}</h3>
     <p>{{ tr("health.action." ~ event.data.action) }}</p>
     {% if event.data.note %}<p>{{ event.data.note }}</p>{% endif %}
+    {% if event.data.confirmed_by_specialist %}<p><strong>{{ tr("health.confirmed_label") }}</strong> {{ event.data.confirmed_by_specialist }}</p>{% endif %}
     {% endif %}
     <time datetime="{{ event.date }}" data-health-time="{{ event.created_at }}">{{ event.date }}</time>
     {% if event.has_photo %}
@@ -71,6 +133,10 @@
 {% else %}
 <p>{{ tr("health.empty") }}</p>
 {% endfor %}
+<details class="botany-group">
+    <summary>{{ tr("health.sources") }}</summary>
+    <ul class="health-sources">{% for source in sources %}<li><a href="{{ source.url }}" rel="noopener noreferrer">{{ source.name }}</a></li>{% endfor %}</ul>
+</details>
 {% if next_before %}<a href="?before={{ next_before }}">{{ tr("health.older") }}</a>{% endif %}
 {% endblock %}
 {% block scripts %}
