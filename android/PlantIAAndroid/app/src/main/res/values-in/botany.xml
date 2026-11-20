@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">Semua kategori</string>
+    <string name="botany_apply" formatted="false">Cari</string>
+    <string name="botany_category" formatted="false">Kategori</string>
+    <string name="botany_empty" formatted="false">Tidak ada profil yang cocok dengan filter ini.</string>
+    <string name="botany_error" formatted="false">Tidak dapat memuat informasi botani.</string>
+    <string name="botany_favorite" formatted="false">Tambahkan ke favorit</string>
+    <string name="botany_favorites" formatted="false">Favorit</string>
+    <string name="botany_loading" formatted="false">Memuat informasi botani…</string>
+    <string name="botany_next" formatted="false">Selanjutnya</string>
+    <string name="botany_notice_risk" formatted="false">Jangan memakan tumbuhan atau menggunakannya pada tubuh atau sebagai obat berdasarkan foto. Periksa alergi, kontraindikasi dan interaksi obat dengan profesional yang berkualifikasi.</string>
+    <string name="botany_open" formatted="false">Buka profil botani</string>
+    <string name="botany_previous" formatted="false">Sebelumnya</string>
+    <string name="botany_search" formatted="false">Nama umum atau ilmiah</string>
+    <string name="botany_title" formatted="false">Ensiklopedia botani</string>
+    <string name="botany_unfavorite" formatted="false">Hapus dari favorit</string>
+</resources>

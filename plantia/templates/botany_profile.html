@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("botany.title") }} · PLANET-IA{% endblock %}
+{% block content %}
+<a href="/enciclopedia">{{ tr("botany.title") }}</a>
+<header class="page-header">
+    <h1>{{ profile.groups[0]["items"][0].value or tr("botany.title") }}</h1>
+    {% set scientific = profile.groups[0]["items"][1] %}
+    {% if scientific.value %}<p><i>{{ scientific.value }}</i></p>{% endif %}
+</header>
+<div class="botany-actions">
+    <a class="btn btn-outline" href="/plantas/{{ profile.id }}">{{ tr("botany.record") }}</a>
+    <form action="/enciclopedia/{{ profile.id }}/favorito" method="post">
+        <input type="hidden" name="favorite" value="{{ 'false' if profile.favorite else 'true' }}">
+        <button class="btn btn-outline">{{ tr("botany.unfavorite" if profile.favorite else "botany.favorite") }}</button>
+    </form>
+</div>
+<aside class="botany-notices" aria-label="{{ tr('botany.group.risks') }}">
+    {% for notice in profile.notices %}<p>{{ notice }}</p>{% endfor %}
+</aside>
+{% for group in profile.groups %}
+<details class="botany-group"{% if loop.first %} open{% endif %}>
+    <summary>{{ group.title }}</summary>
+    <dl>
+        {% for item in group["items"] %}
+        <dt>{{ item.label }}</dt>
+        <dd>
+            <p>{{ item.value or item.evidence }}</p>
+            {% if item.value %}
+            <small>{{ item.evidence }}{% if item.source %} ·
+                <a href="{{ item.source.url }}" rel="noreferrer noopener" target="_blank">{{ item.source.label }}</a>
+            {% endif %}</small>
+            {% endif %}
+        </dd>
+        {% endfor %}
+    </dl>
+</details>
+{% endfor %}
+{% endblock %}

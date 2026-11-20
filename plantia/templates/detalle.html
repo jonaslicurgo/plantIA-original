@@ -3,6 +3,11 @@
 {% block title %}{{ planta.nombre_comun }} · PLANET-IA{% endblock %}
 
 {% block content %}
+<div class="botany-entry">
+    <a class="btn btn-outline" href="/enciclopedia/{{ planta.id }}">{{ tr("botany.open") }}</a>
+    <p>{{ tr("botany.notice.risk") }}</p>
+</div>
+
 <div class="detail-page">
     <div class="breadcrumb">
         <a href="/plantas">{{ tr("← Mis plantas") }}</a>
@@ -182,22 +187,6 @@
                 </section>
                 {% endif %}
 
-                {% if planta.toxicidad_perros or planta.toxicidad_gatos %}
-                <section class="detail-panel toxicity">
-                    <h2>{{ tr("Toxicidad para mascotas") }}</h2>
-                    <dl class="care-list">
-                        {% if planta.toxicidad_perros %}
-                        <dt>{{ tr("🐕 Perros") }}</dt>
-                        <dd>{{ planta.toxicidad_perros }}</dd>
-                        {% endif %}
-                        {% if planta.toxicidad_gatos %}
-                        <dt>{{ tr("🐈 Gatos") }}</dt>
-                        <dd>{{ planta.toxicidad_gatos }}</dd>
-                        {% endif %}
-                    </dl>
-                    <p class="hint">{{ tr("Información orientativa. Consulta a un veterinario ante cualquier ingesta sospechosa.") }}</p>
-                </section>
-                {% endif %}
 
                 <section class="detail-panel detail-panel--wide detail-panel--care">
                     <h2>{{ tr("Cuidados") }}</h2>

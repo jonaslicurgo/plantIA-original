@@ -21,6 +21,9 @@ class Planta(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+    identification_cache_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    identification_cache_until: Mapped[int | None] = mapped_column(nullable=True)
+    encyclopedia_favorite: Mapped[bool] = mapped_column(default=False, server_default="0")
     owner_id: Mapped[int | None] = mapped_column(nullable=True)
     image_path: Mapped[str] = mapped_column(String(512), nullable=False)
 

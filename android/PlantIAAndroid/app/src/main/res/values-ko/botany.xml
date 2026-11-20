@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">모든 카테고리</string>
+    <string name="botany_apply" formatted="false">검색</string>
+    <string name="botany_category" formatted="false">카테고리</string>
+    <string name="botany_empty" formatted="false">이 필터와 일치하는 프로필이 없습니다.</string>
+    <string name="botany_error" formatted="false">식물 정보를 로드할 수 없습니다.</string>
+    <string name="botany_favorite" formatted="false">즐겨찾기에 추가</string>
+    <string name="botany_favorites" formatted="false">즐겨찾기</string>
+    <string name="botany_loading" formatted="false">식물 정보 로드 중…</string>
+    <string name="botany_next" formatted="false">다음</string>
+    <string name="botany_notice_risk" formatted="false">식물을 먹거나 몸에 바르거나 사진을 바탕으로 약으로 사용하지 마세요. 자격을 갖춘 전문가와 알레르기, 금기 사항 및 약물 상호 작용을 확인하십시오.</string>
+    <string name="botany_open" formatted="false">식물 프로필 열기</string>
+    <string name="botany_previous" formatted="false">이전</string>
+    <string name="botany_search" formatted="false">일반명 또는 학명</string>
+    <string name="botany_title" formatted="false">식물백과사전</string>
+    <string name="botany_unfavorite" formatted="false">즐겨찾기에서 제거</string>
+</resources>

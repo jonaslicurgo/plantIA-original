@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">すべてのカテゴリ</string>
+    <string name="botany_apply" formatted="false">検索</string>
+    <string name="botany_category" formatted="false">カテゴリ</string>
+    <string name="botany_empty" formatted="false">これらのフィルターに一致するプロファイルはありません。</string>
+    <string name="botany_error" formatted="false">植物情報を読み込めませんでした。</string>
+    <string name="botany_favorite" formatted="false">お気に入りに追加</string>
+    <string name="botany_favorites" formatted="false">お気に入り</string>
+    <string name="botany_loading" formatted="false">植物情報を読み込み中…</string>
+    <string name="botany_next" formatted="false">次へ</string>
+    <string name="botany_notice_risk" formatted="false">植物を食べたり、写真をもとに体に塗ったり、薬として使用したりしないでください。資格のある専門家にアレルギー、禁忌、薬との相互作用がないか確認してください。</string>
+    <string name="botany_open" formatted="false">オープンな植物プロフィール</string>
+    <string name="botany_previous" formatted="false">前へ</string>
+    <string name="botany_search" formatted="false">一般名または学名</string>
+    <string name="botany_title" formatted="false">植物図鑑</string>
+    <string name="botany_unfavorite" formatted="false">お気に入りから削除</string>
+</resources>

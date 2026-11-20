@@ -4,9 +4,11 @@ Rutas FastAPI: páginas HTML y API REST.
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
 from pathlib import Path
+from threading import Lock
 
 from starlette.concurrency import run_in_threadpool
 
@@ -17,12 +19,14 @@ from fastapi.templating import Jinja2Templates
 
 from plantia import accounts
 from plantia.api.auth import router as auth_router
-from plantia.config import ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES, PAGE_SIZE, ensure_directories
+from plantia.api.encyclopedia import router as encyclopedia_router
+from plantia.config import ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES, PAGE_SIZE, UPLOADS_DIR, ensure_directories, get_gemini_model
 from plantia.i18n import LANGUAGES, catalog, locale_for, translations
 from plantia.security import enforce_security, secure_cookie
 from plantia.database import init_database
 from plantia.schemas.planta import PlantaListResponse, PlantaResponse, PlantaUpdate
-from plantia.services.gemini_service import GeminiService, GeminiUnavailable
+from plantia.utils.taxon import species_name
+from plantia.services.gemini_service import GeminiService, GeminiUnavailable, PROMPT
 from plantia.services.planta_service import PlantaService
 from plantia.utils.jinja_filters import detalle_json_fields
 
@@ -47,7 +51,7 @@ def _contexto_detalle(planta, *, mensaje: str | None, focus_cuaderno: bool, luna
 
 def _planta_to_response(planta) -> PlantaResponse:
     response = PlantaResponse.model_validate(planta)
-    return response.model_copy(update={"image_path": Path(planta.image_path).name})
+    return response.model_copy(update={"image_path": Path(planta.image_path).name, "toxicidad_perros": "", "toxicidad_gatos": ""})
 
 
 def _pagina_lista(pagina, q: str) -> PlantaListResponse:
@@ -71,15 +75,31 @@ async def _leer_imagen(file: UploadFile) -> tuple[bytes, str]:
     return content, file.content_type
 
 
+_IDENTIFICATION_LOCKS = tuple(Lock() for _ in range(32))
+
+
 def _identify(content, mime_type, owner, locale):
     prepared, actual_type = GeminiService.preparar_imagen(content, mime_type)
-    result = GeminiService.identificar(prepared, actual_type, LANGUAGES[locale][1], already_prepared=True)
-    path = PlantaService.guardar_imagen(prepared, PlantaService.extension_desde_mime(actual_type))
     try:
-        return PlantaService.crear_desde_identificacion(result, path, owner)
-    except Exception:
-        Path(path).unlink(missing_ok=True)
-        raise
+        model = get_gemini_model()
+    except ValueError as exc:
+        raise GeminiUnavailable("Invalid server model configuration") from exc
+    context = f"{owner}\0{locale}\0{model}\0{actual_type}\0{PROMPT}\0"
+    cache_key = hashlib.sha256(context.encode() + prepared).hexdigest()
+    with _IDENTIFICATION_LOCKS[int(cache_key[:8], 16) % len(_IDENTIFICATION_LOCKS)]:
+        cached = PlantaService.find_cached_identification(owner, cache_key)
+        if cached and (UPLOADS_DIR / Path(cached.image_path).name).is_file():
+            return cached
+        result = GeminiService.identificar(prepared, actual_type, LANGUAGES[locale][1], already_prepared=True)
+        if (result.estado_identificacion == "inconclusive" or result.confianza == "bajo"
+                or not result.nombre_comun.strip() or not species_name(result.nombre_cientifico)):
+            raise HTTPException(422, "botany.inconclusive")
+        path = PlantaService.guardar_imagen(prepared, PlantaService.extension_desde_mime(actual_type))
+        try:
+            return PlantaService.crear_desde_identificacion(result, path, owner, cache_key)
+        except Exception:
+            Path(path).unlink(missing_ok=True)
+            raise
 
 
 @router.get("/health")
@@ -91,8 +111,8 @@ def health():
 def set_language(request: Request, language: str = Form(...), page: str = Form("/")):
     if language not in LANGUAGES:
         raise HTTPException(400, "Invalid language")
-    allowed = {"/", "/plantas", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir"}
-    response = RedirectResponse(page if page in allowed or re.fullmatch(r"/plantas/[0-9]+", page) else "/", 303)
+    allowed = {"/", "/plantas", "/enciclopedia", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir"}
+    response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:plantas|enciclopedia)/[0-9]+", page) else "/", 303)
     response.set_cookie("planet_language", language, max_age=31536000, httponly=True,
                         secure=secure_cookie(), samesite="lax")
     return response
@@ -319,13 +339,17 @@ def create_app():
         status = exc.status_code if isinstance(exc, StarletteHTTPException) else 422
         key = exc.detail if isinstance(exc, StarletteHTTPException) and isinstance(exc.detail, str) else "Invalid request"
         if request.url.path.startswith(("/api/", "/uploads/")):
-            return JSONResponse({"detail": catalog(locale_for(request)).get(key, key)}, status)
+            body = {"detail": catalog(locale_for(request)).get(key, key)}
+            if key == "botany.inconclusive":
+                body["code"] = "identification_inconclusive"
+            return JSONResponse(body, status)
         return templates.TemplateResponse(request, "error.html", {"message_key": key}, status_code=status)
 
     app.add_exception_handler(StarletteHTTPException, error_handler)
     app.add_exception_handler(RequestValidationError, error_handler)
     app.middleware("http")(enforce_security)
     app.include_router(auth_router)
+    app.include_router(encyclopedia_router)
     app.include_router(router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 

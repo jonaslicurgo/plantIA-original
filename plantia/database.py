@@ -7,11 +7,12 @@ from __future__ import annotations
 from collections.abc import Generator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from plantia.config import DATABASE_PATH, ensure_directories
 from plantia.models import Base
+from plantia.utils.taxon import normalize
 
 _engine = None
 _SessionLocal = None
@@ -19,6 +20,9 @@ _SessionLocal = None
 
 _PLANTAS_COLUMN_MIGRATIONS: list[tuple[str, str]] = [
     ("owner_id", "INTEGER"),
+    ("encyclopedia_favorite", "INTEGER NOT NULL DEFAULT 0"),
+    ("identification_cache_key", "VARCHAR(64)"),
+    ("identification_cache_until", "INTEGER"),
     ("plagas_habituales", "TEXT NOT NULL DEFAULT ''"),
     ("toxicidad_perros", "TEXT NOT NULL DEFAULT ''"),
     ("toxicidad_gatos", "TEXT NOT NULL DEFAULT ''"),
@@ -54,6 +58,9 @@ def _migrate_plantas_columns(engine) -> None:
                 conn.execute(text(f"ALTER TABLE plantas ADD COLUMN {name} {definition}"))
 
         conn.execute(text("CREATE INDEX IF NOT EXISTS ix_plantas_owner ON plantas(owner_id)"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_plantas_identification ON plantas(owner_id,identification_cache_key)"))
+        conn.execute(text("""CREATE TABLE IF NOT EXISTS botany_cache (
+            taxon TEXT PRIMARY KEY, payload TEXT NOT NULL, expires INTEGER NOT NULL)"""))
 
 
 def get_engine():
@@ -66,6 +73,10 @@ def get_engine():
             echo=False,
             connect_args={"check_same_thread": False},
         )
+        @event.listens_for(_engine, "connect")
+        def configure_sqlite(connection, _record):
+            connection.create_function("planet_normalize", 1, normalize, deterministic=True)
+
         Base.metadata.create_all(_engine)
         _migrate_plantas_columns(_engine)
         _SessionLocal = sessionmaker(

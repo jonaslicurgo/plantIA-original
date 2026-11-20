@@ -1,5 +1,8 @@
 package com.plantia.api
 
+import com.plantia.api.models.BotanyFavorite
+import com.plantia.api.models.BotanyList
+import com.plantia.api.models.BotanyProfile
 import com.plantia.api.models.PlantaListResponse
 import com.plantia.api.models.PlantaResponse
 import com.plantia.api.models.PlantaUpdateRequest
@@ -26,6 +29,20 @@ interface PlantIAApi {
 
     @POST("api/auth/logout")
     suspend fun logout()
+
+    @GET("api/enciclopedia")
+    suspend fun encyclopedia(
+        @Query("q") query: String,
+        @Query("category") category: String,
+        @Query("favorite") favorite: Boolean,
+        @Query("page") page: Int,
+    ): BotanyList
+
+    @GET("api/enciclopedia/{id}")
+    suspend fun botanicalProfile(@Path("id") id: Int): BotanyProfile
+
+    @PATCH("api/enciclopedia/{id}/favorito")
+    suspend fun botanicalFavorite(@Path("id") id: Int, @Body favorite: BotanyFavorite): BotanyFavorite
 
     @Multipart
     @POST("api/plantas/identificar")

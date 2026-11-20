@@ -26,11 +26,12 @@ PROMPT = """Eres un botánico experto. Analiza la imagen de esta planta e identi
 Responde ÚNICAMENTE con un objeto JSON válido (sin markdown, sin texto adicional) con esta estructura exacta.
 
 Reglas:
-- Si no estás seguro de la especie exacta, rellena al menos género y familia en taxonomía, y deja especie vacía.
-- Si la confianza es "bajo", incluye 3-5 candidatos y 2-5 preguntas para mejorar la identificación.
-- Sé conservador con las recomendaciones si la confianza es baja.
+- Si la imagen no muestra una planta, es insuficiente, o hay especies similares que no puedes distinguir, usa estado_identificacion "inconclusive", confianza "bajo" y deja nombre_cientifico vacío. No adivines.
+- Usa estado_identificacion "identified" solo con un binomio de especie razonablemente apoyado por rasgos visibles.
+- No generes instrucciones de consumo, preparación, dosis, propiedades medicinales ni declaraciones de seguridad o toxicidad. Los campos de toxicidad se dejan vacíos.
 
 {
+  "estado_identificacion": "identified|inconclusive",
   "nombre_comun": "nombre común en el idioma solicitado",
   "nombre_cientifico": "nombre científico (género y especie)",
   "familia": "familia botánica",
@@ -86,13 +87,13 @@ Reglas:
     "maceta_y_sustrato": "recomendación de tipo de maceta (tamaño/material/drenaje) y sustrato"
   },
   "toxicidad": {
-    "perros": "toxicidad para perros (no tóxica, leve, moderada, alta) y síntomas si aplica",
-    "gatos": "toxicidad para gatos (no tóxica, leve, moderada, alta) y síntomas si aplica"
+    "perros": "",
+    "gatos": ""
   },
   "confianza": "alto|medio|bajo"
 }
 
-Si no puedes identificar la planta con certeza, indica tu mejor estimación y usa confianza "bajo".
+Si no puedes identificar la especie, responde con estado_identificacion "inconclusive".
 Conserva las claves JSON, los nombres taxonómicos y los valores alto/medio/bajo."""
 
 

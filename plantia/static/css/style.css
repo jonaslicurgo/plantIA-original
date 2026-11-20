@@ -1706,7 +1706,7 @@ nav {
     margin: 0;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .nav-toggle {
         display: flex;
     }
@@ -2118,7 +2118,7 @@ nav {
 .account-panel input { width: 100%; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [dir="rtl"] .toast-root { right: auto; left: 1rem; }
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     #main-nav { visibility: hidden; }
     #main-nav.is-open { visibility: visible; max-height: calc(100dvh - 60px); overflow-y: auto; }
 }
@@ -2129,3 +2129,42 @@ nav {
         #124637 url("../img/planet-hero.jpg") center 48% / cover;
 }
 [dir="rtl"] .planet-hero { background-position: right, center 48%; }
+
+.botany-actions, .botany-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .75rem;
+    margin-block: 1rem;
+}
+.main { width: 100%; min-width: 0; }
+.botany-filters label { display: grid; grid-template-columns: minmax(0, 1fr); gap: .3rem; min-width: 0; max-width: 100%; }
+.botany-filters label:first-child { flex: 1 1 13rem; }
+.botany-filters .botany-check { display: flex; align-items: center; min-height: 44px; }
+.botany-filters input[type="search"], .botany-filters select {
+    min-height: 44px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: .65rem;
+    border: 1px solid var(--border);
+    border-radius: .6rem;
+    background: var(--surface);
+    color: inherit;
+}
+.botany-group, .botany-notices, .botany-results li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: .8rem;
+    margin-block: .7rem;
+}
+.botany-notices, .botany-entry { padding: 1rem; }
+.botany-notices { border-inline-start: .3rem solid var(--green-700); }
+.botany-notices p + p, .botany-entry p { margin-block-start: .6rem; }
+.botany-group summary { font-weight: 700; padding: 1rem; cursor: pointer; }
+.botany-group dl { margin: 0; padding: 0 1rem 1rem; }
+.botany-group dt { font-weight: 650; margin-block-start: .6rem; }
+.botany-group dd { margin-inline-start: 0; overflow-wrap: anywhere; }
+.botany-group small { display: block; padding-block-end: .25rem; }
+.botany-results { padding: 0; list-style-type: none; overflow-wrap: anywhere; }
+.botany-results a { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem; padding: .85rem 1rem; }

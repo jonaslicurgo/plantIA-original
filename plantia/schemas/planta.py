@@ -55,7 +55,8 @@ class GuiaInicioSchema(BaseModel):
 
 
 class IdentificacionGemini(BaseModel):
-    nombre_comun: str
+    estado_identificacion: Literal["identified", "inconclusive"] = "identified"
+    nombre_comun: str = ""
     nombre_cientifico: str = ""
     familia: str = ""
     tipo: str = ""

@@ -47,6 +47,10 @@
 
 {% if planta %}
 <section class="result-card">
+    <div class="botany-entry">
+        <a class="btn btn-outline" href="/enciclopedia/{{ planta.id }}">{{ tr("botany.open") }}</a>
+        <p>{{ tr("botany.notice.risk") }}</p>
+    </div>
     <div class="result-header">
         <h2>{{ planta.nombre_comun }}</h2>
         <span class="badge badge-{{ planta.confianza }}">{{ tr("Confianza:") }} {{ tr(planta.confianza) }}</span>
@@ -118,16 +122,10 @@
     </div>
     {% endif %}
 
-    {% if planta.dificultad or planta.toxicidad_perros or planta.toxicidad_gatos %}
+    {% if planta.dificultad %}
     <div class="result-highlights">
         {% if planta.dificultad %}
         <span class="highlight-chip">{{ tr("Dificultad:") }} {{ planta.dificultad }}</span>
-        {% endif %}
-        {% if planta.toxicidad_perros %}
-        <span class="highlight-chip">🐕 {{ planta.toxicidad_perros[:60] }}{% if planta.toxicidad_perros|length > 60 %}…{% endif %}</span>
-        {% endif %}
-        {% if planta.toxicidad_gatos %}
-        <span class="highlight-chip">🐈 {{ planta.toxicidad_gatos[:60] }}{% if planta.toxicidad_gatos|length > 60 %}…{% endif %}</span>
         {% endif %}
     </div>
     {% endif %}

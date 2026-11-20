@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">所有类别</string>
+    <string name="botany_apply" formatted="false">搜索</string>
+    <string name="botany_category" formatted="false">类别</string>
+    <string name="botany_empty" formatted="false">没有配置文件与这些过滤器匹配。</string>
+    <string name="botany_error" formatted="false">无法加载植物信息。</string>
+    <string name="botany_favorite" formatted="false">添加到收藏夹</string>
+    <string name="botany_favorites" formatted="false">收藏夹</string>
+    <string name="botany_loading" formatted="false">正在加载植物信息...</string>
+    <string name="botany_next" formatted="false">下一步</string>
+    <string name="botany_notice_risk" formatted="false">请勿根据照片食用植物或将其用于身体或作为药物。与合格的专业人员检查过敏、禁忌症和药物相互作用。</string>
+    <string name="botany_open" formatted="false">开放的植物概况</string>
+    <string name="botany_previous" formatted="false">上一页</string>
+    <string name="botany_search" formatted="false">通用名或学名</string>
+    <string name="botany_title" formatted="false">植物百科全书</string>
+    <string name="botany_unfavorite" formatted="false">从收藏夹中删除</string>
+</resources>

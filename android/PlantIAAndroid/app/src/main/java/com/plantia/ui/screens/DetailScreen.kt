@@ -91,6 +91,7 @@ fun DetailScreen(
     plantaId: Int,
     onBack: () -> Unit,
     onReIdentify: () -> Unit = {},
+    onOpenBotany: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -290,6 +291,11 @@ fun DetailScreen(
                     if (error != null) {
                         ErrorBanner(message = error!!)
                     }
+
+                    OutlinedButton(onClick = onOpenBotany, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.botany_open))
+                    }
+                    Text(stringResource(R.string.botany_notice_risk), style = MaterialTheme.typography.bodySmall)
 
                     if (p.descripcion.isNotBlank()) {
                         SectionCard(title = stringResource(R.string.ui_descripcion)) { Text(p.descripcion) }

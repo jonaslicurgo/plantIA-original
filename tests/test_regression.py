@@ -8,6 +8,7 @@ import sqlite3
 import subprocess
 import sys
 import unittest
+from urllib.error import URLError
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -27,8 +28,10 @@ os.environ["PLANET_SMTP_FROM"] = "planet@example.com"
 from main import app
 from plantia import accounts
 from plantia.database import get_engine
+from plantia.config import UPLOADS_DIR
 from plantia.i18n import LANGUAGES, catalog
 from plantia.schemas.planta import IdentificacionGemini
+from plantia.services.botany import GROUPS, SPECIES, _fetch_taxon
 from plantia.services.gemini_service import GeminiService
 
 PASSWORD = "A-test-password-long"
@@ -48,7 +51,7 @@ class Regression(unittest.TestCase):
         self.b = TestClient(app, base_url="https://testserver")
         with get_engine().begin() as db:
             db.execute(text("DELETE FROM rate_windows"))
-        self.mock = patch.object(GeminiService, "identificar", return_value=IdentificacionGemini(nombre_comun="Test fern"))
+        self.mock = patch.object(GeminiService, "identificar", return_value=IdentificacionGemini(nombre_comun="Test fern", nombre_cientifico="Dryopteris filix-mas"))
         self.identify = self.mock.start()
         self.addCleanup(self.mock.stop)
 
@@ -151,9 +154,118 @@ class Regression(unittest.TestCase):
             for _ in range(2):
                 subprocess.run([sys.executable, "-B", "-c", "from main import app"], env=environment, check=True)
             with sqlite3.connect(dbfile) as db:
-                self.assertEqual(db.execute("SELECT id, nombre_comun, owner_id FROM plantas").fetchall(),
-                                 [(7, "Legacy", None)])
+                self.assertEqual(db.execute("SELECT id, nombre_comun, owner_id, encyclopedia_favorite FROM plantas").fetchall(),
+                                 [(7, "Legacy", None, 0)])
                 self.assertEqual(db.execute("SELECT count(*) FROM accounts").fetchone()[0], 0)
+
+    def test_encyclopedia_filters_profile_and_private_favorites(self):
+        a = self.account(self.a, "botany-owner@example.com")
+        b = self.account(self.b, "botany-other@example.com")
+        self.identify.return_value = IdentificacionGemini(
+            nombre_comun="Golden pothos", nombre_cientifico="Epipremnum aureum", confianza="alto"
+        )
+        item = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()
+        url = f"/api/enciclopedia/{item['id']}"
+        self.assertEqual(self.a.get(url).status_code, 401)
+        self.assertEqual(self.b.get(url, headers=b).status_code, 404)
+        self.assertEqual(self.b.patch(url + "/favorito", json={"favorite": True}, headers=b).status_code, 404)
+        self.assertEqual(self.b.get("/api/enciclopedia", headers=b).json()["total"], 0)
+
+        self.assertEqual(self.a.get("/api/enciclopedia", headers=a, params={"q": "epipremnum"}).json()["total"], 1)
+        self.assertEqual(self.a.get("/api/enciclopedia", headers=a, params={"q": "JIBÓIA", "category": "toxic"}).json()["total"], 1)
+        self.assertEqual(self.a.get("/api/enciclopedia", headers=a, params={"category": "medicinal"}).json()["total"], 0)
+        self.assertEqual(self.a.get("/api/enciclopedia", headers=a, params={"category": "invented"}).status_code, 400)
+        self.assertEqual(self.a.get("/api/enciclopedia", headers=a, params={"favorite": True}).json()["total"], 0)
+        self.assertEqual(self.a.patch(url + "/favorito", json={"favorite": True}, headers=a).json(), {"favorite": True})
+        self.assertEqual(self.a.get("/api/enciclopedia", headers=a, params={"favorite": True}).json()["total"], 1)
+        self.assertEqual(self.b.get("/api/enciclopedia", headers=b, params={"favorite": True}).json()["total"], 0)
+        self.assertEqual(self.a.patch(url + "/favorito", json={"favorite": "true"}, headers=a).status_code, 422)
+
+        with patch("plantia.services.botany._fetch_taxon", return_value={
+            "key": 2870422, "scientific_name": "Epipremnum aureum", "family": "Araceae"
+        }) as fetch:
+            doc = self.a.get(url, headers=a).json()
+            translated = self.a.get(url, headers={**a, "Accept-Language": "ar"}).json()
+            web = self.a.get(f"/enciclopedia/{item['id']}", headers={**a, "Accept-Language": "ar"})
+        self.assertEqual(fetch.call_count, 1)
+        self.assertEqual(self.identify.call_count, 1)
+        self.assertEqual(web.status_code, 200, web.text)
+        self.assertIn('dir="rtl"', web.text)
+        self.assertIn("<details", web.text)
+        self.assertEqual(len(doc["groups"]), len(GROUPS))
+        fields = {row["key"]: row for group in doc["groups"] for row in group["items"]}
+        self.assertEqual(len(fields), 31)
+        self.assertEqual(fields["family"]["source"]["label"], "GBIF")
+        self.assertEqual(fields["animal_toxicity"]["source"]["label"], "ASPCA Poison Control")
+        self.assertIsNone(fields["panc"]["value"])
+        self.assertIsNone(fields["panc"]["source"])
+        self.assertNotEqual(doc["groups"][0]["title"], translated["groups"][0]["title"])
+        self.assertEqual(self.a.patch(url + "/favorito", json={"favorite": False}, headers=a).status_code, 200)
+        self.assertFalse(self.a.get(url, headers=a).json()["favorite"])
+
+    def test_inconclusive_does_not_save_a_record_or_photo(self):
+        a = self.account(self.a, "uncertain@example.com")
+        photos_before = set(UPLOADS_DIR.iterdir())
+        for result in (
+            IdentificacionGemini(estado_identificacion="inconclusive"),
+            IdentificacionGemini(nombre_comun="Weak guess", nombre_cientifico="Aloe vera", confianza="bajo"),
+            IdentificacionGemini(nombre_comun="Uncertain genus", nombre_cientifico="Aloe"),
+        ):
+            self.identify.return_value = result
+            api = self.a.post("/api/plantas/identificar", files=photo(), headers={**a, "Accept-Language": "en"})
+            self.assertEqual(api.status_code, 422)
+            self.assertEqual(api.json()["code"], "identification_inconclusive")
+            web = self.a.post("/identificar", files=photo(), headers=a)
+            self.assertEqual(web.status_code, 422)
+            self.assertIn("Identificação inconclusiva", web.text)
+        self.assertEqual(self.a.get("/api/plantas", headers=a).json()["total"], 0)
+        self.assertEqual(set(UPLOADS_DIR.iterdir()), photos_before)
+
+    def test_identification_cache_is_scoped_to_owner_and_language(self):
+        a = self.account(self.a, "cache-owner@example.com")
+        b = self.account(self.b, "cache-other@example.com")
+        path = "/api/plantas/identificar"
+        first = self.a.post(path, files=photo(), headers=a).json()
+        again = self.a.post(path, files=photo(), headers=a).json()
+        self.assertEqual(first["id"], again["id"])
+        self.assertEqual(self.identify.call_count, 1)
+        french = self.a.post(path, files=photo(), headers={**a, "Accept-Language": "fr"}).json()
+        other = self.b.post(path, files=photo(), headers=b).json()
+        self.assertNotEqual(first["id"], french["id"])
+        self.assertNotEqual(first["id"], other["id"])
+        self.assertEqual(self.identify.call_count, 3)
+        self.a.delete(f"/api/plantas/{first['id']}", headers=a)
+        new = self.a.post(path, files=photo(), headers=a).json()
+        self.assertNotEqual(first["id"], new["id"])
+        self.assertEqual(self.identify.call_count, 4)
+
+    def test_botany_information_absence_and_catalogs(self):
+        headers = self.account(self.a, "botany-unknown@example.com")
+        created = self.a.post("/api/plantas/identificar", files=photo(), headers=headers).json()
+        with patch("plantia.services.botany._fetch_taxon", side_effect=URLError("offline")):
+            response = self.a.get(f"/api/enciclopedia/{created['id']}", headers=headers)
+        self.assertEqual(response.status_code, 200)
+        result = response.json()
+        self.assertFalse(result["matched_taxon"])
+        fields = {row["key"]: row for group in result["groups"] for row in group["items"]}
+        self.assertIsNone(fields["human_toxicity"]["value"])
+        self.assertTrue(all(row["source"] is None for row in fields.values()))
+        required = {f"botany.field.{field}" for fields in GROUPS.values() for field in fields}
+        required.update(fact.message for facts in SPECIES.values() for fact in facts.values())
+        for locale in LANGUAGES:
+            self.assertTrue(required <= catalog(locale).keys(), locale)
+
+    def test_gbif_accepts_only_exact_plantae_species(self):
+        sample = {"usageKey": 2927305, "canonicalName": "Lavandula angustifolia", "rank": "SPECIES",
+                  "status": "ACCEPTED", "matchType": "EXACT", "kingdom": "Plantae", "family": "Lamiaceae"}
+        from json import dumps
+        with patch("plantia.services.botany.urlopen") as urlopen:
+            response = urlopen.return_value.__enter__.return_value
+            response.read.return_value = dumps(sample).encode()
+            self.assertEqual(_fetch_taxon("lavandula angustifolia")["key"], 2927305)
+            for invalid in ({"matchType": "FUZZY"}, {"status": "SYNONYM"}, {"kingdom": "Fungi"}, {"canonicalName": "Lavandula latifolia"}):
+                response.read.return_value = dumps({**sample, **invalid}).encode()
+                self.assertEqual(_fetch_taxon("lavandula angustifolia"), {})
 
     def test_gemini_request_uses_selected_model_and_language(self):
         self.mock.stop()

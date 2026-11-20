@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">सभी श्रेणियां</string>
+    <string name="botany_apply" formatted="false">खोजें</string>
+    <string name="botany_category" formatted="false">श्रेणी</string>
+    <string name="botany_empty" formatted="false">कोई भी प्रोफ़ाइल इन फ़िल्टर से मेल नहीं खाती.</string>
+    <string name="botany_error" formatted="false">वनस्पति संबंधी जानकारी लोड नहीं की जा सकी.</string>
+    <string name="botany_favorite" formatted="false">पसंदीदा में जोड़ें</string>
+    <string name="botany_favorites" formatted="false">पसंदीदा</string>
+    <string name="botany_loading" formatted="false">वनस्पति संबंधी जानकारी लोड हो रही है...</string>
+    <string name="botany_next" formatted="false">अगला</string>
+    <string name="botany_notice_risk" formatted="false">किसी पौधे को न खाएं, न ही इसे शरीर पर या फोटो के आधार पर दवा के रूप में उपयोग करें। किसी योग्य पेशेवर से एलर्जी, मतभेद और दवा के अंतःक्रियाओं की जाँच करें।</string>
+    <string name="botany_open" formatted="false">वानस्पतिक प्रोफ़ाइल खोलें</string>
+    <string name="botany_previous" formatted="false">पिछला</string>
+    <string name="botany_search" formatted="false">सामान्य या वैज्ञानिक नाम</string>
+    <string name="botany_title" formatted="false">वानस्पतिक विश्वकोश</string>
+    <string name="botany_unfavorite" formatted="false">पसंदीदा से हटाएँ</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">Tutte le categorie</string>
+    <string name="botany_apply" formatted="false">Cerca</string>
+    <string name="botany_category" formatted="false">Categoria</string>
+    <string name="botany_empty" formatted="false">Nessun profilo corrisponde a questi filtri.</string>
+    <string name="botany_error" formatted="false">Impossibile caricare le informazioni botaniche.</string>
+    <string name="botany_favorite" formatted="false">Aggiungi ai preferiti</string>
+    <string name="botany_favorites" formatted="false">Preferiti</string>
+    <string name="botany_loading" formatted="false">Caricamento informazioni botaniche...</string>
+    <string name="botany_next" formatted="false">Avanti</string>
+    <string name="botany_notice_risk" formatted="false">Non mangiare una pianta né usarla sul corpo o come medicinale in base a una foto. Verificare la presenza di allergie, controindicazioni e interazioni medicinali con un professionista qualificato.</string>
+    <string name="botany_open" formatted="false">Apri il profilo botanico</string>
+    <string name="botany_previous" formatted="false">Precedente</string>
+    <string name="botany_search" formatted="false">Nome comune o scientifico</string>
+    <string name="botany_title" formatted="false">Enciclopedia botanica</string>
+    <string name="botany_unfavorite" formatted="false">Rimuovi dai preferiti</string>
+</resources>

@@ -1,5 +1,14 @@
 # Changelog
 
+## Etapa 2 · Enciclopédia botânica
+
+- Enciclopédia privada na web e no Android, com 31 campos em seis grupos expansíveis, busca por nomes populares ou científicos, filtros de evidência por categoria e favoritos.
+- O Gemini sugere a identidade da foto. A ficha consulta o GBIF para taxonomia de espécies aceitas com correspondência exata. A referência taxonômica descreve a espécie e não confirma o exemplar. Resultados duvidosos retornam HTTP 422 com o código `identification_inconclusive`, orientação para novas fotos e nenhum registro ou foto salvo.
+- Curadoria inicial para sete espécies com referências por campo. As fontes incluem [NC State Extension](https://plants.ces.ncsu.edu/), [NIH NCCIH](https://www.nccih.nih.gov/health), [ASPCA](https://www.aspca.org/pet-care/aspca-poison-control), [U.S. Fish & Wildlife Service](https://www.fws.gov/species/venus-fly-trap-dionaea-muscipula) e [Embrapa](https://www.infoteca.cnptia.embrapa.br/infoteca/handle/doc/1132694). Usos tradicionais, evidência limitada e lacunas são identificados. A ficha não recomenda ingestão, preparo, tratamento ou dosagem. Os campos legados de toxicidade da API foram mantidos no contrato, com valores vazios. A toxicidade passa a ser exibida na ficha com referências.
+- As consultas à enciclopédia não chamam o Gemini. As taxonomias públicas são armazenadas por até sete dias. Buscas válidas sem correspondência ficam em cache por seis horas. Falhas de conexão usam a curadoria e o estado de informação insuficiente. A mesma foto processada na mesma conta, idioma, modelo e versão do prompt reutiliza o registro por 24 horas, enquanto ele e a foto existirem. A exclusão remove também a possibilidade de reutilizá-lo. Fotos, notas, favoritos e identificadores de conta ficam fora do cache público.
+- Migração aditiva para favoritos e metadados de cache no SQLite. As rotas autenticadas `/api/enciclopedia` e `/api/enciclopedia/{id}` fornecem a ficha e a busca. `PATCH /api/enciclopedia/{id}/favorito` recebe um booleano JSON `favorite`.
+- Os 12 idiomas incluem a interface, os alertas, o estado inconclusivo e o conteúdo curado inicial. A cobertura factual depende das fontes e dos táxons curados. Fichas sem fonte específica marcam os campos correspondentes como insuficientes.
+
 ## Etapa 1 · PLANET-IA
 
 - Marca PLANET-IA, slogan, identidade web responsiva e telas de conta.

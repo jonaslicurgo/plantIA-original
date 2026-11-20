@@ -6,17 +6,20 @@ from __future__ import annotations
 
 import json
 import uuid
+from time import time
 from dataclasses import dataclass
 from pathlib import Path
 import logging
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 
 from plantia.config import PAGE_SIZE, UPLOADS_DIR, ensure_directories
 from plantia.database import session_scope
 from plantia.models import Planta
 from plantia.schemas.planta import IdentificacionGemini, PlantaCreate
 from plantia.services.candidate_image_service import get_thumbnail_url
+from plantia.services.botany import SPECIES
+from plantia.utils.taxon import normalize
 
 
 @dataclass
@@ -50,7 +53,7 @@ class PlantaService:
 
     @staticmethod
     def crear_desde_identificacion(
-        identificacion: IdentificacionGemini, image_path: str, owner_id: int
+        identificacion: IdentificacionGemini, image_path: str, owner_id: int, cache_key: str | None = None
     ) -> Planta:
         # Enriquecer candidatos con miniaturas (si es posible)
         candidatos = []
@@ -72,8 +75,8 @@ class PlantaService:
             fertilizacion=identificacion.cuidados.fertilizacion,
             problemas_comunes=identificacion.cuidados.problemas_comunes,
             plagas_habituales=identificacion.cuidados.plagas_habituales,
-            toxicidad_perros=identificacion.toxicidad.perros,
-            toxicidad_gatos=identificacion.toxicidad.gatos,
+            toxicidad_perros="",
+            toxicidad_gatos="",
             dificultad=identificacion.caracteristicas.dificultad,
             tamano_adulto=identificacion.caracteristicas.tamano_adulto,
             crecimiento=identificacion.caracteristicas.crecimiento,
@@ -99,13 +102,15 @@ class PlantaService:
             confianza=identificacion.confianza,
             image_path=image_path,
         )
-        return PlantaService.crear(datos, owner_id)
+        return PlantaService.crear(datos, owner_id, cache_key)
 
     @staticmethod
-    def crear(datos: PlantaCreate, owner_id: int) -> Planta:
+    def crear(datos: PlantaCreate, owner_id: int, cache_key: str | None = None) -> Planta:
         with session_scope() as session:
             planta = Planta(
                 owner_id=owner_id,
+                identification_cache_key=cache_key,
+                identification_cache_until=int(time()) + 86400 if cache_key else None,
                 image_path=datos.image_path,
                 nombre_comun=datos.nombre_comun.strip(),
                 nombre_cientifico=datos.nombre_cientifico.strip(),
@@ -147,6 +152,15 @@ class PlantaService:
             return planta
 
     @staticmethod
+    def find_cached_identification(owner_id: int, cache_key: str) -> Planta | None:
+        with session_scope() as session:
+            return session.scalar(select(Planta).where(
+                Planta.owner_id == owner_id,
+                Planta.identification_cache_key == cache_key,
+                Planta.identification_cache_until > int(time()),
+            ).order_by(Planta.id.desc()).limit(1))
+
+    @staticmethod
     def obtener_por_id(planta_id: int, owner_id: int) -> Planta | None:
         with session_scope() as session:
             return session.scalar(select(Planta).where(Planta.id == planta_id, Planta.owner_id == owner_id))
@@ -180,6 +194,10 @@ class PlantaService:
         page: int = 1,
         page_size: int = PAGE_SIZE,
         orden: str = "recientes",
+        category: str | None = None,
+        favorites: bool = False,
+        names_only: bool = False,
+        alternate_taxa: tuple[str, ...] = (),
     ) -> PaginaPlantas:
         page = max(1, page)
         texto = termino.strip()
@@ -190,22 +208,30 @@ class PlantaService:
             query = select(Planta).where(Planta.owner_id == owner_id)
             count_query = select(func.count()).select_from(Planta).where(Planta.owner_id == owner_id)
 
+            filters = []
             if texto:
-                patron = f"%{texto}%"
-                filtro = or_(
-                    Planta.nombre_comun.ilike(patron),
-                    Planta.nombre_cientifico.ilike(patron),
-                    Planta.familia.ilike(patron),
-                    Planta.tipo.ilike(patron),
-                )
-                query = query.where(filtro)
-                count_query = count_query.where(filtro)
+                fields = [Planta.nombre_comun, Planta.nombre_cientifico]
+                if not names_only:
+                    fields.extend((Planta.familia, Planta.tipo))
+                name_filters = [func.planet_normalize(field).contains(normalize(texto), autoescape=True)
+                                for field in fields]
+                if alternate_taxa:
+                    name_filters.append(func.planet_normalize(Planta.nombre_cientifico).in_(alternate_taxa))
+                filters.append(or_(*name_filters))
+            if category:
+                names = [name for name, facts in SPECIES.items() if category in facts]
+                filters.append(func.planet_normalize(Planta.nombre_cientifico).in_(names))
+                filters.append(Planta.confianza.in_(("alto", "medio")))
+            if favorites:
+                filters.append(Planta.encyclopedia_favorite.is_(True))
+            query = query.where(*filters)
+            count_query = count_query.where(*filters)
 
             total = session.scalar(count_query) or 0
             offset = (page - 1) * page_size
             items = list(
                 session.scalars(
-                    query.order_by(*PlantaService._clausula_orden(orden))
+                    query.order_by(*PlantaService._clausula_orden(orden), Planta.id.desc())
                     .offset(offset)
                     .limit(page_size)
                 )
@@ -213,6 +239,14 @@ class PlantaService:
             return PaginaPlantas(
                 items=items, total=total, page=page, page_size=page_size
             )
+
+    @staticmethod
+    def set_favorite(planta_id: int, owner_id: int, favorite: bool) -> bool:
+        with session_scope() as session:
+            result = session.execute(update(Planta).where(
+                Planta.id == planta_id, Planta.owner_id == owner_id
+            ).values(encyclopedia_favorite=favorite))
+            return result.rowcount == 1
 
     @staticmethod
     def actualizar_notas(planta_id: int, notas: str, owner_id: int) -> Planta | None:

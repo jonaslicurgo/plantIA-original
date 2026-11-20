@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="botany_all" formatted="false">جميع الفئات</string>
+    <string name="botany_apply" formatted="false">بحث</string>
+    <string name="botany_category" formatted="false">الفئة</string>
+    <string name="botany_empty" formatted="false">لا توجد ملفات شخصية تتطابق مع عوامل التصفية هذه.</string>
+    <string name="botany_error" formatted="false">لا يمكن تحميل المعلومات النباتية.</string>
+    <string name="botany_favorite" formatted="false">أضف إلى المفضلة</string>
+    <string name="botany_favorites" formatted="false">المفضلة</string>
+    <string name="botany_loading" formatted="false">جارٍ تحميل المعلومات النباتية...</string>
+    <string name="botany_next" formatted="false">التالي</string>
+    <string name="botany_notice_risk" formatted="false">لا تأكل نباتًا أو تستخدمه على الجسم أو كدواء بناءً على الصورة. تحقق من الحساسية وموانع الاستعمال والتفاعلات الدوائية مع أخصائي مؤهل.</string>
+    <string name="botany_open" formatted="false">فتح الملف النباتي</string>
+    <string name="botany_previous" formatted="false">السابق</string>
+    <string name="botany_search" formatted="false">الاسم الشائع أو العلمي</string>
+    <string name="botany_title" formatted="false">الموسوعة النباتية</string>
+    <string name="botany_unfavorite" formatted="false">إزالة من المفضلة</string>
+</resources>

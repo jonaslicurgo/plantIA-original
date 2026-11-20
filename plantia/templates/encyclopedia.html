@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("botany.title") }} · PLANET-IA{% endblock %}
+{% block content %}
+<header class="page-header">
+    <h1>{{ tr("botany.title") }}</h1>
+    <p>{{ tr("botany.intro") }}</p>
+</header>
+<form class="botany-filters" method="get" action="/enciclopedia">
+    <label>{{ tr("botany.search") }}<input type="search" name="q" maxlength="150" value="{{ q }}"></label>
+    <label>{{ tr("botany.category") }}
+        <select name="category">
+            <option value="">{{ tr("botany.all") }}</option>
+            {% for item in filters %}
+            <option value="{{ item }}"{% if item == category %} selected{% endif %}>{{ tr("botany.field." ~ item) }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label class="botany-check"><input type="checkbox" name="favorite" value="true"{% if favorite %} checked{% endif %}> {{ tr("botany.favorites") }}</label>
+    <button class="btn btn-primary">{{ tr("botany.apply") }}</button>
+</form>
+{% if results.items %}
+<ul class="botany-results">
+    {% for plant in results.items %}
+    <li>
+        <a href="/enciclopedia/{{ plant.id }}">
+            <strong>{{ plant.nombre_comun }}</strong>
+            {% if plant.nombre_cientifico %}<i>{{ plant.nombre_cientifico }}</i>{% endif %}
+            {% if plant.encyclopedia_favorite %}<span aria-label="{{ tr('botany.favorites') }}">★</span>{% endif %}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% if results.total_pages > 1 %}
+<nav class="pagination" aria-label="{{ tr('botany.title') }}">
+    {% set params = {'q': q, 'category': category, 'favorite': 'true' if favorite else 'false'} | urlencode %}
+    {% if results.page > 1 %}<a class="btn btn-outline" href="?{{ params }}&amp;page={{ results.page - 1 }}">{{ tr("botany.previous") }}</a>{% endif %}
+    <span>{{ results.page }} / {{ results.total_pages }}</span>
+    {% if results.page < results.total_pages %}<a class="btn btn-outline" href="?{{ params }}&amp;page={{ results.page + 1 }}">{{ tr("botany.next") }}</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<p class="empty-state">{{ tr("botany.empty") }}</p>
+{% endif %}
+{% endblock %}
