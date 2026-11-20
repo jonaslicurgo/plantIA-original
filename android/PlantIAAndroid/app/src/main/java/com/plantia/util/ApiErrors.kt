@@ -1,6 +1,7 @@
 package com.plantia.util
 
-import com.squareup.moshi.Json
+import android.content.Context
+import com.plantia.R
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -18,18 +19,18 @@ private val errorMoshi = Moshi.Builder()
 
 private val errorAdapter = errorMoshi.adapter(ApiErrorBody::class.java)
 
-fun Throwable.userMessage(default: String): String {
+fun Throwable.userMessage(context: Context, default: String): String {
     return when (this) {
         is HttpException -> {
             val raw = response()?.errorBody()?.string()
             if (!raw.isNullOrBlank()) {
                 runCatching { errorAdapter.fromJson(raw)?.detail }.getOrNull()
-                    ?: raw.take(200)
+                    ?: default
             } else {
-                "Error HTTP ${code()}"
+                default
             }
         }
-        is IOException -> "Sin conexión con el servidor. Comprueba la red Wi‑Fi."
-        else -> message?.takeIf { it.isNotBlank() } ?: default
+        is IOException -> context.getString(R.string.native_sin_conexion_con_el_servidor_comprueba_la_red_wi_fi)
+        else -> default
     }
 }

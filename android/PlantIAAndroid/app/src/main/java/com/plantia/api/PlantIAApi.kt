@@ -6,6 +6,8 @@ import com.plantia.api.models.PlantaUpdateRequest
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
@@ -15,7 +17,16 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+data class AccountSession(val access_token: String, val account_id: Int)
+
 interface PlantIAApi {
+    @FormUrlEncoded
+    @POST("api/auth/login")
+    suspend fun login(@Field("email") email: String, @Field("password") password: String): AccountSession
+
+    @POST("api/auth/logout")
+    suspend fun logout()
+
     @Multipart
     @POST("api/plantas/identificar")
     suspend fun identificar(

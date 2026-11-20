@@ -1,3 +1,5 @@
+const messages = JSON.parse(document.getElementById("ui-messages").textContent);
+
 /* ============================================================
    PlantIA — interacciones de la interfaz
    ============================================================ */
@@ -31,13 +33,11 @@ function initMobileNav() {
     const close = () => {
         nav.classList.remove("is-open");
         toggle.setAttribute("aria-expanded", "false");
-        toggle.setAttribute("aria-label", "Abrir menú");
     };
 
     toggle.addEventListener("click", () => {
         const open = nav.classList.toggle("is-open");
         toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
     });
 
     nav.querySelectorAll("a").forEach((link) => {
@@ -62,9 +62,10 @@ function showToast(message, type = "success", timeout = 4200) {
     toast.innerHTML = `
         <span class="toast-icon" aria-hidden="true">${icon}</span>
         <span class="toast-body"></span>
-        <button type="button" class="toast-close" aria-label="Cerrar">×</button>
+        <button type="button" class="toast-close" aria-label="">×</button>
     `;
     toast.querySelector(".toast-body").textContent = message;
+    toast.querySelector(".toast-close").ariaLabel = messages.Close;
     root.appendChild(toast);
 
     requestAnimationFrame(() => toast.classList.add("is-visible"));
@@ -100,11 +101,12 @@ function initLightbox() {
         overlay.className = "lightbox";
         overlay.setAttribute("role", "dialog");
         overlay.setAttribute("aria-modal", "true");
-        overlay.setAttribute("aria-label", "Imagen ampliada");
+        overlay.setAttribute("aria-label", messages["Enlarged image"]);
         overlay.innerHTML = `
-            <button type="button" class="lightbox-close" aria-label="Cerrar">×</button>
-            <img alt="Imagen ampliada">
+            <button type="button" class="lightbox-close" aria-label="">×</button>
+            <img alt="">
         `;
+        overlay.querySelector(".lightbox-close").ariaLabel = messages.Close;
         document.body.appendChild(overlay);
     }
 
@@ -113,7 +115,7 @@ function initLightbox() {
 
     const open = (src, alt) => {
         img.src = src;
-        img.alt = alt || "Imagen ampliada";
+        img.alt = alt || messages["Enlarged image"];
         lastFocus = document.activeElement;
         overlay.classList.add("is-open");
         overlay.querySelector(".lightbox-close").focus();
@@ -151,42 +153,6 @@ function initReveal() {
 }
 
 /* ---------- Splash ---------- */
-function initSplash() {
-    const splash = document.getElementById("splash");
-    const shouldShowSplash = document.documentElement.classList.contains("show-splash");
-    if (splash && shouldShowSplash) {
-        const durationMs = 4000;
-        const bar = document.getElementById("splash-progress-bar");
-        const progress = splash.querySelector(".splash-progress");
-        const start = window.performance.now();
-
-        if (bar && progress) {
-            const tick = (now) => {
-                const elapsed = Math.max(0, now - start);
-                const pct = Math.min(100, (elapsed / durationMs) * 100);
-                bar.style.width = `${pct}%`;
-                progress.setAttribute("aria-valuenow", String(Math.round(pct)));
-                if (elapsed < durationMs) {
-                    window.requestAnimationFrame(tick);
-                }
-            };
-            window.requestAnimationFrame(tick);
-        }
-
-        window.setTimeout(() => {
-            splash.classList.add("splash-hide");
-            window.setTimeout(() => splash.remove(), 400);
-        }, durationMs);
-        try {
-            sessionStorage.setItem("plantiaSplashShown", "1");
-        } catch (e) {
-            /* ignore */
-        }
-    } else if (splash) {
-        splash.remove();
-    }
-}
-
 /* ---------- Subida de imagen ---------- */
 function initUploadForm() {
     const form = document.getElementById("upload-form");
@@ -197,12 +163,15 @@ function initUploadForm() {
     const browseBtn = document.getElementById("browse-btn");
     const preview = document.getElementById("preview");
     const submitBtn = document.getElementById("submit-btn");
+    let previewGeneration = 0;
     const dropContent = dropZone.querySelector(".drop-zone-content");
     const loading = document.getElementById("identify-loading");
 
     function showPreview(file) {
+        const generation = ++previewGeneration;
         const reader = new FileReader();
         reader.onload = (e) => {
+            if (generation !== previewGeneration) return;
             preview.src = e.target.result;
             preview.classList.remove("hidden");
             dropContent.classList.add("hidden");
@@ -213,13 +182,17 @@ function initUploadForm() {
     }
 
     function handleFile(file) {
-        if (!file || !file.type.startsWith("image/")) {
-            showToast("Selecciona un archivo de imagen válido (JPEG, PNG o WebP).", "error");
+        previewGeneration++;
+        submitBtn.disabled = true;
+        preview.classList.add("hidden");
+        dropContent.classList.remove("hidden");
+        dropZone.classList.remove("has-preview");
+        if (!file) return;
+        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+            fileInput.value = "";
+            showToast(form.dataset.invalid, "error");
             return;
         }
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        fileInput.files = dt.files;
         showPreview(file);
     }
 
@@ -229,10 +202,12 @@ function initUploadForm() {
         fileInput.click();
     });
 
-    dropZone.addEventListener("click", () => fileInput.click());
+    dropZone.addEventListener("click", (event) => {
+        if (event.target !== fileInput) fileInput.click();
+    });
 
     fileInput.addEventListener("change", () => {
-        if (fileInput.files.length) handleFile(fileInput.files[0]);
+        handleFile(fileInput.files[0]);
     });
 
     dropZone.addEventListener("dragover", (e) => {
@@ -247,12 +222,14 @@ function initUploadForm() {
     dropZone.addEventListener("drop", (e) => {
         e.preventDefault();
         dropZone.classList.remove("dragover");
-        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        if (!e.dataTransfer.files.length) return;
+        fileInput.files = e.dataTransfer.files;
+        handleFile(fileInput.files[0]);
     });
 
     form.addEventListener("submit", () => {
         submitBtn.disabled = true;
-        submitBtn.textContent = "Identificando…";
+        submitBtn.textContent = form.dataset.loading;
         form.classList.add("loading");
         if (loading) loading.classList.add("is-active");
     });
@@ -271,17 +248,17 @@ function renderCandidates() {
         if (!Array.isArray(candidates) || candidates.length === 0) return;
 
         const escapeHtml = (s) =>
-            String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
         grid.innerHTML = candidates
             .map((c) => {
-                const name = escapeHtml(c.nombre_comun || c.nombre_cientifico || "Candidato");
+                const name = escapeHtml(c.nombre_comun || c.nombre_cientifico || messages.Candidate);
                 const sci = escapeHtml(c.nombre_cientifico || "");
                 const reason = escapeHtml(c.razon || "");
-                const conf = escapeHtml(c.confianza || "medio");
-                const img = c.thumbnail_url || "";
+                const conf = ["alto", "medio", "bajo"].includes(c.confianza) ? c.confianza : "medio";
+                const img = typeof c.thumbnail_url === "string" && c.thumbnail_url.startsWith("https://upload.wikimedia.org/") ? c.thumbnail_url : "";
                 const imgTag = img
-                    ? `<img class="candidate-thumb" src="${encodeURI(img)}" alt="${sci}">`
+                    ? `<img class="candidate-thumb" src="${escapeHtml(img)}" alt="${sci}">`
                     : `<div class="candidate-thumb candidate-thumb-placeholder" aria-hidden="true">🌿</div>`;
 
                 const wikiUrl = c.nombre_cientifico
@@ -294,7 +271,7 @@ function renderCandidates() {
                     : "";
                 const wikiClose = wikiUrl ? "</a>" : "";
                 const wikiRow = wikiUrl
-                    ? `<a class="candidate-wiki-badge" href="${wikiUrl}" target="_blank" rel="noreferrer noopener">Ver en Wikipedia ↗</a>`
+                    ? `<a class="candidate-wiki-badge" href="${wikiUrl}" target="_blank" rel="noreferrer noopener">${escapeHtml(messages["View on Wikipedia"])} ↗</a>`
                     : "";
 
                 return `
@@ -304,7 +281,7 @@ function renderCandidates() {
                         <div class="candidate-title">${wikiOpen}${name}${wikiClose}</div>
                         ${sci ? `<div class="candidate-sci"><em>${wikiOpen}${sci}${wikiClose}</em></div>` : ""}
                         <div class="candidate-meta">
-                            <span class="badge badge-${conf}">${conf}</span>
+                            <span class="badge badge-${conf}">${escapeHtml(messages[conf])}</span>
                         </div>
                         ${reason ? `<div class="candidate-reason">${reason}</div>` : ""}
                         ${wikiRow}
@@ -317,13 +294,7 @@ function renderCandidates() {
 
 /* ---------- Cuaderno ---------- */
 function formatJournalDate() {
-    const now = new Date();
-    const day = now.getDate();
-    const months = [
-        "enero", "febrero", "marzo", "abril", "mayo", "junio",
-        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-    ];
-    return `${day} de ${months[now.getMonth()]}`;
+    return new Intl.DateTimeFormat(document.documentElement.lang, {day: "numeric", month: "long"}).format(new Date());
 }
 
 function initJournalSections() {
@@ -349,19 +320,6 @@ function initJournalSections() {
 }
 
 /* ---------- Mostrar/ocultar API key ---------- */
-function initRevealInputs() {
-    document.querySelectorAll("[data-reveal-target]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const target = document.getElementById(btn.getAttribute("data-reveal-target"));
-            if (!target) return;
-            const show = target.type === "password";
-            target.type = show ? "text" : "password";
-            btn.textContent = show ? "🙈" : "👁️";
-            btn.setAttribute("aria-label", show ? "Ocultar" : "Mostrar");
-        });
-    });
-}
-
 /* ---------- Scroll to top (ficha) ---------- */
 function initScrollTop() {
     const btn = document.getElementById("scroll-top-btn");
@@ -374,7 +332,6 @@ function initScrollTop() {
 
 /* ---------- Init ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-    initSplash();
     initThemeToggle();
     initMobileNav();
     initFlashToast();
@@ -383,6 +340,10 @@ document.addEventListener("DOMContentLoaded", () => {
     initReveal();
     initUploadForm();
     initJournalSections();
-    initRevealInputs();
     initScrollTop();
+    document.querySelectorAll("form[data-confirm]").forEach(form => {
+        form.addEventListener("submit", event => {
+            if (!window.confirm(form.dataset.confirm)) event.preventDefault();
+        });
+    });
 });

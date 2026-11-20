@@ -1,5 +1,7 @@
 package com.plantia.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,7 +34,7 @@ fun WaterTodayCard(
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text(
-                "💧 Plantas que tocan regar hoy",
+                stringResource(R.string.ui_plantas_que_tocan_regar_hoy),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
             )

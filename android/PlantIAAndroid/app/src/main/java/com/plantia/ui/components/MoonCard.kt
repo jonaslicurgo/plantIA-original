@@ -1,5 +1,7 @@
 package com.plantia.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +38,7 @@ fun MoonCard(moon: MoonInfo) {
             ) {
                 Text(moon.emoji, style = MaterialTheme.typography.displaySmall)
                 Column {
-                    Text("Calendario lunar", style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.ui_calendario_lunar), style = MaterialTheme.typography.labelLarge)
                     Text(moon.phaseName, fontWeight = FontWeight.SemiBold)
                     Text(moon.dateIso, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

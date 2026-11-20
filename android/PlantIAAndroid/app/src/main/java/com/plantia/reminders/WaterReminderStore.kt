@@ -1,6 +1,7 @@
 package com.plantia.reminders
 
 import android.content.Context
+import com.plantia.data.ServerPreferences
 import org.json.JSONObject
 import java.util.Calendar
 
@@ -13,7 +14,7 @@ data class WaterReminder(
     val hourOfDay: Int = 9,
 )
 
-class WaterReminderStore(context: Context) {
+class WaterReminderStore(private val context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun get(plantId: Int): WaterReminder? {
@@ -29,9 +30,17 @@ class WaterReminderStore(context: Context) {
         prefs.edit().remove(key(plantId)).apply()
     }
 
+    private val prefix: String
+        get() {
+            val server = ServerPreferences(context)
+            val scope = server.reminderOwner?.takeIf { it.startsWith(server.baseUrl + "#") }
+            return if (scope != null) "account_${scope}_"
+                else if (server.baseUrl.startsWith("https://")) "signed_out_" else PREFIX
+        }
+
     fun allEnabled(): List<WaterReminder> =
         prefs.all.mapNotNull { (k, v) ->
-            if (!k.startsWith(PREFIX)) return@mapNotNull null
+            if (!k.startsWith(prefix)) return@mapNotNull null
             runCatching { decode(v as String) }.getOrNull()?.takeIf { it.enabled }
         }
 
@@ -55,6 +64,8 @@ class WaterReminderStore(context: Context) {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         return hour >= reminder.hourOfDay
     }
+
+    private fun key(plantId: Int) = "$prefix$plantId"
 
     private fun encode(r: WaterReminder): String =
         JSONObject()
@@ -81,6 +92,6 @@ class WaterReminderStore(context: Context) {
     companion object {
         private const val PREFS_NAME = "plantia_water_reminders"
         private const val PREFIX = "plant_"
-        private fun key(plantId: Int) = "$PREFIX$plantId"
+
     }
 }

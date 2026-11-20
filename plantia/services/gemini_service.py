@@ -31,7 +31,7 @@ Reglas:
 - Sé conservador con las recomendaciones si la confianza es baja.
 
 {
-  "nombre_comun": "nombre común en español",
+  "nombre_comun": "nombre común en el idioma solicitado",
   "nombre_cientifico": "nombre científico (género y especie)",
   "familia": "familia botánica",
   "tipo": "tipo de planta (ej. suculenta, árbol, hierba, arbusto, trepadora)",
@@ -93,7 +93,11 @@ Reglas:
 }
 
 Si no puedes identificar la planta con certeza, indica tu mejor estimación y usa confianza "bajo".
-Todos los textos deben estar en español."""
+Conserva las claves JSON, los nombres taxonómicos y los valores alto/medio/bajo."""
+
+
+class GeminiUnavailable(Exception):
+    """Gemini cannot currently provide a usable result."""
 
 
 class GeminiService:
@@ -147,11 +151,11 @@ class GeminiService:
     def _get_client() -> genai.Client:
         api_key = get_gemini_api_key()
         if not api_key:
-            raise ValueError(
+            raise GeminiUnavailable(
                 "No se ha configurado GEMINI_API_KEY. "
                 "Añade tu clave en Configuración o crea un archivo .env con tu clave de Google AI Studio."
             )
-        return genai.Client(api_key=api_key)
+        return genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=12000))
 
     @staticmethod
     def preparar_imagen(image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
@@ -168,13 +172,20 @@ class GeminiService:
         except Exception as exc:
             raise ValueError("El archivo no es una imagen válida.") from exc
 
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
+        from PIL import ImageOps
+
+        detected = Image.MIME.get(img.format)
+        if detected != mime_type:
+            raise ValueError("Invalid image type")
+        if img.width * img.height > 25_000_000:
+            raise ValueError("Image dimensions exceed the limit")
+        img = ImageOps.exif_transpose(img).convert("RGB")
+        img.info.clear()
 
         max_dim = max(img.size)
         if max_dim > MAX_IMAGE_DIMENSION:
             ratio = MAX_IMAGE_DIMENSION / max_dim
-            new_size = (int(img.width * ratio), int(img.height * ratio))
+            new_size = (max(1, int(img.width * ratio)), max(1, int(img.height * ratio)))
             img = img.resize(new_size, Image.Resampling.LANCZOS)
 
         output = BytesIO()
@@ -205,44 +216,45 @@ class GeminiService:
         return IdentificacionGemini.model_validate(data)
 
     @staticmethod
-    def identificar(image_bytes: bytes, mime_type: str) -> IdentificacionGemini:
+    def identificar(image_bytes: bytes, mime_type: str, language: str = "Spanish", *, already_prepared: bool = False) -> IdentificacionGemini:
         """Envía la imagen a Gemini y devuelve la identificación estructurada."""
-        prepared_bytes, prepared_mime = GeminiService.preparar_imagen(
-            image_bytes, mime_type
-        )
-        client = GeminiService._get_client()
-
+        prepared_bytes, prepared_mime = (image_bytes, mime_type) if already_prepared else GeminiService.preparar_imagen(image_bytes, mime_type)
         image_part = types.Part.from_bytes(
             data=prepared_bytes, mime_type=prepared_mime
         )
 
-        max_attempts = 4
+        max_attempts = 3
         last_error: Exception | None = None
-        for attempt in range(max_attempts):
-            try:
-                response = client.models.generate_content(
-                    model=get_gemini_model(),
-                    contents=[PROMPT, image_part],
-                    config=types.GenerateContentConfig(
-                        temperature=0.2,
-                        response_mime_type="application/json",
-                    ),
-                )
-                text = response.text
-                if not text:
-                    raise ValueError("Gemini no devolvió ninguna respuesta.")
-                return GeminiService._parse_json_response(text)
-            except Exception as exc:
-                last_error = exc
-                es_ultimo = attempt == max_attempts - 1
-                # Solo reintentamos errores temporales (503 sobrecarga, 429, red).
-                if not es_ultimo and GeminiService._is_transient(exc):
-                    time.sleep(1.5 * (2**attempt))  # 1.5s, 3s, 6s
-                    continue
-                raise ValueError(
-                    f"Error al identificar la planta: {GeminiService._friendly_error(exc)}"
-                ) from exc
+        client = GeminiService._get_client()
+        try:
+            for attempt in range(max_attempts):
+                try:
+                    response = client.models.generate_content(
+                        model=get_gemini_model(),
+                        contents=[PROMPT + f"\nWrite all user-facing prose in {language}.", image_part],
+                        config=types.GenerateContentConfig(
+                            temperature=0.2,
+                            response_mime_type="application/json",
+                        ),
+                    )
+                    text = response.text
+                    if not text:
+                        raise ValueError("Gemini no devolvió ninguna respuesta.")
+                    return GeminiService._parse_json_response(text)
+                except Exception as exc:
+                    last_error = exc
+                    es_ultimo = attempt == max_attempts - 1
+                    # Solo reintentamos errores temporales (503 sobrecarga, 429, red).
+                    if not es_ultimo and GeminiService._is_transient(exc):
+                        time.sleep(1.5 * (2**attempt))  # 1.5s, 3s
+                        continue
+                    raise GeminiUnavailable(
+                        f"Error al identificar la planta: {GeminiService._friendly_error(exc)}"
+                    ) from exc
 
-        raise ValueError(
+        finally:
+            client.close()
+
+        raise GeminiUnavailable(
             f"Error al identificar la planta: {GeminiService._friendly_error(last_error or Exception('Error desconocido'))}"
         )

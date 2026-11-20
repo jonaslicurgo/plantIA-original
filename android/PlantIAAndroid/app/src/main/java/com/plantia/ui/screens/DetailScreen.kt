@@ -1,5 +1,7 @@
 package com.plantia.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -70,14 +72,14 @@ import com.plantia.util.imageUrlFromPath
 import com.plantia.util.userMessage
 import kotlinx.coroutines.launch
 
-private data class JournalChip(val label: String, val template: String)
+private data class JournalChip(val label: Int, val template: Int)
 
 private val journalChips = listOf(
-    JournalChip("🧪 Abonada", "Abonada el {fecha}"),
-    JournalChip("🪴 Trasplantada", "Trasplantada el {fecha}"),
-    JournalChip("✂️ Podada", "Podada el {fecha}"),
-    JournalChip("🌸 Floreció", "Floreció el {fecha}"),
-    JournalChip("🌱 Nuevo sustrato", "Cambié el sustrato el {fecha}"),
+    JournalChip(R.string.native_abonada, R.string.native_abonada_el_fecha),
+    JournalChip(R.string.native_trasplantada, R.string.native_trasplantada_el_fecha),
+    JournalChip(R.string.native_podada, R.string.native_podada_el_fecha),
+    JournalChip(R.string.native_florecio, R.string.native_florecio_el_fecha),
+    JournalChip(R.string.native_nuevo_sustrato, R.string.native_cambie_el_sustrato_el_fecha),
 )
 
 private val reminderIntervals = listOf(1, 2, 3, 5, 7, 14)
@@ -158,10 +160,10 @@ fun DetailScreen(
             notas = updated.notas_usuario
             error = null
             if (showSnack) {
-                snackbar.showSnackbar("Cuaderno guardado", duration = SnackbarDuration.Short)
+                snackbar.showSnackbar(context.getString(R.string.native_cuaderno_guardado), duration = SnackbarDuration.Short)
             }
         } catch (e: Exception) {
-            error = e.userMessage("No se pudo guardar")
+            error = e.userMessage(context, context.getString(R.string.native_no_se_pudo_guardar))
         } finally {
             saving = false
         }
@@ -176,7 +178,7 @@ fun DetailScreen(
             notas = p.notas_usuario
             loadReminderState()
         } catch (e: Exception) {
-            error = e.userMessage("Error al cargar la ficha")
+            error = e.userMessage(context, context.getString(R.string.native_error_al_cargar_la_ficha))
         } finally {
             loading = false
         }
@@ -199,7 +201,7 @@ fun DetailScreen(
                         reminderStore.delete(plantaId)
                         onBack()
                     } catch (e: Exception) {
-                        error = e.userMessage("No se pudo borrar")
+                        error = e.userMessage(context, context.getString(R.string.native_no_se_pudo_borrar))
                         deleting = false
                     }
                 }
@@ -259,7 +261,7 @@ fun DetailScreen(
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     AsyncImage(
-                        model = imageUrl,
+                        model = PlantIAClient.imageRequest(LocalContext.current, imageUrl),
                         contentDescription = p.nombre_comun,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -279,7 +281,7 @@ fun DetailScreen(
                             onClick = onReIdentify,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Text("Re-identificar con nueva foto")
+                            Text(stringResource(R.string.ui_re_identificar_con_nueva_foto))
                         }
                     }
 
@@ -290,7 +292,7 @@ fun DetailScreen(
                     }
 
                     if (p.descripcion.isNotBlank()) {
-                        SectionCard(title = "Descripción") { Text(p.descripcion) }
+                        SectionCard(title = stringResource(R.string.ui_descripcion)) { Text(p.descripcion) }
                     }
 
                     val careItems = listOf(
@@ -303,51 +305,51 @@ fun DetailScreen(
                     ).filter { it.second.isNotBlank() }
 
                     if (careItems.isNotEmpty()) {
-                        SectionCard(title = "Cuidados") {
+                        SectionCard(title = stringResource(R.string.ui_cuidados)) {
                             CareGrid(items = careItems)
                         }
                     }
 
                     DetailInfoSection(
-                        title = "Características",
+                        title = stringResource(R.string.ui_caracteristicas),
                         items = listOf(
-                            "Dificultad" to p.dificultad,
-                            "Tamaño adulto" to p.tamano_adulto,
-                            "Crecimiento" to p.crecimiento,
-                            "Floración" to p.floracion,
+                            stringResource(R.string.native_dificultad) to p.dificultad,
+                            stringResource(R.string.native_tamano_adulto) to p.tamano_adulto,
+                            stringResource(R.string.native_crecimiento) to p.crecimiento,
+                            stringResource(R.string.native_floracion) to p.floracion,
                         ),
                     )
 
                     DetailInfoSection(
-                        title = "Mantenimiento",
+                        title = stringResource(R.string.ui_mantenimiento),
                         items = listOf(
-                            "Época de poda" to p.epoca_poda,
-                            "Época de trasplante" to p.epoca_trasplante,
-                            "Señales de trasplante" to p.senales_trasplante,
-                            "Maceta y sustrato" to p.maceta_y_sustrato,
+                            stringResource(R.string.native_epoca_de_poda) to p.epoca_poda,
+                            stringResource(R.string.native_epoca_de_trasplante) to p.epoca_trasplante,
+                            stringResource(R.string.native_senales_de_trasplante) to p.senales_trasplante,
+                            stringResource(R.string.native_maceta_y_sustrato) to p.maceta_y_sustrato,
                         ),
                     )
 
                     DetailInfoSection(
-                        title = "Seguridad y problemas",
+                        title = stringResource(R.string.ui_seguridad_y_problemas),
                         items = listOf(
-                            "Toxicidad perros" to p.toxicidad_perros,
-                            "Toxicidad gatos" to p.toxicidad_gatos,
-                            "Problemas comunes" to p.problemas_comunes,
-                            "Plagas habituales" to p.plagas_habituales,
+                            stringResource(R.string.native_toxicidad_perros) to p.toxicidad_perros,
+                            stringResource(R.string.native_toxicidad_gatos) to p.toxicidad_gatos,
+                            stringResource(R.string.native_problemas_comunes) to p.problemas_comunes,
+                            stringResource(R.string.native_plagas_habituales) to p.plagas_habituales,
                         ),
                     )
 
                     SectionCard(
-                        title = "Recordatorio de riego",
-                        subtitle = "Notificación local cuando toque regar.",
+                        title = stringResource(R.string.ui_recordatorio_de_riego),
+                        subtitle = stringResource(R.string.ui_notificacion_local_cuando_toque_regar),
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text("Activar recordatorio")
+                            Text(stringResource(R.string.ui_activar_recordatorio))
                             Switch(
                                 checked = reminderEnabled,
                                 onCheckedChange = {
@@ -362,10 +364,10 @@ fun DetailScreen(
                                 onExpandedChange = { reminderMenuExpanded = it },
                             ) {
                                 OutlinedTextField(
-                                    value = "Cada $reminderDays día${if (reminderDays == 1) "" else "s"}",
+                                    value = stringResource(R.string.native_cada_count_dia).replace("{count}", reminderDays.toString()),
                                     onValueChange = {},
                                     readOnly = true,
-                                    label = { Text("Frecuencia") },
+                                    label = { Text(stringResource(R.string.ui_frecuencia)) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = reminderMenuExpanded) },
                                     modifier = Modifier
                                         .menuAnchor()
@@ -377,7 +379,7 @@ fun DetailScreen(
                                 ) {
                                     reminderIntervals.forEach { days ->
                                         DropdownMenuItem(
-                                            text = { Text("Cada $days día${if (days == 1) "" else "s"}") },
+                                            text = { Text(stringResource(R.string.native_cada_count_dia).replace("{count}", days.toString())) },
                                             onClick = {
                                                 reminderDays = days
                                                 reminderMenuExpanded = false
@@ -392,10 +394,10 @@ fun DetailScreen(
                                 onExpandedChange = { reminderHourMenuExpanded = it },
                             ) {
                                 OutlinedTextField(
-                                    value = "Aviso a las ${"%02d".format(reminderHour)}:00",
+                                    value = stringResource(R.string.native_aviso_a_las_hora).replace("{hora}", "%02d:00".format(reminderHour)),
                                     onValueChange = {},
                                     readOnly = true,
-                                    label = { Text("Hora del aviso") },
+                                    label = { Text(stringResource(R.string.ui_hora_del_aviso)) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = reminderHourMenuExpanded) },
                                     modifier = Modifier
                                         .menuAnchor()
@@ -422,7 +424,7 @@ fun DetailScreen(
 
                     val rasgos = JsonHelpers.parseStringList(p.rasgos_observados_json)
                     if (rasgos.isNotEmpty()) {
-                        SectionCard(title = "Rasgos observados") {
+                        SectionCard(title = stringResource(R.string.ui_rasgos_observados)) {
                             rasgos.forEach { Text("• $it") }
                         }
                     }
@@ -430,8 +432,8 @@ fun DetailScreen(
                     val preguntas = JsonHelpers.parseStringList(p.preguntas_para_mejorar_json)
                     if (preguntas.isNotEmpty()) {
                         SectionCard(
-                            title = "Preguntas para afinar",
-                            subtitle = "Responde en tu cuaderno o con nuevas fotos.",
+                            title = stringResource(R.string.ui_preguntas_para_afinar),
+                            subtitle = stringResource(R.string.ui_responde_en_tu_cuaderno_o_con_nuevas_fotos),
                         ) {
                             preguntas.forEachIndexed { i, q -> Text("${i + 1}. $q") }
                         }
@@ -439,10 +441,10 @@ fun DetailScreen(
 
                     val guia = JsonHelpers.parseGuia(p.guia_inicio_json)
                     if (guia.pasos.isNotEmpty() || guia.errores_comunes.isNotEmpty()) {
-                        SectionCard(title = "Empezar hoy") {
+                        SectionCard(title = stringResource(R.string.ui_empezar_hoy)) {
                             guia.pasos.forEachIndexed { i, paso -> Text("${i + 1}. $paso") }
                             if (guia.errores_comunes.isNotEmpty()) {
-                                Text("Errores comunes:", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 8.dp))
+                                Text(stringResource(R.string.ui_errores_comunes), fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 8.dp))
                                 guia.errores_comunes.forEach { Text("⚠ $it") }
                             }
                         }
@@ -450,7 +452,7 @@ fun DetailScreen(
 
                     val candidatos = JsonHelpers.parseCandidatos(p.candidatos_json)
                     if (candidatos.isNotEmpty()) {
-                        SectionCard(title = "Otras posibilidades") {
+                        SectionCard(title = stringResource(R.string.ui_otras_posibilidades)) {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 candidatos.forEach { c ->
                                     CandidateCard(
@@ -463,12 +465,12 @@ fun DetailScreen(
                     }
 
                     SectionCard(
-                        title = "Cuaderno de la planta",
-                        subtitle = "Registra riegos, trasplantes y observaciones.",
+                        title = stringResource(R.string.ui_cuaderno_de_la_planta),
+                        subtitle = stringResource(R.string.ui_registra_riegos_trasplantes_y_observaciones),
                     ) {
                         Button(
                             onClick = {
-                                val line = "Regada el ${formatJournalDate()}"
+                                val line = context.getString(R.string.native_regada_el_fecha).replace("{fecha}", formatJournalDate(context))
                                 notas = appendJournalLine(notas, line)
                                 reminderStore.markWatered(plantaId, p.nombre_comun)
                                 scope.launch { saveNotas(showSnack = true) }
@@ -476,7 +478,7 @@ fun DetailScreen(
                             enabled = !saving && !deleting,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Text("💧 Regada hoy")
+                            Text(stringResource(R.string.ui_regada_hoy))
                         }
 
                         FlowRow(
@@ -488,12 +490,12 @@ fun DetailScreen(
                                     shape = RoundedCornerShape(999.dp),
                                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
                                     modifier = Modifier.clickable {
-                                        val line = chip.template.replace("{fecha}", formatJournalDate())
+                                        val line = context.getString(chip.template).replace("{fecha}", formatJournalDate(context))
                                         notas = appendJournalLine(notas, line)
                                     },
                                 ) {
                                     Text(
-                                        chip.label,
+                                        stringResource(chip.label),
                                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                         style = MaterialTheme.typography.labelMedium,
                                     )
@@ -501,7 +503,7 @@ fun DetailScreen(
                             }
                         }
 
-                        Text("Historial", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.ui_historial), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                         JournalTimeline(notas = notas)
 
                         OutlinedTextField(
@@ -509,7 +511,7 @@ fun DetailScreen(
                             onValueChange = { notas = it },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 4,
-                            label = { Text("Editar observaciones") },
+                            label = { Text(stringResource(R.string.ui_editar_observaciones)) },
                         )
 
                         Row(
@@ -533,7 +535,7 @@ fun DetailScreen(
                                                 .size(18.dp),
                                         )
                                     }
-                                    Text(if (saving) "Guardando…" else "Guardar")
+                                    Text(stringResource(if (saving) R.string.planet_saving else R.string.planet_save))
                                 }
                             }
 
@@ -541,7 +543,7 @@ fun DetailScreen(
                                 onClick = { showDeleteDialog = true },
                                 enabled = !saving && !deleting,
                             ) {
-                                Text(if (deleting) "Borrando…" else "Eliminar")
+                                Text(stringResource(if (deleting) R.string.planet_deleting else R.string.planet_delete))
                             }
                         }
                     }

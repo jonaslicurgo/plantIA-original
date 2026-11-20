@@ -1,5 +1,6 @@
 package com.plantia.ui
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,7 +63,7 @@ fun SplashScreen(
         ) {
             Image(
                 painter = painterResource(R.drawable.logo),
-                contentDescription = "PlantIA",
+                contentDescription = stringResource(R.string.ui_planet_ia),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth(0.72f)

@@ -3,8 +3,6 @@ package com.plantia.util
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.TextStyle
-import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -60,9 +58,9 @@ object MoonCalculator {
     }
 }
 
-fun formatJournalDate(date: LocalDate = LocalDate.now()): String {
-    val month = date.month.getDisplayName(TextStyle.FULL, Locale("es", "ES"))
-    return "${date.dayOfMonth} de $month"
+fun formatJournalDate(context: android.content.Context, date: LocalDate = LocalDate.now()): String {
+    val formatter = android.text.format.DateFormat.getBestDateTimePattern(context.resources.configuration.locales[0], "MMMMd")
+    return date.format(java.time.format.DateTimeFormatter.ofPattern(formatter, context.resources.configuration.locales[0]))
 }
 
 fun parseJournalLines(notas: String): List<String> =

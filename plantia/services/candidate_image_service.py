@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import logging
+import tempfile
+from threading import Lock
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -8,6 +11,7 @@ from pathlib import Path
 from plantia.config import APP_DATA_DIR, ensure_directories
 
 _CACHE_PATH = APP_DATA_DIR / "candidate_thumbnails.json"
+_CACHE_LOCK = Lock()
 
 
 def _load_cache() -> dict[str, str]:
@@ -20,11 +24,22 @@ def _load_cache() -> dict[str, str]:
         return {}
 
 
-def _save_cache(cache: dict[str, str]) -> None:
-    ensure_directories()
-    tmp = Path(str(_CACHE_PATH) + ".tmp")
-    tmp.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(_CACHE_PATH)
+def _save_cache(key: str, value: str) -> None:
+    try:
+        with _CACHE_LOCK:
+            ensure_directories()
+            cache = _load_cache()
+            cache[key] = value
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=APP_DATA_DIR, delete=False) as file:
+                path = Path(file.name)
+                try:
+                    json.dump(cache, file, ensure_ascii=False)
+                    file.close()
+                    path.replace(_CACHE_PATH)
+                finally:
+                    path.unlink(missing_ok=True)
+    except OSError:
+        logging.getLogger(__name__).warning("Could not cache candidate thumbnail")
 
 
 def get_thumbnail_url(nombre_cientifico: str) -> str:
@@ -43,22 +58,20 @@ def get_thumbnail_url(nombre_cientifico: str) -> str:
     title = key.replace(" ", "_")
     url = (
         "https://en.wikipedia.org/api/rest_v1/page/summary/"
-        + urllib.parse.quote(title)
+        + urllib.parse.quote(title, safe="")
     )
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "PlantIA/0.1 (+https://localhost)"},
+            headers={"User-Agent": "PLANET-IA/0.1 (+https://github.com/jonaslicurgo/plantIA-original)"},
         )
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            payload = json.loads(resp.read(256 * 1024).decode("utf-8"))
         thumb = payload.get("thumbnail", {}) or {}
         src = (thumb.get("source") or "").strip()
-        cache[key] = src
-        _save_cache(cache)
-        return src
-    except Exception:
-        cache[key] = ""
-        _save_cache(cache)
+        if src.startswith("https://upload.wikimedia.org/"):
+            _save_cache(key, src)
+            return src
+    except (OSError, ValueError, AttributeError):
         return ""
-
+    return ""

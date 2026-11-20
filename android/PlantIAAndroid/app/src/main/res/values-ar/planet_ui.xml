@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_empezar_hoy" formatted="false">ابدأ اليوم</string>
+    <string name="ui_calendario_lunar" formatted="false">التقويم القمري</string>
+    <string name="ui_otras_posibilidades" formatted="false">احتمالات أخرى</string>
+    <string name="ui_ejemplo_http_192_168_1_96_8000" formatted="false">مثال: http://192.168.1.96:8000/</string>
+    <string name="ui_seguridad_y_problemas" formatted="false">الأمن والمشاكل</string>
+    <string name="ui_conceder_permiso" formatted="false">منح الإذن</string>
+    <string name="ui_editar_observaciones" formatted="false">تحرير الملاحظات</string>
+    <string name="ui_mantenimiento" formatted="false">صيانة</string>
+    <string name="ui_elegir_de_galeria" formatted="false">اختر من المعرض</string>
+    <string name="ui_ordenar_por" formatted="false">الترتيب حسب</string>
+    <string name="ui_rasgos_observados" formatted="false">السمات المرصودة</string>
+    <string name="ui_caracteristicas" formatted="false">الميزات</string>
+    <string name="ui_recordatorio_de_riego" formatted="false">تذكير بالسقي</string>
+    <string name="ui_ver_en_github" formatted="false">عرض على جيثب</string>
+    <string name="ui_historial" formatted="false">التاريخ</string>
+    <string name="ui_planet_ia" formatted="false">PLANET-IA</string>
+    <string name="ui_regada_hoy" formatted="false">💧سقيت اليوم</string>
+    <string name="ui_crea_o_recupera_tu_cuenta_desde_la_version_web" formatted="false">قم بإنشاء أو استرداد حسابك من إصدار الويب.</string>
+    <string name="ui_apariencia" formatted="false">المظهر</string>
+    <string name="ui_acerca_de_plantia" formatted="false">حول بلانتيا</string>
+    <string name="ui_eliminar" formatted="false">حذف</string>
+    <string name="ui_frecuencia" formatted="false">التردد</string>
+    <string name="ui_contrasena" formatted="false">كلمة المرور</string>
+    <string name="ui_capturar" formatted="false">التقاط</string>
+    <string name="ui_informacion_y_codigo_fuente" formatted="false">المعلومات وكود المصدر</string>
+    <string name="ui_url_del_servidor" formatted="false">عنوان URL للخادم</string>
+    <string name="ui_activar_recordatorio" formatted="false">تفعيل التذكير</string>
+    <string name="ui_errores_comunes" formatted="false">الأخطاء الشائعة:</string>
+    <string name="ui_mis_plantas" formatted="false">نباتاتي</string>
+    <string name="ui_conecta_con_tu_servidor_plantia_en_la_red_local_para" formatted="false">اتصل بخادم PlantIA الخاص بك على الشبكة المحلية لمزامنة مصانعك بين الهاتف المحمول والويب.</string>
+    <string name="ui_identifica_plantas_a_partir_de_fotografias_con_googl" formatted="false">حدد النباتات من الصور الفوتوغرافية باستخدام Google Gemini، واحفظ كل بطاقة في مجموعتك الشخصية واحتفظ بدفتر ملاحظة يحتوي على ملاحظات الري وعمليات الزرع والرعاية.</string>
+    <string name="ui_buscar_por_nombre" formatted="false">البحث بالاسم</string>
+    <string name="ui_responde_en_tu_cuaderno_o_con_nuevas_fotos" formatted="false">قم بالرد في دفتر ملاحظاتك أو بصور جديدة.</string>
+    <string name="ui_descripcion" formatted="false">الوصف</string>
+    <string name="ui_volver" formatted="false">العودة</string>
+    <string name="ui_correo_electronico" formatted="false">البريد الإلكتروني</string>
+    <string name="ui_acerca_de" formatted="false">حول</string>
+    <string name="ui_preguntas_para_afinar" formatted="false">أسئلة لتحسين</string>
+    <string name="ui_ajustes" formatted="false">الإعدادات</string>
+    <string name="ui_cuaderno_de_la_planta" formatted="false">دفتر النبات</string>
+    <string name="ui_identificar_planta" formatted="false">التعرف على النبات</string>
+    <string name="ui_cuidados" formatted="false">رعاية</string>
+    <string name="ui_reintentar" formatted="false">أعد المحاولة</string>
+    <string name="ui_registra_riegos_trasplantes_y_observaciones" formatted="false">يسجل عمليات الري وزرع الأعضاء والملاحظات.</string>
+    <string name="ui_introduce_la_url_de_tu_servidor_plantia_ip_y_puerto" formatted="false">أدخل عنوان URL لخادم PlantIA الخاص بك (IP والمنفذ على الشبكة المحلية).</string>
+    <string name="ui_cancelar" formatted="false">إلغاء</string>
+    <string name="ui_elige_el_tema_de_la_app_sistema_sigue_la_configuraci" formatted="false">اختر موضوع التطبيق. \"النظام\" يتبع إعدادات الجهاز.</string>
+    <string name="ui_plantas_que_tocan_regar_hoy" formatted="false">💧 نباتات تحتاج للسقي اليوم</string>
+    <string name="ui_plantia_necesita_acceso_a_la_camara_para_identificar" formatted="false">يحتاج PlantIA إلى الوصول إلى الكاميرا للتعرف على النباتات.</string>
+    <string name="ui_notificacion_local_cuando_toque_regar" formatted="false">إشعار محلي عندما يحين وقت الماء.</string>
+    <string name="ui_analizando_con_gemini" formatted="false">التحليل مع الجوزاء...</string>
+    <string name="ui_eliminar_planta" formatted="false">حذف النبات</string>
+    <string name="ui_desliza_una_tarjeta_a_la_derecha_para_marcar_regada" formatted="false">اسحب البطاقة إلى اليمين لوضع علامة \"سقيت اليوم\"</string>
+    <string name="ui_re_identificar_con_nueva_foto" formatted="false">إعادة التعرف على الصورة الجديدة</string>
+    <string name="ui_conexion_lan" formatted="false">اتصال الشبكة المحلية</string>
+    <string name="ui_hora_del_aviso" formatted="false">لاحظ الوقت</string>
+    <string name="ui_ver_en_wikipedia" formatted="false">انظر على ويكيبيديا ↗</string>
+    <string name="ui_aun_no_hay_anotaciones_usa_regada_hoy_o_los_chips_ra" formatted="false">لا توجد تعليقات توضيحية حتى الآن. استخدم \"المروي اليوم\" أو الرقائق السريعة.</string>
+    <string name="planet_plants" formatted="false">نباتاتي</string>
+    <string name="planet_identify" formatted="false">تحديد</string>
+    <string name="planet_settings" formatted="false">الإعدادات</string>
+    <string name="planet_about" formatted="false">حول</string>
+    <string name="planet_detail" formatted="false">التفاصيل</string>
+    <string name="planet_saving" formatted="false">جارٍ الحفظ…</string>
+    <string name="planet_save" formatted="false">حفظ</string>
+    <string name="planet_deleting" formatted="false">جارٍ الحذف...</string>
+    <string name="planet_delete" formatted="false">حذف</string>
+    <string name="planet_save_url" formatted="false">حفظ URL</string>
+    <string name="planet_test_server" formatted="false">حاول</string>
+    <string name="planet_sign_out" formatted="false">تسجيل الخروج</string>
+    <string name="planet_sign_in" formatted="false">تسجيل الدخول</string>
+    <string name="planet_system" formatted="false">النظام</string>
+    <string name="planet_light" formatted="false">بالتأكيد</string>
+    <string name="planet_dark" formatted="false">داكن</string>
+    <string name="native_error_al_cargar" formatted="false">حدث خطأ أثناء التحميل</string>
+    <string name="native_error_al_cargar_mas" formatted="false">حدث خطأ أثناء تحميل المزيد</string>
+    <string name="native_no_se_pudo_guardar" formatted="false">لا يمكن الحفظ</string>
+    <string name="native_mas_recientes" formatted="false">الأحدث</string>
+    <string name="native_mas_antiguas" formatted="false">أقدم</string>
+    <string name="native_nombre_a_z" formatted="false">الاسم (أ-ي)</string>
+    <string name="native_confianza" formatted="false">الثقة</string>
+    <string name="native_aun_no_tienes_plantas" formatted="false">ليس لديك نباتات بعد</string>
+    <string name="native_sin_resultados" formatted="false">لا توجد نتائج</string>
+    <string name="native_identifica_tu_primera_planta_con_la_camara" formatted="false">حدد مصنعك الأول بالكاميرا.</string>
+    <string name="native_prueba_con_otro_nombre_o_termino_de_busqueda" formatted="false">جرب اسمًا آخر أو مصطلح بحث آخر.</string>
+    <string name="native_identificar_planta" formatted="false">التعرف على النبات</string>
+    <string name="native_error_al_cargar_la_ficha" formatted="false">خطأ في تحميل الملف</string>
+    <string name="native_no_se_pudo_borrar" formatted="false">لا يمكن الحذف</string>
+    <string name="native_cuaderno_guardado" formatted="false">دفتر الملاحظات المحفوظ</string>
+    <string name="native_abonada" formatted="false">🧪 مشترك</string>
+    <string name="native_abonada_el_fecha" formatted="false">تم الدفع في {fecha}</string>
+    <string name="native_trasplantada" formatted="false">🪴 مزروع</string>
+    <string name="native_trasplantada_el_fecha" formatted="false">تمت الزرع في {fecha}</string>
+    <string name="native_podada" formatted="false">✂️ التقليم</string>
+    <string name="native_podada_el_fecha" formatted="false">تم تقليمه في {fecha}</string>
+    <string name="native_florecio" formatted="false">🌸 أزهرت</string>
+    <string name="native_florecio_el_fecha" formatted="false">أزهرت في {fecha}</string>
+    <string name="native_nuevo_sustrato" formatted="false">🌱ركيزة جديدة</string>
+    <string name="native_cambie_el_sustrato_el_fecha" formatted="false">لقد قمت بتغيير الركيزة في {fecha}</string>
+    <string name="native_dificultad" formatted="false">صعوبة</string>
+    <string name="native_tamano_adulto" formatted="false">حجم الكبار</string>
+    <string name="native_crecimiento" formatted="false">النمو</string>
+    <string name="native_floracion" formatted="false">المزهرة</string>
+    <string name="native_epoca_de_poda" formatted="false">موسم التقليم</string>
+    <string name="native_epoca_de_trasplante" formatted="false">وقت الزرع</string>
+    <string name="native_senales_de_trasplante" formatted="false">علامات الزرع</string>
+    <string name="native_maceta_y_sustrato" formatted="false">وعاء والركيزة</string>
+    <string name="native_toxicidad_perros" formatted="false">سمية الكلاب</string>
+    <string name="native_toxicidad_gatos" formatted="false">سمية القطط</string>
+    <string name="native_problemas_comunes" formatted="false">المشاكل الشائعة</string>
+    <string name="native_plagas_habituales" formatted="false">الآفات الشائعة</string>
+    <string name="native_regada_el_fecha" formatted="false">سقي في {fecha}</string>
+    <string name="native_cada_count_dia" formatted="false">كل {count} يوم</string>
+    <string name="native_aviso_a_las_hora" formatted="false">إشعار في {hora}</string>
+    <string name="native_no_se_pudo_identificar" formatted="false">لا يمكن تحديد</string>
+    <string name="native_no_se_pudo_capturar" formatted="false">لا يمكن الالتقاط</string>
+    <string name="native_identificar" formatted="false">تحديد</string>
+    <string name="native_afinar_identificacion" formatted="false">تحسين تحديد الهوية</string>
+    <string name="native_centra_la_hoja_o_flor_en_el_encuadre_buena_luz_mejor_resultado" formatted="false">قم بتوسيط الورقة أو الزهرة في الإطار. ضوء جيد = نتيجة أفضل.</string>
+    <string name="native_nueva_foto_para_afinar_planta_compara_el_resultado_con_tu_fich" formatted="false">صورة جديدة لصقل {planta}. قارن النتيجة ببطاقتك الحالية.</string>
+    <string name="native_no_se_pudo_conectar" formatted="false">لا يمكن الاتصال</string>
+    <string name="native_no_se_pudo_cambiar_la_sesion" formatted="false">لا يمكن تغيير الجلسة</string>
+    <string name="native_servidor_guardado" formatted="false">الخادم المحفوظ</string>
+    <string name="native_sesion_iniciada" formatted="false">بدأت الجلسة</string>
+    <string name="native_usa_la_url_https_de_planet_ia" formatted="false">استخدم عنوان URL الخاص بـ PLANET-IA HTTPS</string>
+    <string name="native_conectado_count_planta_s" formatted="false">متصل · {count} من النباتات</string>
+    <string name="native_sin_conexion_con_el_servidor_comprueba_la_red_wi_fi" formatted="false">لا يوجد اتصال بالخادم. تحقق من شبكة الواي فاي.</string>
+    <string name="native_recordatorios_de_riego" formatted="false">تذكيرات الري</string>
+    <string name="native_avisos_para_regar_tus_plantas" formatted="false">إشعارات لسقي النباتات الخاصة بك</string>
+    <string name="native_toca_para_abrir_el_cuaderno_de_la_planta" formatted="false">اضغط لفتح دفتر النبات.</string>
+    <string name="native_has_regado_planta" formatted="false">هل سقيت {planta}؟</string>
+</resources>

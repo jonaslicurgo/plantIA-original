@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}{{ planta.nombre_comun }} — PlantIA{% endblock %}
+{% block title %}{{ planta.nombre_comun }} · PLANET-IA{% endblock %}
 
 {% block content %}
 <div class="detail-page">
     <div class="breadcrumb">
-        <a href="/plantas">← Mis plantas</a>
+        <a href="/plantas">{{ tr("← Mis plantas") }}</a>
     </div>
 
     {% if mensaje %}
-    <div class="alert alert-success">{{ mensaje }}</div>
+    <div class="alert alert-success">{{ tr(mensaje) }}</div>
     {% endif %}
 
     <article class="detail-card">
@@ -18,7 +18,7 @@
                 <h1>{{ planta.nombre_comun }}</h1>
                 <p class="scientific"><em>{{ planta.nombre_cientifico }}</em></p>
             </div>
-            <span class="badge badge-{{ planta.confianza }}">Confianza: {{ planta.confianza }}</span>
+            <span class="badge badge-{{ planta.confianza }}">{{ tr("Confianza:") }} {{ tr(planta.confianza) }}</span>
         </div>
 
         {% with origen='detalle', compact=false %}
@@ -28,39 +28,39 @@
         <div class="detail-layout">
             <aside class="detail-sidebar">
                 <img src="{{ image_url(planta.image_path) }}" alt="{{ planta.nombre_comun }}" class="detail-sidebar-img zoomable">
-                <time class="detail-date">Identificada el {{ planta.created_at.strftime('%d/%m/%Y a las %H:%M') }}</time>
+                <time class="detail-date">{{ tr("Identificada el") }} {{ planta.created_at.strftime('%d/%m/%Y · %H:%M') }}</time>
 
                 {% if luna %}
-                <div class="moon-card" aria-label="Calendario lunar">
+                <div class="moon-card" aria-label="{{ tr("Calendario lunar") }}">
                     <div class="moon-top">
                         <span class="moon-emoji" aria-hidden="true">{{ luna.emoji }}</span>
                         <div class="moon-meta">
-                            <div class="moon-phase">{{ luna.phase_name }}</div>
+                            <div class="moon-phase">{{ tr(luna.phase_name) }}</div>
                             <div class="moon-date">{{ luna.date_iso }}</div>
                         </div>
                     </div>
-                    <div class="moon-bar" role="progressbar" aria-label="Iluminación lunar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ luna.illumination_pct }}">
+                    <div class="moon-bar" role="progressbar" aria-label="{{ tr("Iluminación lunar") }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ luna.illumination_pct }}">
                         <div class="moon-bar-fill" style="width: {{ luna.illumination_pct }}%"></div>
                     </div>
-                    <div class="moon-hint">{{ luna.illumination_pct }}% iluminada</div>
+                    <div class="moon-hint">{{ luna.illumination_pct }}{{ tr("% iluminada") }}</div>
                 </div>
                 {% endif %}
 
                 <dl class="sidebar-facts">
-                    <dt>Familia</dt>
+                    <dt>{{ tr("Familia") }}</dt>
                     <dd>{{ planta.familia or '—' }}</dd>
-                    <dt>Tipo</dt>
+                    <dt>{{ tr("Tipo") }}</dt>
                     <dd>{{ planta.tipo or '—' }}</dd>
                     {% if planta.taxonomia_genero %}
-                    <dt>Género</dt>
+                    <dt>{{ tr("Género") }}</dt>
                     <dd><em>{{ planta.taxonomia_genero }}</em></dd>
                     {% endif %}
                     {% if planta.taxonomia_especie %}
-                    <dt>Especie</dt>
+                    <dt>{{ tr("Especie") }}</dt>
                     <dd><em>{{ planta.taxonomia_especie }}</em></dd>
                     {% endif %}
                     {% if planta.dificultad %}
-                    <dt>Dificultad</dt>
+                    <dt>{{ tr("Dificultad") }}</dt>
                     <dd class="capitalize">{{ planta.dificultad }}</dd>
                     {% endif %}
                 </dl>
@@ -68,14 +68,14 @@
 
             <div class="detail-sections">
                 <section class="detail-panel detail-panel--wide">
-                    <h2>Descripción</h2>
+                    <h2>{{ tr("Descripción") }}</h2>
                     <p class="detail-description">{{ planta.descripcion or '—' }}</p>
                 </section>
 
                 {% if guia.pasos or guia.errores_comunes %}
                 <section class="detail-panel detail-panel--wide guide-section">
-                    <h2>Empezar hoy (paso a paso)</h2>
-                    <p class="hint">Guía orientativa para principiantes.</p>
+                    <h2>{{ tr("Empezar hoy (paso a paso)") }}</h2>
+                    <p class="hint">{{ tr("Guía orientativa para principiantes.") }}</p>
                     {% if guia.pasos %}
                     <ol class="step-list">
                         {% for paso in guia.pasos %}
@@ -88,7 +88,7 @@
                     {% endif %}
                     {% if guia.errores_comunes %}
                     <div class="guide-warnings">
-                        <h3 class="subsection">Errores comunes</h3>
+                        <h3 class="subsection">{{ tr("Errores comunes") }}</h3>
                         <ul class="warning-list">
                             {% for error in guia.errores_comunes %}
                             <li>
@@ -104,8 +104,8 @@
 
                 {% if rasgos %}
                 <section class="detail-panel traits-section">
-                    <h2>Rasgos observados</h2>
-                    <p class="hint">Características visibles que apoyan la identificación.</p>
+                    <h2>{{ tr("Rasgos observados") }}</h2>
+                    <p class="hint">{{ tr("Características visibles que apoyan la identificación.") }}</p>
                     <ul class="trait-list">
                         {% for rasgo in rasgos %}
                         <li>
@@ -119,8 +119,8 @@
 
                 {% if preguntas %}
                 <section class="detail-panel questions-section">
-                    <h2>Preguntas para mejorar la identificación</h2>
-                    <p class="hint">Responde en tu cuaderno o con nuevas fotos para afinar el resultado.</p>
+                    <h2>{{ tr("Preguntas para mejorar la identificación") }}</h2>
+                    <p class="hint">{{ tr("Responde en tu cuaderno o con nuevas fotos para afinar el resultado.") }}</p>
                     <ul class="question-list">
                         {% for pregunta in preguntas %}
                         <li>
@@ -134,34 +134,34 @@
 
                 {% if planta.candidatos_json and planta.candidatos_json != '[]' %}
                 <section class="detail-panel detail-panel--wide">
-                    <h2>Candidatos</h2>
+                    <h2>{{ tr("Candidatos") }}</h2>
                     <div class="candidate-grid" data-candidates="{{ planta.candidatos_json | e }}"></div>
-                    <p class="hint">Las imágenes se obtienen automáticamente por nombre científico.</p>
+                    <p class="hint">{{ tr("Las imágenes se obtienen automáticamente por nombre científico.") }}</p>
                 </section>
                 {% endif %}
 
                 {% if planta.tamano_adulto or planta.crecimiento or planta.floracion or planta.epoca_poda or planta.epoca_trasplante %}
                 <section class="detail-panel">
-                    <h2>Características</h2>
+                    <h2>{{ tr("Características") }}</h2>
                     <dl class="care-list">
                         {% if planta.tamano_adulto %}
-                        <dt>📏 Tamaño adulto</dt>
+                        <dt>{{ tr("📏 Tamaño adulto") }}</dt>
                         <dd>{{ planta.tamano_adulto }}</dd>
                         {% endif %}
                         {% if planta.crecimiento %}
-                        <dt>🌱 Crecimiento</dt>
+                        <dt>{{ tr("🌱 Crecimiento") }}</dt>
                         <dd>{{ planta.crecimiento }}</dd>
                         {% endif %}
                         {% if planta.floracion %}
-                        <dt>🌸 Floración</dt>
+                        <dt>{{ tr("🌸 Floración") }}</dt>
                         <dd>{{ planta.floracion }}</dd>
                         {% endif %}
                         {% if planta.epoca_poda %}
-                        <dt>✂️ Época de poda</dt>
+                        <dt>{{ tr("✂️ Época de poda") }}</dt>
                         <dd>{{ planta.epoca_poda }}</dd>
                         {% endif %}
                         {% if planta.epoca_trasplante %}
-                        <dt>🪴 Época de trasplante</dt>
+                        <dt>{{ tr("🪴 Época de trasplante") }}</dt>
                         <dd>{{ planta.epoca_trasplante }}</dd>
                         {% endif %}
                     </dl>
@@ -170,13 +170,13 @@
 
                 {% if planta.senales_trasplante or planta.maceta_y_sustrato %}
                 <section class="detail-panel">
-                    <h2>Trasplante</h2>
+                    <h2>{{ tr("Trasplante") }}</h2>
                     {% if planta.senales_trasplante %}
-                    <h3 class="subsection">Señales</h3>
+                    <h3 class="subsection">{{ tr("Señales") }}</h3>
                     <p>{{ planta.senales_trasplante }}</p>
                     {% endif %}
                     {% if planta.maceta_y_sustrato %}
-                    <h3 class="subsection">Maceta y sustrato</h3>
+                    <h3 class="subsection">{{ tr("Maceta y sustrato") }}</h3>
                     <p>{{ planta.maceta_y_sustrato }}</p>
                     {% endif %}
                 </section>
@@ -184,52 +184,52 @@
 
                 {% if planta.toxicidad_perros or planta.toxicidad_gatos %}
                 <section class="detail-panel toxicity">
-                    <h2>Toxicidad para mascotas</h2>
+                    <h2>{{ tr("Toxicidad para mascotas") }}</h2>
                     <dl class="care-list">
                         {% if planta.toxicidad_perros %}
-                        <dt>🐕 Perros</dt>
+                        <dt>{{ tr("🐕 Perros") }}</dt>
                         <dd>{{ planta.toxicidad_perros }}</dd>
                         {% endif %}
                         {% if planta.toxicidad_gatos %}
-                        <dt>🐈 Gatos</dt>
+                        <dt>{{ tr("🐈 Gatos") }}</dt>
                         <dd>{{ planta.toxicidad_gatos }}</dd>
                         {% endif %}
                     </dl>
-                    <p class="hint">Información orientativa. Consulta a un veterinario ante cualquier ingesta sospechosa.</p>
+                    <p class="hint">{{ tr("Información orientativa. Consulta a un veterinario ante cualquier ingesta sospechosa.") }}</p>
                 </section>
                 {% endif %}
 
                 <section class="detail-panel detail-panel--wide detail-panel--care">
-                    <h2>Cuidados</h2>
+                    <h2>{{ tr("Cuidados") }}</h2>
                     <div class="detail-care-grid">
                         <div class="care-item">
                             <span class="care-icon">💧</span>
-                            <h4>Riego</h4>
+                            <h4>{{ tr("Riego") }}</h4>
                             <p>{{ planta.riego or '—' }}</p>
                         </div>
                         <div class="care-item">
                             <span class="care-icon">☀️</span>
-                            <h4>Luz</h4>
+                            <h4>{{ tr("Luz") }}</h4>
                             <p>{{ planta.luz or '—' }}</p>
                         </div>
                         <div class="care-item">
                             <span class="care-icon">🌡️</span>
-                            <h4>Temperatura</h4>
+                            <h4>{{ tr("Temperatura") }}</h4>
                             <p>{{ planta.temperatura or '—' }}</p>
                         </div>
                         <div class="care-item">
                             <span class="care-icon">💨</span>
-                            <h4>Humedad</h4>
+                            <h4>{{ tr("Humedad") }}</h4>
                             <p>{{ planta.humedad or '—' }}</p>
                         </div>
                         <div class="care-item">
                             <span class="care-icon">🪴</span>
-                            <h4>Suelo</h4>
+                            <h4>{{ tr("Suelo") }}</h4>
                             <p>{{ planta.suelo or '—' }}</p>
                         </div>
                         <div class="care-item">
                             <span class="care-icon">🧪</span>
-                            <h4>Fertilización</h4>
+                            <h4>{{ tr("Fertilización") }}</h4>
                             <p>{{ planta.fertilizacion or '—' }}</p>
                         </div>
                     </div>
@@ -237,33 +237,33 @@
 
                 {% if planta.plagas_habituales %}
                 <section class="detail-panel">
-                    <h2>Plagas habituales</h2>
+                    <h2>{{ tr("Plagas habituales") }}</h2>
                     <p>{{ planta.plagas_habituales }}</p>
                 </section>
                 {% endif %}
 
                 {% if planta.problemas_comunes %}
                 <section class="detail-panel">
-                    <h2>Problemas comunes</h2>
+                    <h2>{{ tr("Problemas comunes") }}</h2>
                     <p>{{ planta.problemas_comunes }}</p>
                 </section>
                 {% endif %}
 
                 <section class="detail-panel detail-panel--wide danger-zone">
-                    <h2>Eliminar</h2>
-                    <p>Esta acción eliminará la planta y su fotografía de forma permanente.</p>
+                    <h2>{{ tr("Eliminar") }}</h2>
+                    <p>{{ tr("Esta acción eliminará la planta y su fotografía de forma permanente.") }}</p>
                     <form method="post" action="/plantas/{{ planta.id }}/eliminar"
-                          onsubmit="return confirm('Esta acción eliminará de forma permanente la planta, su fotografía y todo el cuaderno de observaciones. ¿Está seguro?');">
-                        <button type="submit" class="btn btn-danger">Eliminar planta</button>
+                          data-confirm="{{ tr('Esta acción eliminará de forma permanente la planta, su fotografía y todo el cuaderno de observaciones. ¿Está seguro?') }}">
+                        <button type="submit" class="btn btn-danger">{{ tr("Eliminar planta") }}</button>
                     </form>
                 </section>
             </div>
         </div>
     </article>
 
-    <button type="button" class="scroll-top" id="scroll-top-btn" aria-label="Ir arriba" title="Ir arriba">
+    <button type="button" class="scroll-top" id="scroll-top-btn" aria-label="{{ tr("Ir arriba") }}" title="{{ tr("Ir arriba") }}">
         <span class="scroll-top-icon" aria-hidden="true">↑</span>
-        <span class="scroll-top-label">Ir arriba</span>
+        <span class="scroll-top-label">{{ tr("Ir arriba") }}</span>
     </button>
 </div>
 {% endblock %}

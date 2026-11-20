@@ -8,6 +8,7 @@ import json
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
+import logging
 
 from sqlalchemy import func, or_, select
 
@@ -49,13 +50,12 @@ class PlantaService:
 
     @staticmethod
     def crear_desde_identificacion(
-        identificacion: IdentificacionGemini, image_path: str
+        identificacion: IdentificacionGemini, image_path: str, owner_id: int
     ) -> Planta:
         # Enriquecer candidatos con miniaturas (si es posible)
         candidatos = []
-        for cand in identificacion.candidatos:
-            if not cand.thumbnail_url and cand.nombre_cientifico:
-                cand.thumbnail_url = get_thumbnail_url(cand.nombre_cientifico)
+        for cand in identificacion.candidatos[:3]:
+            cand.thumbnail_url = get_thumbnail_url(cand.nombre_cientifico) if cand.nombre_cientifico else ""
             candidatos.append(cand.model_dump())
 
         datos = PlantaCreate(
@@ -99,12 +99,13 @@ class PlantaService:
             confianza=identificacion.confianza,
             image_path=image_path,
         )
-        return PlantaService.crear(datos)
+        return PlantaService.crear(datos, owner_id)
 
     @staticmethod
-    def crear(datos: PlantaCreate) -> Planta:
+    def crear(datos: PlantaCreate, owner_id: int) -> Planta:
         with session_scope() as session:
             planta = Planta(
+                owner_id=owner_id,
                 image_path=datos.image_path,
                 nombre_comun=datos.nombre_comun.strip(),
                 nombre_cientifico=datos.nombre_cientifico.strip(),
@@ -146,9 +147,9 @@ class PlantaService:
             return planta
 
     @staticmethod
-    def obtener_por_id(planta_id: int) -> Planta | None:
+    def obtener_por_id(planta_id: int, owner_id: int) -> Planta | None:
         with session_scope() as session:
-            return session.get(Planta, planta_id)
+            return session.scalar(select(Planta).where(Planta.id == planta_id, Planta.owner_id == owner_id))
 
     # Órdenes admitidos para el listado de plantas.
     ORDENES_VALIDOS = ("recientes", "antiguas", "nombre", "confianza")
@@ -174,6 +175,7 @@ class PlantaService:
 
     @staticmethod
     def listar(
+        owner_id: int,
         termino: str = "",
         page: int = 1,
         page_size: int = PAGE_SIZE,
@@ -185,8 +187,8 @@ class PlantaService:
             orden = "recientes"
 
         with session_scope() as session:
-            query = select(Planta)
-            count_query = select(func.count()).select_from(Planta)
+            query = select(Planta).where(Planta.owner_id == owner_id)
+            count_query = select(func.count()).select_from(Planta).where(Planta.owner_id == owner_id)
 
             if texto:
                 patron = f"%{texto}%"
@@ -213,9 +215,9 @@ class PlantaService:
             )
 
     @staticmethod
-    def actualizar_notas(planta_id: int, notas: str) -> Planta | None:
+    def actualizar_notas(planta_id: int, notas: str, owner_id: int) -> Planta | None:
         with session_scope() as session:
-            planta = session.get(Planta, planta_id)
+            planta = session.scalar(select(Planta).where(Planta.id == planta_id, Planta.owner_id == owner_id))
             if planta is None:
                 return None
             planta.notas_usuario = notas.strip()
@@ -224,17 +226,29 @@ class PlantaService:
             return planta
 
     @staticmethod
-    def eliminar(planta_id: int) -> bool:
+    def eliminar(planta_id: int, owner_id: int) -> bool:
         with session_scope() as session:
-            planta = session.get(Planta, planta_id)
+            planta = session.scalar(select(Planta).where(Planta.id == planta_id, Planta.owner_id == owner_id))
             if planta is None:
                 return False
-            image_path = Path(planta.image_path)
+            image_path = UPLOADS_DIR / Path(planta.image_path).name
             session.delete(planta)
-            session.flush()
-            if image_path.exists():
-                image_path.unlink()
-            return True
+        try:
+            image_path.unlink(missing_ok=True)
+        except OSError:
+            logging.getLogger(__name__).exception("Could not delete plant photo")
+        return True
+
+    @staticmethod
+    def photo_for_owner(filename: str, owner_id: int) -> Path | None:
+        with session_scope() as session:
+            candidates = session.scalars(select(Planta.image_path).where(
+                Planta.owner_id == owner_id,
+                or_(Planta.image_path == filename, Planta.image_path.endswith("/" + filename, autoescape=True)),
+            ))
+            if any(Path(path).name == filename for path in candidates):
+                return UPLOADS_DIR / filename
+        return None
 
     @staticmethod
     def extension_desde_mime(mime_type: str) -> str:

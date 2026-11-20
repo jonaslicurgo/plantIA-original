@@ -1,5 +1,7 @@
 package com.plantia.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +47,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import androidx.compose.ui.platform.LocalContext
+import com.plantia.api.PlantIAClient
 import com.plantia.domain.Candidato
 import com.plantia.util.wikipediaUrl
 
@@ -68,7 +72,7 @@ fun PlantTopBar(
         navigationIcon = {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ui_volver))
                 }
             }
         },
@@ -148,7 +152,7 @@ fun ErrorBanner(message: String, onRetry: (() -> Unit)? = null) {
                 style = MaterialTheme.typography.bodyMedium,
             )
             if (onRetry != null) {
-                TextButton(onClick = onRetry) { Text("Reintentar") }
+                TextButton(onClick = onRetry) { Text(stringResource(R.string.ui_reintentar)) }
             }
         }
     }
@@ -250,7 +254,7 @@ fun CandidateCard(
                 }
                 if (wiki != null && onOpenWiki != null) {
                     Text(
-                        "Ver en Wikipedia ↗",
+                        stringResource(R.string.ui_ver_en_wikipedia),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
@@ -275,7 +279,7 @@ fun ImageLightbox(
             shape = RoundedCornerShape(16.dp),
         ) {
             AsyncImage(
-                model = imageUrl,
+                model = PlantIAClient.imageRequest(LocalContext.current, imageUrl),
                 contentDescription = contentDescription,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -295,7 +299,7 @@ fun DeletePlantDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Eliminar planta") },
+        title = { Text(stringResource(R.string.ui_eliminar_planta)) },
         text = {
             Text(
                 "Esta acción eliminará de forma permanente «$plantName», su fotografía y todo el cuaderno de observaciones. No se puede deshacer."
@@ -306,11 +310,11 @@ fun DeletePlantDialog(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
             ) {
-                Text("Eliminar")
+                Text(stringResource(R.string.ui_eliminar))
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text("Cancelar") }
+            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.ui_cancelar)) }
         },
     )
 }

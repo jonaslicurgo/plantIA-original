@@ -1,5 +1,7 @@
 package com.plantia.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +23,7 @@ fun JournalTimeline(notas: String) {
     val lines = parseJournalLines(notas)
     if (lines.isEmpty()) {
         Text(
-            "Aún no hay anotaciones. Usa «Regada hoy» o los chips rápidos.",
+            stringResource(R.string.ui_aun_no_hay_anotaciones_usa_regada_hoy_o_los_chips_ra),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

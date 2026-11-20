@@ -1,5 +1,7 @@
 package com.plantia.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -63,7 +65,7 @@ fun CameraScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val title = if (refinePlantName.isNullOrBlank()) "Identificar" else "Afinar identificación"
+    val title = if (refinePlantName.isNullOrBlank()) stringResource(R.string.native_identificar) else stringResource(R.string.native_afinar_identificacion)
 
     var hasPermission by remember {
         mutableStateOf(
@@ -92,7 +94,7 @@ fun CameraScreen(
                 val planta = identifyImageFile(context, file, mimeTypeForFile(file))
                 onIdentified(planta.id)
             } catch (e: Exception) {
-                error = e.userMessage("No se pudo identificar")
+                error = e.userMessage(context, context.getString(R.string.native_no_se_pudo_identificar))
             } finally {
                 busy = false
             }
@@ -108,7 +110,7 @@ fun CameraScreen(
                 val planta = identifyImageFile(context, file, mimeTypeForFile(file))
                 onIdentified(planta.id)
             } catch (e: Exception) {
-                error = e.userMessage("No se pudo identificar")
+                error = e.userMessage(context, context.getString(R.string.native_no_se_pudo_identificar))
             } finally {
                 busy = false
             }
@@ -138,7 +140,7 @@ fun CameraScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        "PlantIA necesita acceso a la cámara para identificar plantas.",
+                        stringResource(R.string.ui_plantia_necesita_acceso_a_la_camara_para_identificar),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge,
                     )
@@ -146,13 +148,13 @@ fun CameraScreen(
                         onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) },
                         modifier = Modifier.padding(top = 16.dp),
                     ) {
-                        Text("Conceder permiso")
+                        Text(stringResource(R.string.ui_conceder_permiso))
                     }
                     OutlinedButton(
                         onClick = { if (!busy) galleryLauncher.launch("image/*") },
                         modifier = Modifier.padding(top = 10.dp),
                     ) {
-                        Text("Elegir de galería")
+                        Text(stringResource(R.string.ui_elegir_de_galeria))
                     }
                 }
                 return@Box
@@ -180,9 +182,9 @@ fun CameraScreen(
                 Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
                     Text(
                         if (refinePlantName.isNullOrBlank()) {
-                            "Centra la hoja o flor en el encuadre. Buena luz = mejor resultado."
+                            stringResource(R.string.native_centra_la_hoja_o_flor_en_el_encuadre_buena_luz_mejor_resultado)
                         } else {
-                            "Nueva foto para afinar «$refinePlantName». Compara el resultado con tu ficha actual."
+                            stringResource(R.string.native_nueva_foto_para_afinar_planta_compara_el_resultado_con_tu_fich).replace("{planta}", refinePlantName.orEmpty())
                         },
                         color = Color.White,
                         style = MaterialTheme.typography.bodySmall,
@@ -203,7 +205,7 @@ fun CameraScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         CircularProgressIndicator(color = Color.White)
-                        Text("Analizando con Gemini…", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                        Text(stringResource(R.string.ui_analizando_con_gemini), color = Color.White, style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
@@ -234,7 +236,7 @@ fun CameraScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !busy,
                 ) {
-                    Text("Elegir de galería")
+                    Text(stringResource(R.string.ui_elegir_de_galeria))
                 }
 
                 Row(
@@ -246,7 +248,7 @@ fun CameraScreen(
                         modifier = Modifier.weight(1f),
                         enabled = !busy,
                     ) {
-                        Text("Cancelar")
+                        Text(stringResource(R.string.ui_cancelar))
                     }
 
                     Button(
@@ -257,7 +259,7 @@ fun CameraScreen(
                                     val file = captureToTempFile(context, cap)
                                     identifyFile(file)
                                 } catch (e: Exception) {
-                                    error = e.userMessage("No se pudo capturar")
+                                    error = e.userMessage(context, context.getString(R.string.native_no_se_pudo_capturar))
                                     busy = false
                                 }
                             }
@@ -265,7 +267,7 @@ fun CameraScreen(
                         modifier = Modifier.weight(1f),
                         enabled = !busy && imageCapture != null,
                     ) {
-                        Text("Capturar")
+                        Text(stringResource(R.string.ui_capturar))
                     }
                 }
             }

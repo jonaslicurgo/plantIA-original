@@ -1,37 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}Mis plantas — PlantIA{% endblock %}
+{% block title %}{{ tr("Mis plantas") }} · PLANET-IA{% endblock %}
 
 {% block content %}
 <section class="page-header">
-    <h1>Mis plantas</h1>
-    <p>{{ total }} planta{{ 's' if total != 1 else '' }} identificada{{ 's' if total != 1 else '' }}</p>
+    <h1>{{ tr("Mis plantas") }}</h1>
+    <p>{{ tr("Identified plants") }} · {{ total }}</p>
 </section>
 
 {% if mensaje %}
-<div class="alert alert-success">{{ mensaje }}</div>
+<div class="alert alert-success">{{ tr(mensaje) }}</div>
 {% endif %}
 
 <div class="plants-toolbar">
     <form class="search-bar" method="get" action="/plantas">
-        <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, familia o tipo…">
+        <input type="search" name="q" value="{{ q }}" placeholder="{{ tr("Buscar por nombre, familia o tipo…") }}">
         <input type="hidden" name="orden" value="{{ orden }}">
-        <button type="submit" class="btn btn-primary">Buscar</button>
+        <button type="submit" class="btn btn-primary">{{ tr("Buscar") }}</button>
         {% if q %}
-        <a href="/plantas?orden={{ orden }}" class="btn btn-outline">Limpiar</a>
+        <a href="/plantas?orden={{ orden }}" class="btn btn-outline">{{ tr("Limpiar") }}</a>
         {% endif %}
     </form>
 
     <form class="sort-control" method="get" action="/plantas">
         <input type="hidden" name="q" value="{{ q }}">
-        <label for="orden">Ordenar por</label>
+        <label for="orden">{{ tr("Ordenar por") }}</label>
         <select id="orden" name="orden" class="sort-select" onchange="this.form.submit()">
-            <option value="recientes"{% if orden == 'recientes' %} selected{% endif %}>Más recientes</option>
-            <option value="antiguas"{% if orden == 'antiguas' %} selected{% endif %}>Más antiguas</option>
-            <option value="nombre"{% if orden == 'nombre' %} selected{% endif %}>Nombre (A-Z)</option>
-            <option value="confianza"{% if orden == 'confianza' %} selected{% endif %}>Confianza</option>
+            <option value="recientes"{% if orden == 'recientes' %} selected{% endif %}>{{ tr("Más recientes") }}</option>
+            <option value="antiguas"{% if orden == 'antiguas' %} selected{% endif %}>{{ tr("Más antiguas") }}</option>
+            <option value="nombre"{% if orden == 'nombre' %} selected{% endif %}>{{ tr("Nombre (A-Z)") }}</option>
+            <option value="confianza"{% if orden == 'confianza' %} selected{% endif %}>{{ tr("Confianza") }}</option>
         </select>
-        <noscript><button type="submit" class="btn btn-outline">Aplicar</button></noscript>
+        <noscript><button type="submit" class="btn btn-outline">{{ tr("Aplicar") }}</button></noscript>
     </form>
 </div>
 
@@ -44,7 +44,7 @@
             <h3>{{ planta.nombre_comun }}</h3>
             <p class="scientific"><em>{{ planta.nombre_cientifico }}</em></p>
             <div class="plant-card-meta">
-                <span class="badge badge-{{ planta.confianza }}">{{ planta.confianza }}</span>
+                <span class="badge badge-{{ planta.confianza }}">{{ tr(planta.confianza) }}</span>
                 <time>{{ planta.created_at.strftime('%d/%m/%Y') }}</time>
             </div>
             {% if planta.notas_usuario and planta.notas_usuario.strip() %}
@@ -53,7 +53,7 @@
                 📝 {{ primera_nota[:72] }}{% if primera_nota|length > 72 %}…{% endif %}
             </p>
             {% else %}
-            <p class="plant-card-note plant-card-note--empty">Sin anotaciones aún</p>
+            <p class="plant-card-note plant-card-note--empty">{{ tr("Sin anotaciones aún") }}</p>
             {% endif %}
         </div>
     </a>
@@ -63,11 +63,11 @@
 {% if total_pages > 1 %}
 <nav class="pagination">
     {% if page > 1 %}
-    <a href="/plantas?q={{ q }}&orden={{ orden }}&page={{ page - 1 }}" class="btn btn-outline">← Anterior</a>
+    <a href="/plantas?q={{ q }}&orden={{ orden }}&page={{ page - 1 }}" class="btn btn-outline">{{ tr("← Anterior") }}</a>
     {% endif %}
-    <span class="page-info">Página {{ page }} de {{ total_pages }}</span>
+    <span class="page-info">{{ tr("Página") }} {{ page }} / {{ total_pages }}</span>
     {% if page < total_pages %}
-    <a href="/plantas?q={{ q }}&orden={{ orden }}&page={{ page + 1 }}" class="btn btn-outline">Siguiente →</a>
+    <a href="/plantas?q={{ q }}&orden={{ orden }}&page={{ page + 1 }}" class="btn btn-outline">{{ tr("Siguiente →") }}</a>
     {% endif %}
 </nav>
 {% endif %}
@@ -76,10 +76,10 @@
 <div class="empty-state">
     <span class="empty-icon">🌱</span>
     {% if q %}
-    <p>No se encontraron plantas para «{{ q }}».</p>
+    <p>{{ tr("No se encontraron plantas para «") }}{{ q }}».</p>
     {% else %}
-    <p>Aún no has identificado ninguna planta.</p>
-    <a href="/" class="btn btn-primary">Identificar la primera</a>
+    <p>{{ tr("Aún no has identificado ninguna planta.") }}</p>
+    <a href="/" class="btn btn-primary">{{ tr("Identificar la primera") }}</a>
     {% endif %}
 </div>
 {% endif %}

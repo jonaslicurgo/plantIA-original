@@ -18,6 +18,7 @@ _SessionLocal = None
 
 
 _PLANTAS_COLUMN_MIGRATIONS: list[tuple[str, str]] = [
+    ("owner_id", "INTEGER"),
     ("plagas_habituales", "TEXT NOT NULL DEFAULT ''"),
     ("toxicidad_perros", "TEXT NOT NULL DEFAULT ''"),
     ("toxicidad_gatos", "TEXT NOT NULL DEFAULT ''"),
@@ -43,6 +44,7 @@ _PLANTAS_COLUMN_MIGRATIONS: list[tuple[str, str]] = [
 def _migrate_plantas_columns(engine) -> None:
     """Añade columnas nuevas a plantas en bases de datos existentes."""
     with engine.begin() as conn:
+        conn.exec_driver_sql("BEGIN IMMEDIATE")
         rows = conn.execute(text("PRAGMA table_info(plantas)")).fetchall()
         if not rows:
             return
@@ -50,6 +52,8 @@ def _migrate_plantas_columns(engine) -> None:
         for name, definition in _PLANTAS_COLUMN_MIGRATIONS:
             if name not in existing:
                 conn.execute(text(f"ALTER TABLE plantas ADD COLUMN {name} {definition}"))
+
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_plantas_owner ON plantas(owner_id)"))
 
 
 def get_engine():
@@ -90,6 +94,4 @@ def session_scope() -> Generator[Session, None, None]:
 
 def init_database() -> None:
     """Crea las tablas si no existen."""
-    engine = get_engine()
-    Base.metadata.create_all(engine)
-    _migrate_plantas_columns(engine)
+    get_engine()

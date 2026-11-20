@@ -1,5 +1,7 @@
 package com.plantia.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -76,13 +78,13 @@ import kotlinx.coroutines.launch
 
 private const val PAGE_SIZE = 20
 
-private data class SortOption(val value: String, val label: String)
+private data class SortOption(val value: String, val label: Int)
 
 private val sortOptions = listOf(
-    SortOption("recientes", "Más recientes"),
-    SortOption("antiguas", "Más antiguas"),
-    SortOption("nombre", "Nombre (A-Z)"),
-    SortOption("confianza", "Confianza"),
+    SortOption("recientes", R.string.native_mas_recientes),
+    SortOption("antiguas", R.string.native_mas_antiguas),
+    SortOption("nombre", R.string.native_nombre_a_z),
+    SortOption("confianza", R.string.native_confianza),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,7 +134,7 @@ fun PlantsScreen(
         try {
             fetchPage(1, replace = true)
         } catch (e: Exception) {
-            error = e.userMessage("Error al cargar")
+            error = e.userMessage(context, context.getString(R.string.native_error_al_cargar))
         } finally {
             loading = false
             refreshing = false
@@ -145,7 +147,7 @@ fun PlantsScreen(
         try {
             fetchPage(page + 1, replace = false)
         } catch (e: Exception) {
-            error = e.userMessage("Error al cargar más")
+            error = e.userMessage(context, context.getString(R.string.native_error_al_cargar_mas))
         } finally {
             loadingMore = false
         }
@@ -171,11 +173,11 @@ fun PlantsScreen(
     }
 
     Scaffold(
-        topBar = { PlantTopBar(title = "Mis plantas") },
+        topBar = { PlantTopBar(title = stringResource(R.string.ui_mis_plantas)) },
         snackbarHost = { PlantSnackbarHost(snackbar) },
         floatingActionButton = {
             FloatingActionButton(onClick = onOpenCamera) {
-                Icon(Icons.Default.CameraAlt, contentDescription = "Identificar planta")
+                Icon(Icons.Default.CameraAlt, contentDescription = stringResource(R.string.ui_identificar_planta))
             }
         },
     ) { padding ->
@@ -203,7 +205,7 @@ fun PlantsScreen(
                         .padding(top = 8.dp),
                     value = q,
                     onValueChange = { q = it },
-                    label = { Text("Buscar por nombre") },
+                    label = { Text(stringResource(R.string.ui_buscar_por_nombre)) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     singleLine = true,
                 )
@@ -213,10 +215,10 @@ fun PlantsScreen(
                     onExpandedChange = { sortExpanded = it },
                 ) {
                     OutlinedTextField(
-                        value = sortOptions.first { it.value == orden }.label,
+                        value = stringResource(sortOptions.first { it.value == orden }.label),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Ordenar por") },
+                        label = { Text(stringResource(R.string.ui_ordenar_por)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sortExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -228,7 +230,7 @@ fun PlantsScreen(
                     ) {
                         sortOptions.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option.label) },
+                                text = { Text(stringResource(option.label)) },
                                 onClick = {
                                     orden = option.value
                                     sortExpanded = false
@@ -253,13 +255,13 @@ fun PlantsScreen(
                     items.isEmpty() -> {
                         EmptyState(
                             emoji = "🪴",
-                            title = if (q.isBlank()) "Aún no tienes plantas" else "Sin resultados",
+                            title = if (q.isBlank()) stringResource(R.string.native_aun_no_tienes_plantas) else stringResource(R.string.native_sin_resultados),
                             subtitle = if (q.isBlank()) {
-                                "Identifica tu primera planta con la cámara."
+                                stringResource(R.string.native_identifica_tu_primera_planta_con_la_camara)
                             } else {
-                                "Prueba con otro nombre o término de búsqueda."
+                                stringResource(R.string.native_prueba_con_otro_nombre_o_termino_de_busqueda)
                             },
-                            actionLabel = if (q.isBlank()) "Identificar planta" else null,
+                            actionLabel = if (q.isBlank()) stringResource(R.string.native_identificar_planta) else null,
                             onAction = if (q.isBlank()) onOpenCamera else null,
                         )
                     }
@@ -273,7 +275,7 @@ fun PlantsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            "Desliza una tarjeta a la derecha para marcar «Regada hoy»",
+                            stringResource(R.string.ui_desliza_una_tarjeta_a_la_derecha_para_marcar_regada),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -306,7 +308,7 @@ fun PlantsScreen(
                                                 )
                                             } catch (e: Exception) {
                                                 snackbar.showSnackbar(
-                                                    e.userMessage("No se pudo guardar"),
+                                                    e.userMessage(context, context.getString(R.string.native_no_se_pudo_guardar)),
                                                     duration = SnackbarDuration.Short,
                                                 )
                                             }
@@ -364,7 +366,7 @@ private fun SwipeablePlantCard(
                 contentAlignment = Alignment.CenterStart,
             ) {
                 Text(
-                    "💧 Regada hoy",
+                    stringResource(R.string.ui_regada_hoy),
                     modifier = Modifier.padding(horizontal = 16.dp),
                     color = Color.White,
                     style = MaterialTheme.typography.labelLarge,
@@ -391,7 +393,7 @@ private fun PlantGridCard(planta: PlantaResponse, baseUrl: String, onClick: () -
     ) {
         Column {
             AsyncImage(
-                model = imageUrl,
+                model = PlantIAClient.imageRequest(LocalContext.current, imageUrl),
                 contentDescription = planta.nombre_comun,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

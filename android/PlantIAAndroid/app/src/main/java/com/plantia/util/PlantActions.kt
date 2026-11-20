@@ -2,6 +2,7 @@ package com.plantia.util
 
 import android.content.Context
 import android.net.Uri
+import com.plantia.R
 import com.plantia.api.PlantIAClient
 import com.plantia.api.models.PlantaResponse
 import com.plantia.api.models.PlantaUpdateRequest
@@ -18,7 +19,7 @@ fun appendJournalLine(current: String, line: String): String {
 }
 
 suspend fun markPlantWatered(context: Context, plant: PlantaResponse): PlantaResponse {
-    val line = "Regada el ${formatJournalDate()}"
+    val line = context.getString(R.string.native_regada_el_fecha).replace("{fecha}", formatJournalDate(context))
     val notas = appendJournalLine(plant.notas_usuario, line)
     val request = PlantaUpdateRequest(notas_usuario = notas)
     val updated = try {

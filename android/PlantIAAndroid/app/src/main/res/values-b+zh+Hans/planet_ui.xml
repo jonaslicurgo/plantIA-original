@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_empezar_hoy" formatted="false">从今天开始</string>
+    <string name="ui_calendario_lunar" formatted="false">农历</string>
+    <string name="ui_otras_posibilidades" formatted="false">其他可能性</string>
+    <string name="ui_ejemplo_http_192_168_1_96_8000" formatted="false">示例：http://192.168.1.96:8000/</string>
+    <string name="ui_seguridad_y_problemas" formatted="false">安全与问题</string>
+    <string name="ui_conceder_permiso" formatted="false">授予权限</string>
+    <string name="ui_editar_observaciones" formatted="false">编辑观察结果</string>
+    <string name="ui_mantenimiento" formatted="false">维护</string>
+    <string name="ui_elegir_de_galeria" formatted="false">从画廊中选择</string>
+    <string name="ui_ordenar_por" formatted="false">排序依据</string>
+    <string name="ui_rasgos_observados" formatted="false">观察到的特征</string>
+    <string name="ui_caracteristicas" formatted="false">特点</string>
+    <string name="ui_recordatorio_de_riego" formatted="false">浇水提醒</string>
+    <string name="ui_ver_en_github" formatted="false">在 GitHub 上查看</string>
+    <string name="ui_historial" formatted="false">历史</string>
+    <string name="ui_planet_ia" formatted="false">PLANET-IA</string>
+    <string name="ui_regada_hoy" formatted="false">💧 今天浇水了</string>
+    <string name="ui_crea_o_recupera_tu_cuenta_desde_la_version_web" formatted="false">从网络版本创建或恢复您的帐户。</string>
+    <string name="ui_apariencia" formatted="false">外观</string>
+    <string name="ui_acerca_de_plantia" formatted="false">关于 PlantIA</string>
+    <string name="ui_eliminar" formatted="false">删除</string>
+    <string name="ui_frecuencia" formatted="false">频率</string>
+    <string name="ui_contrasena" formatted="false">密码</string>
+    <string name="ui_capturar" formatted="false">捕获</string>
+    <string name="ui_informacion_y_codigo_fuente" formatted="false">信息和源代码</string>
+    <string name="ui_url_del_servidor" formatted="false">服务器地址</string>
+    <string name="ui_activar_recordatorio" formatted="false">激活提醒</string>
+    <string name="ui_errores_comunes" formatted="false">常见错误：</string>
+    <string name="ui_mis_plantas" formatted="false">我的植物</string>
+    <string name="ui_conecta_con_tu_servidor_plantia_en_la_red_local_para" formatted="false">连接到本地网络上的 PlantIA 服务器，以在移动设备和 Web 之间同步您的植物。</string>
+    <string name="ui_identifica_plantas_a_partir_de_fotografias_con_googl" formatted="false">使用 Google Gemini 从照片中识别植物，将每张卡片保存在您的个人收藏中，并保留一本观察笔记本，其中包含浇水、移植和护理说明。</string>
+    <string name="ui_buscar_por_nombre" formatted="false">按名称搜索</string>
+    <string name="ui_responde_en_tu_cuaderno_o_con_nuevas_fotos" formatted="false">在笔记本或新照片中回复。</string>
+    <string name="ui_descripcion" formatted="false">描述</string>
+    <string name="ui_volver" formatted="false">返回</string>
+    <string name="ui_correo_electronico" formatted="false">电子邮件</string>
+    <string name="ui_acerca_de" formatted="false">关于</string>
+    <string name="ui_preguntas_para_afinar" formatted="false">需要完善的问题</string>
+    <string name="ui_ajustes" formatted="false">设置</string>
+    <string name="ui_cuaderno_de_la_planta" formatted="false">植物笔记本</string>
+    <string name="ui_identificar_planta" formatted="false">识别植物</string>
+    <string name="ui_cuidados" formatted="false">护理</string>
+    <string name="ui_reintentar" formatted="false">重试</string>
+    <string name="ui_registra_riegos_trasplantes_y_observaciones" formatted="false">记录灌溉、移植和观察。</string>
+    <string name="ui_introduce_la_url_de_tu_servidor_plantia_ip_y_puerto" formatted="false">输入 PlantIA 服务器的 URL（本地网络上的 IP 和端口）。</string>
+    <string name="ui_cancelar" formatted="false">取消</string>
+    <string name="ui_elige_el_tema_de_la_app_sistema_sigue_la_configuraci" formatted="false">选择应用程序的主题。 “系统”遵循设备设置。</string>
+    <string name="ui_plantas_que_tocan_regar_hoy" formatted="false">💧 今天需要浇水的植物</string>
+    <string name="ui_plantia_necesita_acceso_a_la_camara_para_identificar" formatted="false">PlantIA 需要访问摄像头才能识别植物。</string>
+    <string name="ui_notificacion_local_cuando_toque_regar" formatted="false">到了浇水时间的本地通知。</string>
+    <string name="ui_analizando_con_gemini" formatted="false">与双子座分析...</string>
+    <string name="ui_eliminar_planta" formatted="false">删除植物</string>
+    <string name="ui_desliza_una_tarjeta_a_la_derecha_para_marcar_regada" formatted="false">向右滑动卡片以标记“今天浇水”</string>
+    <string name="ui_re_identificar_con_nueva_foto" formatted="false">用新照片重新识别</string>
+    <string name="ui_conexion_lan" formatted="false">局域网连接</string>
+    <string name="ui_hora_del_aviso" formatted="false">通知时间</string>
+    <string name="ui_ver_en_wikipedia" formatted="false">请参阅维基百科 ↗</string>
+    <string name="ui_aun_no_hay_anotaciones_usa_regada_hoy_o_los_chips_ra" formatted="false">还没有注释。使用“今日灌溉”或快速薯片。</string>
+    <string name="planet_plants" formatted="false">我的植物</string>
+    <string name="planet_identify" formatted="false">识别</string>
+    <string name="planet_settings" formatted="false">设置</string>
+    <string name="planet_about" formatted="false">关于</string>
+    <string name="planet_detail" formatted="false">详情</string>
+    <string name="planet_saving" formatted="false">正在保存...</string>
+    <string name="planet_save" formatted="false">保存</string>
+    <string name="planet_deleting" formatted="false">正在删除...</string>
+    <string name="planet_delete" formatted="false">删除</string>
+    <string name="planet_save_url" formatted="false">保存网址</string>
+    <string name="planet_test_server" formatted="false">尝试一下</string>
+    <string name="planet_sign_out" formatted="false">退出</string>
+    <string name="planet_sign_in" formatted="false">登录</string>
+    <string name="planet_system" formatted="false">系统</string>
+    <string name="planet_light" formatted="false">当然可以</string>
+    <string name="planet_dark" formatted="false">黑暗</string>
+    <string name="native_error_al_cargar" formatted="false">加载错误</string>
+    <string name="native_error_al_cargar_mas" formatted="false">加载更多时出错</string>
+    <string name="native_no_se_pudo_guardar" formatted="false">无法保存</string>
+    <string name="native_mas_recientes" formatted="false">最近的</string>
+    <string name="native_mas_antiguas" formatted="false">年长的</string>
+    <string name="native_nombre_a_z" formatted="false">姓名（A-Z）</string>
+    <string name="native_confianza" formatted="false">信任</string>
+    <string name="native_aun_no_tienes_plantas" formatted="false">你还没有植物</string>
+    <string name="native_sin_resultados" formatted="false">没有结果</string>
+    <string name="native_identifica_tu_primera_planta_con_la_camara" formatted="false">用相机识别你的第一株植物。</string>
+    <string name="native_prueba_con_otro_nombre_o_termino_de_busqueda" formatted="false">尝试其他名称或搜索词。</string>
+    <string name="native_identificar_planta" formatted="false">识别植物</string>
+    <string name="native_error_al_cargar_la_ficha" formatted="false">加载文件时出错</string>
+    <string name="native_no_se_pudo_borrar" formatted="false">无法删除</string>
+    <string name="native_cuaderno_guardado" formatted="false">保存的笔记本</string>
+    <string name="native_abonada" formatted="false">🧪 订阅者</string>
+    <string name="native_abonada_el_fecha" formatted="false">于{fecha}付款</string>
+    <string name="native_trasplantada" formatted="false">🪴移植了</string>
+    <string name="native_trasplantada_el_fecha" formatted="false">于{fecha}移植</string>
+    <string name="native_podada" formatted="false">✂️修剪</string>
+    <string name="native_podada_el_fecha" formatted="false">于{fecha}修剪</string>
+    <string name="native_florecio" formatted="false">🌈 绽放了</string>
+    <string name="native_florecio_el_fecha" formatted="false">于{fecha}开花</string>
+    <string name="native_nuevo_sustrato" formatted="false">🌱新基材</string>
+    <string name="native_cambie_el_sustrato_el_fecha" formatted="false">我于{fecha}更换了基材</string>
+    <string name="native_dificultad" formatted="false">难度</string>
+    <string name="native_tamano_adulto" formatted="false">成人尺寸</string>
+    <string name="native_crecimiento" formatted="false">成长</string>
+    <string name="native_floracion" formatted="false">开花</string>
+    <string name="native_epoca_de_poda" formatted="false">修剪季节</string>
+    <string name="native_epoca_de_trasplante" formatted="false">移植时间</string>
+    <string name="native_senales_de_trasplante" formatted="false">移植迹象</string>
+    <string name="native_maceta_y_sustrato" formatted="false">盆和基质</string>
+    <string name="native_toxicidad_perros" formatted="false">狗毒性</string>
+    <string name="native_toxicidad_gatos" formatted="false">猫毒性</string>
+    <string name="native_problemas_comunes" formatted="false">常见问题</string>
+    <string name="native_plagas_habituales" formatted="false">常见害虫</string>
+    <string name="native_regada_el_fecha" formatted="false">{fecha}浇水</string>
+    <string name="native_cada_count_dia" formatted="false">每 {count} 天</string>
+    <string name="native_aviso_a_las_hora" formatted="false">{hora}通知</string>
+    <string name="native_no_se_pudo_identificar" formatted="false">无法识别</string>
+    <string name="native_no_se_pudo_capturar" formatted="false">无法捕捉</string>
+    <string name="native_identificar" formatted="false">识别</string>
+    <string name="native_afinar_identificacion" formatted="false">细化识别</string>
+    <string name="native_centra_la_hoja_o_flor_en_el_encuadre_buena_luz_mejor_resultado" formatted="false">将叶子或花朵置于框架中央。良好的光线=更好的效果。</string>
+    <string name="native_nueva_foto_para_afinar_planta_compara_el_resultado_con_tu_fich" formatted="false">精炼{planta}的新照片。将结果与您当前的卡进行比较。</string>
+    <string name="native_no_se_pudo_conectar" formatted="false">无法连接</string>
+    <string name="native_no_se_pudo_cambiar_la_sesion" formatted="false">无法更改会话</string>
+    <string name="native_servidor_guardado" formatted="false">已保存的服务器</string>
+    <string name="native_sesion_iniciada" formatted="false">会话开始</string>
+    <string name="native_usa_la_url_https_de_planet_ia" formatted="false">使用 PLANET-IA HTTPS URL</string>
+    <string name="native_conectado_count_planta_s" formatted="false">已连接 · {count} 个工厂</string>
+    <string name="native_sin_conexion_con_el_servidor_comprueba_la_red_wi_fi" formatted="false">没有连接到服务器。检查 Wi-Fi 网络。</string>
+    <string name="native_recordatorios_de_riego" formatted="false">浇水提醒</string>
+    <string name="native_avisos_para_regar_tus_plantas" formatted="false">给植物浇水的注意事项</string>
+    <string name="native_toca_para_abrir_el_cuaderno_de_la_planta" formatted="false">点击打开植物笔记本。</string>
+    <string name="native_has_regado_planta" formatted="false">你给{planta}浇水了吗？</string>
+</resources>

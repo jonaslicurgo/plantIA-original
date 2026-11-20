@@ -27,6 +27,10 @@ import com.plantia.ui.SplashScreen
 import com.plantia.ui.theme.PlantIATheme
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.plantia.data.ServerPreferences(newBase).localizedContext(newBase))
+    }
+
     private val notificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { /* opcional */ }

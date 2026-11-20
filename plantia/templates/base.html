@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ locale }}" dir="{{ 'rtl' if rtl else 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}PlantIA{% endblock %}</title>
+    <title>{% block title %}PLANET-IA{% endblock %}</title>
     <link rel="icon" href="/static/img/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,56 +24,43 @@
             } catch (e) {
                 document.documentElement.setAttribute("data-theme", "light");
             }
-            // Splash: mostrar solo en primera carga o al volver a Identificar.
-            try {
-                var shown = sessionStorage.getItem("plantiaSplashShown") === "1";
-                var shouldShow = !shown || window.location.pathname === "/";
-                if (shouldShow) {
-                    document.documentElement.classList.add("show-splash");
-                }
-            } catch (e) {
-                document.documentElement.classList.add("show-splash");
-            }
         })();
     </script>
 </head>
-<body{% if mensaje %} data-flash="{{ mensaje }}" data-flash-type="success"{% elif error %} data-flash="{{ error }}" data-flash-type="error"{% endif %}>
-    <div id="splash" class="splash" aria-hidden="true">
-        <div class="splash-inner">
-            <img class="splash-logo" src="/static/img/logo.png" alt="PlantIA">
-            <div class="splash-progress" role="progressbar" aria-label="Cargando" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div id="splash-progress-bar" class="splash-progress-bar"></div>
-            </div>
-        </div>
-    </div>
-
+<body{% if mensaje %} data-flash="{{ tr(mensaje) }}" data-flash-type="success"{% elif error %} data-flash="{{ error }}" data-flash-type="error"{% endif %}>
     <header class="header">
         <div class="container header-inner">
             <a href="/" class="logo">
-                <img class="logo-img" src="/static/img/logo.png" alt="PlantIA">
-                <span class="logo-text">PlantIA</span>
+                <img class="logo-img" src="/static/img/logo.png" alt="PLANET-IA">
+                <span class="logo-text">PLANET-IA</span>
             </a>
 
-            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-nav">
+            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="{{ tr("Abrir menú") }}" aria-expanded="false" aria-controls="main-nav">
                 <span class="nav-toggle-bar"></span>
                 <span class="nav-toggle-bar"></span>
                 <span class="nav-toggle-bar"></span>
             </button>
 
             <nav id="main-nav">
-                <a href="/" class="nav-link{% if request.url.path == '/' %} active{% endif %}">Identificar</a>
-                <a href="/plantas" class="nav-link{% if request.url.path.startswith('/plantas') %} active{% endif %}">Mis plantas</a>
-                <a href="/configuracion" class="nav-link{% if request.url.path.startswith('/configuracion') %} active{% endif %}">Configuración</a>
-                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" title="Cambiar tema claro/oscuro">
+                <a href="/" class="nav-link{% if request.url.path == '/' %} active{% endif %}">{{ tr("Identificar") }}</a>
+                {% if request.state.account_id %}<a href="/plantas" class="nav-link{% if request.url.path.startswith('/plantas') %} active{% endif %}">{{ tr("Mis plantas") }}</a>{% endif %}
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="{{ tr("Cambiar tema") }}" title="{{ tr("Cambiar tema claro/oscuro") }}">
                     <span class="theme-toggle-icon theme-toggle-icon--sun" aria-hidden="true">☀️</span>
                     <span class="theme-toggle-icon theme-toggle-icon--moon" aria-hidden="true">🌙</span>
                 </button>
-                <form method="post" action="/salir" class="nav-exit-form">
-                    <button
-                        type="submit"
-                        class="btn btn-danger nav-exit"
-                        onclick="return confirm('¿Seguro que quieres salir? Se cerrará el servidor y se liberará el puerto.');"
-                    >Salir</button>
+                {% if request.state.account_id %}
+                <form method="post" action="/conta/sair"><button class="btn btn-outline">{{ tr("Sign out") }}</button></form>
+                {% else %}
+                <a class="nav-link" href="/conta/entrar">{{ tr("Sign in") }}</a>
+                {% endif %}
+                <form class="language-picker" method="post" action="/idioma">
+                    <input type="hidden" name="page" value="{{ request.url.path }}">
+                    <select name="language" aria-label="{{ tr('Language') }}">
+                    {% for code, names in languages.items() %}
+                        <option value="{{ code }}" lang="{{ code }}"{% if code == locale %} selected{% endif %}>{{ names[0] }}</option>
+                    {% endfor %}
+                    </select>
+                    <button class="btn btn-outline">{{ tr("Apply") }}</button>
                 </form>
             </nav>
         </div>
@@ -85,12 +72,17 @@
 
     <footer class="footer">
         <div class="container">
-            <p>PlantIA — identificación de plantas con Gemini. Los resultados son orientativos.</p>
+            <p>{{ tr("AI results are for guidance") }} · <a href="https://github.com/entreunosyceros/plantIA">{{ tr("Original project") }}</a> · GPL v3</p>
         </div>
     </footer>
 
     <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="false"></div>
 
+    <script id="ui-messages" type="application/json">{{ {
+        'Close': tr('Close'), 'Enlarged image': tr('Enlarged image'), 'Candidate': tr('Candidate'),
+        'View on Wikipedia': tr('View on Wikipedia'), 'alto': tr('alto'), 'medio': tr('medio'),
+        'bajo': tr('bajo')
+    } | tojson }}</script>
     <script src="/static/js/app.js"></script>
     {% block scripts %}{% endblock %}
 </body>

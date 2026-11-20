@@ -1,4 +1,6 @@
-# PlantIA
+# PLANET-IA
+
+> Branch de desenvolvimento comercial. A configuração desta versão, autenticação e homologação estão no [CHANGELOG](CHANGELOG.md).
 
 <img width="1200" height="655" alt="PlantIA" src="https://github.com/user-attachments/assets/cc8c9c52-1a06-4704-818b-60c9afd33cec" />
 
@@ -150,6 +152,7 @@ El modelo de Gemini se configura en **Configuración** (interfaz web) o con la v
 ## Requisitos
 
 - Python 3.10 o superior
+- SQLite 3.35 o superior
 - Conexión a internet (solo al identificar plantas)
 - Clave de API de [Google AI Studio](https://aistudio.google.com/apikey)
 
@@ -162,52 +165,32 @@ python3 run_app.py
 
 Abre [http://localhost:8000](http://localhost:8000) en el navegador.
 
-Después, entra en **Configuración** y pega tu API key (y elige el modelo).
-
-> Alternativa: si prefieres usar `.env`, copia `.env.example` a `.env` y define `GEMINI_API_KEY`.
+Para identificar plantas, configura la variable del servidor `GEMINI_API_KEY` con una clave de prueba. Puedes copiar `.env.example` a un archivo local `.env` excluido de Git. Crea una cuenta e inicia sesión desde la interfaz web.
 
 ## Configuración
 
-Variables en `.env`:
-
-| Variable | Descripción | Por defecto |
-|----------|-------------|-------------|
-| `GEMINI_API_KEY` | Clave de Google AI Studio | *(obligatoria)* |
-| `GEMINI_MODEL` | Modelo de Gemini | `gemini-2.5-flash` |
-| `PLANTIA_PORT` | Puerto del servidor | `8000` |
-
-### Configurar desde la interfaz
-
-<p align="center">
-
-  <img width="990" height="541" alt="configuracion" src="https://github.com/user-attachments/assets/136c48aa-1c32-4403-a3be-31bb8949dfc0" />
-
-</p>
-
-También puedes configurar Gemini desde la propia aplicación:
-
-- Abre PlantIA y entra en **Configuración**
-- Pega tu API key y elige un modelo (recomendado: **Gemini 2.5 Flash**)
-- Pulsa **Guardar configuración**
-
-La configuración se guarda localmente en `~/.plantia/config.json` (con permisos restringidos) y tiene prioridad sobre el `.env`.
-
-> **Nota:** `gemini-2.0-flash` fue retirado por Google en junio de 2026. Si tenías ese modelo configurado, PlantIA usará `gemini-2.5-flash` automáticamente.
+| Variable | Descripción |
+|----------|-------------|
+| `GEMINI_API_KEY` | Clave de Google AI Studio, solo en el servidor |
+| `GEMINI_MODEL` | Modelo de Gemini, por defecto `gemini-2.5-flash` |
+| `PLANTIA_PORT` | Puerto del iniciador local, por defecto `8000` |
+| `PLANET_DATA_DIR` | Directorio con SQLite y fotografías, por defecto `~/.plantia` |
+| `PLANET_PUBLIC_ORIGIN` | Origen HTTPS del entorno, necesario para recuperación de contraseña |
+| `PLANET_SMTP_*` | Transporte de recuperación de contraseña. Consulta [CHANGELOG.md](CHANGELOG.md) |
 
 ## Datos locales
 
-Todo se guarda en `~/.plantia/`:
+El banco de datos y las fotos se guardan por defecto en `~/.plantia/`:
 
 ```
 ~/.plantia/
-├── config.json     # API key y modelo de Gemini
 ├── plantia.db      # Base de datos SQLite
 └── uploads/        # Fotografías subidas
 ```
 
 ### Copia de seguridad
 
-Para hacer backup, copia la carpeta completa:
+Para hacer backup, detén la escritura y copia la carpeta de datos completa:
 
 ```bash
 cp -r ~/.plantia ~/backup-plantia-$(date +%Y%m%d)
@@ -224,10 +207,11 @@ cp -r ~/.plantia ~/backup-plantia-$(date +%Y%m%d)
 | `POST` | `/api/plantas/{id}/notas` | Guardar notas del cuaderno (mismo cuerpo JSON; útil para la app Android) |
 | `DELETE` | `/api/plantas/{id}` | Eliminar planta |
 
-Ejemplo con `curl`:
+Entrega el token de sesión por el encabezado Authorization en las solicitudes API. Puedes obtenerlo iniciando sesión con `POST /api/auth/login` y un formulario con `email` y `password`. Ejemplo con `curl`:
 
 ```bash
 curl -X POST http://localhost:8000/api/plantas/identificar \
+  -H "Authorization: Bearer $PLANET_TOKEN" \
   -F "file=@mi-planta.jpg"
 ```
 
@@ -265,7 +249,7 @@ python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn main:app --reload --port 8000
+PLANET_INSECURE_LOCAL_HTTP=1 uvicorn main:app --host 127.0.0.1 --reload --port 8000
 ```
 
 ## Aviso

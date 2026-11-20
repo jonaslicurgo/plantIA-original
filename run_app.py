@@ -1,13 +1,8 @@
 from __future__ import annotations
 
-import json
 import os
-import socket
-import signal
 import subprocess
 import sys
-import time
-from re import findall
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -15,7 +10,6 @@ REQUIREMENTS_FILE = PROJECT_DIR / "requirements.txt"
 DEFAULT_PORT = int(os.getenv("PLANTIA_PORT", "8000"))
 
 APP_DATA_DIR = Path.home() / ".plantia"
-LOCAL_CONFIG_PATH = APP_DATA_DIR / "config.json"
 
 
 def get_venv_dir() -> Path:
@@ -94,76 +88,16 @@ def launch_app() -> int:
 
     port = int(os.getenv("PLANTIA_PORT", str(DEFAULT_PORT)))
 
-    def _is_port_open(p: int) -> bool:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            return s.connect_ex(("127.0.0.1", p)) == 0
-
-    def _pids_using_port(p: int) -> list[int]:
-        try:
-            out = subprocess.check_output(["ss", "-ltnp"], text=True, stderr=subprocess.STDOUT)
-        except Exception:
-            return []
-        # Example: users:(("python",pid=33160,fd=16))
-        pids: list[int] = []
-        for line in out.splitlines():
-            if f":{p} " in line or f":{p}\t" in line or f":{p}," in line or f":{p}: " in line:
-                pids.extend([int(x) for x in findall(r"pid=(\d+)", line)])
-        return list(dict.fromkeys(pids))
-
-    def _is_plantia_pid(pid: int) -> bool:
-        try:
-            cmd = subprocess.check_output(
-                ["ps", "-p", str(pid), "-o", "cmd="], text=True, stderr=subprocess.DEVNULL
-            ).strip()
-        except Exception:
-            return False
-        cmd_l = cmd.lower()
-        # Heurística: evita matar algo que no sea PlantIA/uvicorn.
-        return ("plantia" in cmd_l) or ("run_app.py" in cmd_l) or ("uvicorn" in cmd_l)
-
-    if _is_port_open(port):
-        # Intento 1: cerrar procesos que parezcan PlantIA.
-        pids = _pids_using_port(port)
-        plantia_pids = [pid for pid in pids if _is_plantia_pid(pid)]
-        if plantia_pids:
-            print(
-                f"Puerto {port} ya está en uso. Intentando cerrar PlantIA (PIDs: {plantia_pids}) …",
-                file=sys.stderr,
-            )
-            for pid in plantia_pids:
-                try:
-                    os.kill(pid, signal.SIGTERM)
-                except Exception:
-                    continue
-            time.sleep(1.0)
-
-        # Reintento: si ya está libre, seguimos.
-        if _is_port_open(port):
-            print(
-                f"Error: el puerto {port} sigue ocupado. Detén el proceso que lo usa o arranca con otro puerto, por ejemplo:\n"
-                f"  PLANTIA_PORT=8001 python3 run_app.py",
-                file=sys.stderr,
-            )
-            return 1
-
-    print(f"Iniciando PlantIA en http://localhost:{port}")
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
+    host = os.getenv("PLANET_BIND_HOST", "127.0.0.1")
+    if host in {"127.0.0.1", "::1"}:
+        os.environ.setdefault("PLANET_INSECURE_LOCAL_HTTP", "1")
+    print(f"Iniciando PLANET-IA en http://localhost:{port}")
+    uvicorn.run("main:app", host=host, port=port, reload=False)
     return 0
 
 
 def has_configured_api_key() -> bool:
-    if (os.getenv("GEMINI_API_KEY") or "").strip():
-        return True
-    try:
-        if not LOCAL_CONFIG_PATH.exists():
-            return False
-        data = json.loads(LOCAL_CONFIG_PATH.read_text(encoding="utf-8"))
-        if not isinstance(data, dict):
-            return False
-        return bool((data.get("GEMINI_API_KEY") or "").strip())
-    except Exception:
-        return False
+    return bool((os.getenv("GEMINI_API_KEY") or "").strip())
 
 
 def main() -> int:
@@ -178,7 +112,7 @@ def main() -> int:
             if not has_configured_api_key():
                 print(
                     "Aviso: no existe .env. Copia .env.example a .env y añade tu GEMINI_API_KEY "
-                    "(o configúrala desde la interfaz en /configuracion).",
+                    "La clave se configura exclusivamente en el servidor.",
                     file=sys.stderr,
                 )
 

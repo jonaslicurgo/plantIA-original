@@ -1,6 +1,6 @@
-# PlantIA Android (LAN)
+# PLANET-IA Android
 
-App Android (Kotlin + Jetpack Compose) para usar PlantIA desde el móvil en **red local**:
+App Android (Kotlin + Jetpack Compose). La rama comercial requiere la URL HTTPS del servidor y una cuenta. Crea o recupera la cuenta en la web y entra en Ajustes para iniciar sesión en la app. Las conexiones LAN con un servidor de la versión original siguen disponibles para desarrollo.
 
 - Hacer foto con **CameraX**
 - Enviar la foto a PlantIA: `POST /api/plantas/identificar`
@@ -27,7 +27,7 @@ App Android (Kotlin + Jetpack Compose) para usar PlantIA desde el móvil en **re
 
 ## Requisitos
 - Android 10+ (minSdk 29)
-- Servidor PlantIA accesible en LAN en `http://192.168.1.96:8000`
+- Servidor PLANET-IA HTTPS alcanzable desde el dispositivo, o un servidor LAN de la versión original para desarrollo.
 
 ## Abrir el proyecto
 

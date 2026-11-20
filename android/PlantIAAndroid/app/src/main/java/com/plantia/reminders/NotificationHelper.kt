@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.plantia.MainActivity
+import com.plantia.data.ServerPreferences
 import com.plantia.R
 import java.util.concurrent.TimeUnit
 
@@ -19,12 +20,13 @@ object NotificationHelper {
     fun ensureChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java)
+        val localized = ServerPreferences(context).localizedContext(context)
         val channel = NotificationChannel(
             CHANNEL_WATER,
-            "Recordatorios de riego",
+            localized.getString(R.string.native_recordatorios_de_riego),
             NotificationManager.IMPORTANCE_DEFAULT,
         ).apply {
-            description = "Avisos para regar tus plantas"
+            description = localized.getString(R.string.native_avisos_para_regar_tus_plantas)
         }
         manager.createNotificationChannel(channel)
     }
@@ -41,11 +43,13 @@ object NotificationHelper {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
+        val localized = ServerPreferences(context).localizedContext(context)
         val notification = NotificationCompat.Builder(context, CHANNEL_WATER)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("¿Has regado $plantName?")
-            .setContentText("Toca para abrir el cuaderno de la planta.")
+            .setContentTitle(localized.getString(R.string.native_has_regado_planta).replace("{planta}", plantName))
+            .setContentText(localized.getString(R.string.native_toca_para_abrir_el_cuaderno_de_la_planta))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setContentIntent(pending)
             .setAutoCancel(true)
             .build()

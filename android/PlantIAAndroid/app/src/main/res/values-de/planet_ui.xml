@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_empezar_hoy" formatted="false">Beginnen Sie noch heute</string>
+    <string name="ui_calendario_lunar" formatted="false">lunar calendar</string>
+    <string name="ui_otras_posibilidades" formatted="false">Andere Möglichkeiten</string>
+    <string name="ui_ejemplo_http_192_168_1_96_8000" formatted="false">Beispiel: http://192.168.1.96:8000/</string>
+    <string name="ui_seguridad_y_problemas" formatted="false">Sicherheit und Probleme</string>
+    <string name="ui_conceder_permiso" formatted="false">Erteilen Sie die Erlaubnis</string>
+    <string name="ui_editar_observaciones" formatted="false">Beobachtungen bearbeiten</string>
+    <string name="ui_mantenimiento" formatted="false">Wartung</string>
+    <string name="ui_elegir_de_galeria" formatted="false">Wählen Sie aus der Galerie</string>
+    <string name="ui_ordenar_por" formatted="false">Sortieren nach</string>
+    <string name="ui_rasgos_observados" formatted="false">Beobachtete Merkmale</string>
+    <string name="ui_caracteristicas" formatted="false">Funktionen</string>
+    <string name="ui_recordatorio_de_riego" formatted="false">Bewässerungserinnerung</string>
+    <string name="ui_ver_en_github" formatted="false">Auf GitHub ansehen</string>
+    <string name="ui_historial" formatted="false">Geschichte</string>
+    <string name="ui_planet_ia" formatted="false">PLANET-IA</string>
+    <string name="ui_regada_hoy" formatted="false">💧 Heute gegossen</string>
+    <string name="ui_crea_o_recupera_tu_cuenta_desde_la_version_web" formatted="false">Erstellen Sie Ihr Konto über die Webversion oder stellen Sie es wieder her.</string>
+    <string name="ui_apariencia" formatted="false">Aussehen</string>
+    <string name="ui_acerca_de_plantia" formatted="false">Über PlantIA</string>
+    <string name="ui_eliminar" formatted="false">Löschen</string>
+    <string name="ui_frecuencia" formatted="false">Häufigkeit</string>
+    <string name="ui_contrasena" formatted="false">Passwort</string>
+    <string name="ui_capturar" formatted="false">Erfassen</string>
+    <string name="ui_informacion_y_codigo_fuente" formatted="false">Informationen und Quellcode</string>
+    <string name="ui_url_del_servidor" formatted="false">Server-URL</string>
+    <string name="ui_activar_recordatorio" formatted="false">Erinnerung aktivieren</string>
+    <string name="ui_errores_comunes" formatted="false">Häufige Fehler:</string>
+    <string name="ui_mis_plantas" formatted="false">meine Pflanzen</string>
+    <string name="ui_conecta_con_tu_servidor_plantia_en_la_red_local_para" formatted="false">Stellen Sie eine Verbindung zu Ihrem PlantIA-Server im lokalen Netzwerk her, um Ihre Anlagen zwischen Mobilgerät und Web zu synchronisieren.</string>
+    <string name="ui_identifica_plantas_a_partir_de_fotografias_con_googl" formatted="false">Identifizieren Sie Pflanzen anhand von Fotos mit Google Gemini, speichern Sie jede Karte in Ihrer persönlichen Sammlung und führen Sie ein Beobachtungsnotizbuch mit Bewässerungs-, Transplantations- und Pflegehinweisen.</string>
+    <string name="ui_buscar_por_nombre" formatted="false">Suche nach Namen</string>
+    <string name="ui_responde_en_tu_cuaderno_o_con_nuevas_fotos" formatted="false">Reagieren Sie in Ihrem Notizbuch oder mit neuen Fotos.</string>
+    <string name="ui_descripcion" formatted="false">Beschreibung</string>
+    <string name="ui_volver" formatted="false">Zurück</string>
+    <string name="ui_correo_electronico" formatted="false">E-Mail</string>
+    <string name="ui_acerca_de" formatted="false">Über</string>
+    <string name="ui_preguntas_para_afinar" formatted="false">Fragen zur Verfeinerung</string>
+    <string name="ui_ajustes" formatted="false">Einstellungen</string>
+    <string name="ui_cuaderno_de_la_planta" formatted="false">Pflanzennotizbuch</string>
+    <string name="ui_identificar_planta" formatted="false">Pflanze identifizieren</string>
+    <string name="ui_cuidados" formatted="false">Pflege</string>
+    <string name="ui_reintentar" formatted="false">Versuchen Sie es noch einmal</string>
+    <string name="ui_registra_riegos_trasplantes_y_observaciones" formatted="false">Zeichnet Bewässerungen, Transplantationen und Beobachtungen auf.</string>
+    <string name="ui_introduce_la_url_de_tu_servidor_plantia_ip_y_puerto" formatted="false">Geben Sie die URL Ihres PlantIA-Servers ein (IP und Port im lokalen Netzwerk).</string>
+    <string name="ui_cancelar" formatted="false">Abbrechen</string>
+    <string name="ui_elige_el_tema_de_la_app_sistema_sigue_la_configuraci" formatted="false">Wählen Sie das Thema der App. „System“ folgt den Geräteeinstellungen.</string>
+    <string name="ui_plantas_que_tocan_regar_hoy" formatted="false">💧 Pflanzen, die heute gegossen werden müssen</string>
+    <string name="ui_plantia_necesita_acceso_a_la_camara_para_identificar" formatted="false">PlantIA benötigt Zugriff auf die Kamera, um Pflanzen zu identifizieren.</string>
+    <string name="ui_notificacion_local_cuando_toque_regar" formatted="false">Lokale Benachrichtigung, wenn es Zeit zum Gießen ist.</string>
+    <string name="ui_analizando_con_gemini" formatted="false">Analysieren mit Zwillingen…</string>
+    <string name="ui_eliminar_planta" formatted="false">Anlage löschen</string>
+    <string name="ui_desliza_una_tarjeta_a_la_derecha_para_marcar_regada" formatted="false">Wischen Sie eine Karte nach rechts, um „Heute bewässert“ zu markieren.</string>
+    <string name="ui_re_identificar_con_nueva_foto" formatted="false">Identifizieren Sie sich erneut mit einem neuen Foto</string>
+    <string name="ui_conexion_lan" formatted="false">LAN-Verbindung</string>
+    <string name="ui_hora_del_aviso" formatted="false">Merkzeit</string>
+    <string name="ui_ver_en_wikipedia" formatted="false">Siehe auf Wikipedia ↗</string>
+    <string name="ui_aun_no_hay_anotaciones_usa_regada_hoy_o_los_chips_ra" formatted="false">Es liegen noch keine Anmerkungen vor. Benutzen Sie „Heute bewässert“ oder die schnellen Chips.</string>
+    <string name="planet_plants" formatted="false">meine Pflanzen</string>
+    <string name="planet_identify" formatted="false">Identifizieren</string>
+    <string name="planet_settings" formatted="false">Einstellungen</string>
+    <string name="planet_about" formatted="false">Über</string>
+    <string name="planet_detail" formatted="false">Detailliert</string>
+    <string name="planet_saving" formatted="false">Sparen…</string>
+    <string name="planet_save" formatted="false">Speichern</string>
+    <string name="planet_deleting" formatted="false">Löschen…</string>
+    <string name="planet_delete" formatted="false">Löschen</string>
+    <string name="planet_save_url" formatted="false">URL speichern</string>
+    <string name="planet_test_server" formatted="false">Versuchen Sie es</string>
+    <string name="planet_sign_out" formatted="false">Abmelden</string>
+    <string name="planet_sign_in" formatted="false">Melden Sie sich an</string>
+    <string name="planet_system" formatted="false">System</string>
+    <string name="planet_light" formatted="false">Klar</string>
+    <string name="planet_dark" formatted="false">dunkel</string>
+    <string name="native_error_al_cargar" formatted="false">Fehler beim Laden</string>
+    <string name="native_error_al_cargar_mas" formatted="false">Beim Laden weiterer Dateien ist ein Fehler aufgetreten</string>
+    <string name="native_no_se_pudo_guardar" formatted="false">Konnte nicht gespeichert werden</string>
+    <string name="native_mas_recientes" formatted="false">Neueste</string>
+    <string name="native_mas_antiguas" formatted="false">Älter</string>
+    <string name="native_nombre_a_z" formatted="false">Name (A-Z)</string>
+    <string name="native_confianza" formatted="false">Vertrauen</string>
+    <string name="native_aun_no_tienes_plantas" formatted="false">Sie haben noch keine Pflanzen</string>
+    <string name="native_sin_resultados" formatted="false">Keine Ergebnisse</string>
+    <string name="native_identifica_tu_primera_planta_con_la_camara" formatted="false">Identifizieren Sie Ihre erste Pflanze mit der Kamera.</string>
+    <string name="native_prueba_con_otro_nombre_o_termino_de_busqueda" formatted="false">Versuchen Sie es mit einem anderen Namen oder Suchbegriff.</string>
+    <string name="native_identificar_planta" formatted="false">Pflanze identifizieren</string>
+    <string name="native_error_al_cargar_la_ficha" formatted="false">Fehler beim Laden der Datei</string>
+    <string name="native_no_se_pudo_borrar" formatted="false">Konnte nicht gelöscht werden</string>
+    <string name="native_cuaderno_guardado" formatted="false">Gespeichertes Notizbuch</string>
+    <string name="native_abonada" formatted="false">🧪 Abonnent</string>
+    <string name="native_abonada_el_fecha" formatted="false">Bezahlt am {fecha}</string>
+    <string name="native_trasplantada" formatted="false">🪴Transplantiert</string>
+    <string name="native_trasplantada_el_fecha" formatted="false">Transplantiert am {fecha}</string>
+    <string name="native_podada" formatted="false">✂️ Beschneiden</string>
+    <string name="native_podada_el_fecha" formatted="false">Beschnitten am {fecha}</string>
+    <string name="native_florecio" formatted="false">🌸 Geblüht</string>
+    <string name="native_florecio_el_fecha" formatted="false">Blühte am {fecha}</string>
+    <string name="native_nuevo_sustrato" formatted="false">🌱 Neues Substrat</string>
+    <string name="native_cambie_el_sustrato_el_fecha" formatted="false">Ich habe das Substrat am {fecha} gewechselt</string>
+    <string name="native_dificultad" formatted="false">Schwierigkeit</string>
+    <string name="native_tamano_adulto" formatted="false">Erwachsenengröße</string>
+    <string name="native_crecimiento" formatted="false">Wachstum</string>
+    <string name="native_floracion" formatted="false">Blüte</string>
+    <string name="native_epoca_de_poda" formatted="false">Schnittsaison</string>
+    <string name="native_epoca_de_trasplante" formatted="false">Transplantationszeit</string>
+    <string name="native_senales_de_trasplante" formatted="false">Anzeichen einer Transplantation</string>
+    <string name="native_maceta_y_sustrato" formatted="false">Topf und Substrat</string>
+    <string name="native_toxicidad_perros" formatted="false">Toxizität bei Hunden</string>
+    <string name="native_toxicidad_gatos" formatted="false">Katzentoxizität</string>
+    <string name="native_problemas_comunes" formatted="false">Häufige Probleme</string>
+    <string name="native_plagas_habituales" formatted="false">Häufige Schädlinge</string>
+    <string name="native_regada_el_fecha" formatted="false">Bewässert am {fecha}</string>
+    <string name="native_cada_count_dia" formatted="false">Jeden {count} Tag</string>
+    <string name="native_aviso_a_las_hora" formatted="false">Mitteilung um {hora}</string>
+    <string name="native_no_se_pudo_identificar" formatted="false">Konnte nicht identifiziert werden</string>
+    <string name="native_no_se_pudo_capturar" formatted="false">Konnte nicht erfasst werden</string>
+    <string name="native_identificar" formatted="false">Identifizieren</string>
+    <string name="native_afinar_identificacion" formatted="false">Identifikation verfeinern</string>
+    <string name="native_centra_la_hoja_o_flor_en_el_encuadre_buena_luz_mejor_resultado" formatted="false">Zentrieren Sie das Blatt oder die Blume im Rahmen. Gutes Licht = besseres Ergebnis.</string>
+    <string name="native_nueva_foto_para_afinar_planta_compara_el_resultado_con_tu_fich" formatted="false">Neues Foto zur Verfeinerung von {planta}. Vergleichen Sie das Ergebnis mit Ihrer aktuellen Karte.</string>
+    <string name="native_no_se_pudo_conectar" formatted="false">Es konnte keine Verbindung hergestellt werden</string>
+    <string name="native_no_se_pudo_cambiar_la_sesion" formatted="false">Die Sitzung konnte nicht geändert werden</string>
+    <string name="native_servidor_guardado" formatted="false">Gespeicherter Server</string>
+    <string name="native_sesion_iniciada" formatted="false">Sitzung gestartet</string>
+    <string name="native_usa_la_url_https_de_planet_ia" formatted="false">Verwenden Sie die PLANET-IA-HTTPS-URL</string>
+    <string name="native_conectado_count_planta_s" formatted="false">Verbunden · {count} Anlage(n)</string>
+    <string name="native_sin_conexion_con_el_servidor_comprueba_la_red_wi_fi" formatted="false">Keine Verbindung zum Server. Überprüfen Sie das Wi-Fi-Netzwerk.</string>
+    <string name="native_recordatorios_de_riego" formatted="false">Bewässerungserinnerungen</string>
+    <string name="native_avisos_para_regar_tus_plantas" formatted="false">Hinweise zur Bewässerung Ihrer Pflanzen</string>
+    <string name="native_toca_para_abrir_el_cuaderno_de_la_planta" formatted="false">Tippen Sie hier, um das Pflanzennotizbuch zu öffnen.</string>
+    <string name="native_has_regado_planta" formatted="false">Hast du {planta} gegossen?</string>
+</resources>

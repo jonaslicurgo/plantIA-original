@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_empezar_hoy" formatted="false">आज ही प्रारंभ करें</string>
+    <string name="ui_calendario_lunar" formatted="false">चंद्र कैलेंडर</string>
+    <string name="ui_otras_posibilidades" formatted="false">अन्य संभावनाएँ</string>
+    <string name="ui_ejemplo_http_192_168_1_96_8000" formatted="false">उदाहरण: http://192.168.1.96:8000/</string>
+    <string name="ui_seguridad_y_problemas" formatted="false">सुरक्षा और समस्याएँ</string>
+    <string name="ui_conceder_permiso" formatted="false">अनुमति प्रदान करें</string>
+    <string name="ui_editar_observaciones" formatted="false">अवलोकन संपादित करें</string>
+    <string name="ui_mantenimiento" formatted="false">रखरखाव</string>
+    <string name="ui_elegir_de_galeria" formatted="false">गैलरी से चुनें</string>
+    <string name="ui_ordenar_por" formatted="false">क्रमबद्ध करें</string>
+    <string name="ui_rasgos_observados" formatted="false">देखे गए लक्षण</string>
+    <string name="ui_caracteristicas" formatted="false">विशेषताएं</string>
+    <string name="ui_recordatorio_de_riego" formatted="false">पानी देने का अनुस्मारक</string>
+    <string name="ui_ver_en_github" formatted="false">GitHub पर देखें</string>
+    <string name="ui_historial" formatted="false">इतिहास</string>
+    <string name="ui_planet_ia" formatted="false">PLANET-IA</string>
+    <string name="ui_regada_hoy" formatted="false">💧 आज पानी पिलाया</string>
+    <string name="ui_crea_o_recupera_tu_cuenta_desde_la_version_web" formatted="false">वेब संस्करण से अपना खाता बनाएं या पुनर्प्राप्त करें।</string>
+    <string name="ui_apariencia" formatted="false">दिखावट</string>
+    <string name="ui_acerca_de_plantia" formatted="false">प्लांटआईए के बारे में</string>
+    <string name="ui_eliminar" formatted="false">हटाएँ</string>
+    <string name="ui_frecuencia" formatted="false">आवृत्ति</string>
+    <string name="ui_contrasena" formatted="false">पासवर्ड</string>
+    <string name="ui_capturar" formatted="false">कब्जा</string>
+    <string name="ui_informacion_y_codigo_fuente" formatted="false">सूचना और स्रोत कोड</string>
+    <string name="ui_url_del_servidor" formatted="false">सर्वर यूआरएल</string>
+    <string name="ui_activar_recordatorio" formatted="false">अनुस्मारक सक्रिय करें</string>
+    <string name="ui_errores_comunes" formatted="false">सामान्य गलतियाँ:</string>
+    <string name="ui_mis_plantas" formatted="false">मेरे पौधे</string>
+    <string name="ui_conecta_con_tu_servidor_plantia_en_la_red_local_para" formatted="false">अपने प्लांट को मोबाइल और वेब के बीच सिंक्रोनाइज़ करने के लिए स्थानीय नेटवर्क पर अपने प्लांटआईए सर्वर से कनेक्ट करें।</string>
+    <string name="ui_identifica_plantas_a_partir_de_fotografias_con_googl" formatted="false">Google मिथुन के साथ तस्वीरों से पौधों की पहचान करें, प्रत्येक कार्ड को अपने व्यक्तिगत संग्रह में सहेजें और पानी, प्रत्यारोपण और देखभाल नोट्स के साथ एक अवलोकन नोटबुक रखें।</string>
+    <string name="ui_buscar_por_nombre" formatted="false">नाम से खोजें</string>
+    <string name="ui_responde_en_tu_cuaderno_o_con_nuevas_fotos" formatted="false">अपनी नोटबुक में या नई फ़ोटो के साथ उत्तर दें।</string>
+    <string name="ui_descripcion" formatted="false">विवरण</string>
+    <string name="ui_volver" formatted="false">वापस</string>
+    <string name="ui_correo_electronico" formatted="false">ईमेल</string>
+    <string name="ui_acerca_de" formatted="false">के बारे में</string>
+    <string name="ui_preguntas_para_afinar" formatted="false">परिष्कृत करने के लिए प्रश्न</string>
+    <string name="ui_ajustes" formatted="false">सेटिंग्स</string>
+    <string name="ui_cuaderno_de_la_planta" formatted="false">प्लांट नोटबुक</string>
+    <string name="ui_identificar_planta" formatted="false">पौधे की पहचान करें</string>
+    <string name="ui_cuidados" formatted="false">देखभाल</string>
+    <string name="ui_reintentar" formatted="false">पुनः प्रयास करें</string>
+    <string name="ui_registra_riegos_trasplantes_y_observaciones" formatted="false">सिंचाई, प्रत्यारोपण और अवलोकन रिकॉर्ड करता है।</string>
+    <string name="ui_introduce_la_url_de_tu_servidor_plantia_ip_y_puerto" formatted="false">अपने प्लांटआईए सर्वर का यूआरएल दर्ज करें (स्थानीय नेटवर्क पर आईपी और पोर्ट)।</string>
+    <string name="ui_cancelar" formatted="false">रद्द करें</string>
+    <string name="ui_elige_el_tema_de_la_app_sistema_sigue_la_configuraci" formatted="false">ऐप की थीम चुनें. \"सिस्टम\" डिवाइस सेटिंग्स का अनुसरण करता है।</string>
+    <string name="ui_plantas_que_tocan_regar_hoy" formatted="false">💧पौधे जिन्हें आज पानी देने की आवश्यकता है</string>
+    <string name="ui_plantia_necesita_acceso_a_la_camara_para_identificar" formatted="false">प्लांटआईए को पौधों की पहचान करने के लिए कैमरे तक पहुंच की आवश्यकता है।</string>
+    <string name="ui_notificacion_local_cuando_toque_regar" formatted="false">पानी देने का समय होने पर स्थानीय सूचना।</string>
+    <string name="ui_analizando_con_gemini" formatted="false">मिथुन राशि से विश्लेषण...</string>
+    <string name="ui_eliminar_planta" formatted="false">पौधा हटाएँ</string>
+    <string name="ui_desliza_una_tarjeta_a_la_derecha_para_marcar_regada" formatted="false">\"आज पानी दिया गया\" अंकित करने के लिए कार्ड को दाईं ओर स्वाइप करें</string>
+    <string name="ui_re_identificar_con_nueva_foto" formatted="false">नई फोटो से दोबारा पहचानें</string>
+    <string name="ui_conexion_lan" formatted="false">लैन कनेक्शन</string>
+    <string name="ui_hora_del_aviso" formatted="false">समय पर ध्यान दें</string>
+    <string name="ui_ver_en_wikipedia" formatted="false">विकिपीडिया पर देखें ↗</string>
+    <string name="ui_aun_no_hay_anotaciones_usa_regada_hoy_o_los_chips_ra" formatted="false">अभी तक कोई एनोटेशन नहीं है. \"आज सिंचित\" या त्वरित चिप्स का उपयोग करें।</string>
+    <string name="planet_plants" formatted="false">मेरे पौधे</string>
+    <string name="planet_identify" formatted="false">पहचानें</string>
+    <string name="planet_settings" formatted="false">सेटिंग्स</string>
+    <string name="planet_about" formatted="false">के बारे में</string>
+    <string name="planet_detail" formatted="false">विवरण</string>
+    <string name="planet_saving" formatted="false">सहेजा जा रहा है...</string>
+    <string name="planet_save" formatted="false">सहेजें</string>
+    <string name="planet_deleting" formatted="false">हटाया जा रहा है...</string>
+    <string name="planet_delete" formatted="false">हटाएँ</string>
+    <string name="planet_save_url" formatted="false">यूआरएल सहेजें</string>
+    <string name="planet_test_server" formatted="false">प्रयास करें</string>
+    <string name="planet_sign_out" formatted="false">साइन आउट करें</string>
+    <string name="planet_sign_in" formatted="false">साइन इन करें</string>
+    <string name="planet_system" formatted="false">सिस्टम</string>
+    <string name="planet_light" formatted="false">ज़रूर</string>
+    <string name="planet_dark" formatted="false">अंधेरा</string>
+    <string name="native_error_al_cargar" formatted="false">लोड करने में त्रुटि</string>
+    <string name="native_error_al_cargar_mas" formatted="false">अधिक लोड करने में त्रुटि</string>
+    <string name="native_no_se_pudo_guardar" formatted="false">सहेजा नहीं जा सका</string>
+    <string name="native_mas_recientes" formatted="false">सबसे ताज़ा</string>
+    <string name="native_mas_antiguas" formatted="false">पुराना</string>
+    <string name="native_nombre_a_z" formatted="false">नाम (ए-जेड)</string>
+    <string name="native_confianza" formatted="false">भरोसा रखें</string>
+    <string name="native_aun_no_tienes_plantas" formatted="false">आपके पास अभी तक पौधे नहीं हैं</string>
+    <string name="native_sin_resultados" formatted="false">कोई परिणाम नहीं</string>
+    <string name="native_identifica_tu_primera_planta_con_la_camara" formatted="false">कैमरे से अपने पहले पौधे की पहचान करें।</string>
+    <string name="native_prueba_con_otro_nombre_o_termino_de_busqueda" formatted="false">कोई अन्य नाम या खोज शब्द आज़माएँ.</string>
+    <string name="native_identificar_planta" formatted="false">पौधे की पहचान करें</string>
+    <string name="native_error_al_cargar_la_ficha" formatted="false">फ़ाइल लोड करने में त्रुटि</string>
+    <string name="native_no_se_pudo_borrar" formatted="false">मिटाया नहीं जा सका</string>
+    <string name="native_cuaderno_guardado" formatted="false">सहेजी गई नोटबुक</string>
+    <string name="native_abonada" formatted="false">🧪 सब्सक्राइबर</string>
+    <string name="native_abonada_el_fecha" formatted="false">{fecha} को भुगतान किया गया</string>
+    <string name="native_trasplantada" formatted="false">🪴प्रत्यारोपित</string>
+    <string name="native_trasplantada_el_fecha" formatted="false">{fecha} को प्रत्यारोपित किया गया</string>
+    <string name="native_podada" formatted="false">✂️प्रूनिंग</string>
+    <string name="native_podada_el_fecha" formatted="false">{fecha} को काट-छाँट की गई</string>
+    <string name="native_florecio" formatted="false">🌸खिला हुआ</string>
+    <string name="native_florecio_el_fecha" formatted="false">{fecha} को खिले</string>
+    <string name="native_nuevo_sustrato" formatted="false">🌱 नया सब्सट्रेट</string>
+    <string name="native_cambie_el_sustrato_el_fecha" formatted="false">मैंने {fecha} को सब्सट्रेट बदल दिया</string>
+    <string name="native_dificultad" formatted="false">कठिनाई</string>
+    <string name="native_tamano_adulto" formatted="false">वयस्क आकार</string>
+    <string name="native_crecimiento" formatted="false">विकास</string>
+    <string name="native_floracion" formatted="false">फूलना</string>
+    <string name="native_epoca_de_poda" formatted="false">छंटाई का मौसम</string>
+    <string name="native_epoca_de_trasplante" formatted="false">प्रत्यारोपण का समय</string>
+    <string name="native_senales_de_trasplante" formatted="false">प्रत्यारोपण के लक्षण</string>
+    <string name="native_maceta_y_sustrato" formatted="false">पॉट और सब्सट्रेट</string>
+    <string name="native_toxicidad_perros" formatted="false">कुत्ते की विषाक्तता</string>
+    <string name="native_toxicidad_gatos" formatted="false">बिल्ली विषाक्तता</string>
+    <string name="native_problemas_comunes" formatted="false">सामान्य समस्याएँ</string>
+    <string name="native_plagas_habituales" formatted="false">सामान्य कीट</string>
+    <string name="native_regada_el_fecha" formatted="false">{fecha} को पानी पिलाया गया</string>
+    <string name="native_cada_count_dia" formatted="false">प्रत्येक {count} दिन</string>
+    <string name="native_aviso_a_las_hora" formatted="false">{hora} पर सूचना</string>
+    <string name="native_no_se_pudo_identificar" formatted="false">पहचान नहीं हो सकी</string>
+    <string name="native_no_se_pudo_capturar" formatted="false">कब्जा नहीं हो सका</string>
+    <string name="native_identificar" formatted="false">पहचानें</string>
+    <string name="native_afinar_identificacion" formatted="false">पहचान को परिष्कृत करें</string>
+    <string name="native_centra_la_hoja_o_flor_en_el_encuadre_buena_luz_mejor_resultado" formatted="false">पत्ती या फूल को फ्रेम में केन्द्रित करें। अच्छी रोशनी = बेहतर परिणाम.</string>
+    <string name="native_nueva_foto_para_afinar_planta_compara_el_resultado_con_tu_fich" formatted="false">{planta} को निखारने के लिए नई फोटो। परिणाम की तुलना अपने वर्तमान कार्ड से करें।</string>
+    <string name="native_no_se_pudo_conectar" formatted="false">कनेक्ट नहीं हो सका</string>
+    <string name="native_no_se_pudo_cambiar_la_sesion" formatted="false">सत्र नहीं बदला जा सका</string>
+    <string name="native_servidor_guardado" formatted="false">सहेजा गया सर्वर</string>
+    <string name="native_sesion_iniciada" formatted="false">सत्र प्रारंभ हुआ</string>
+    <string name="native_usa_la_url_https_de_planet_ia" formatted="false">PLANET-IA HTTPS URL का उपयोग करें</string>
+    <string name="native_conectado_count_planta_s" formatted="false">जुड़ा हुआ · {count} पौधे</string>
+    <string name="native_sin_conexion_con_el_servidor_comprueba_la_red_wi_fi" formatted="false">सर्वर से कोई कनेक्शन नहीं. वाई-फ़ाई नेटवर्क की जाँच करें.</string>
+    <string name="native_recordatorios_de_riego" formatted="false">जल अनुस्मारक</string>
+    <string name="native_avisos_para_regar_tus_plantas" formatted="false">अपने पौधों को पानी देने के लिए सूचनाएँ</string>
+    <string name="native_toca_para_abrir_el_cuaderno_de_la_planta" formatted="false">प्लांट नोटबुक खोलने के लिए टैप करें.</string>
+    <string name="native_has_regado_planta" formatted="false">क्या आपने {planta} को पानी दिया है?</string>
+</resources>

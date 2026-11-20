@@ -1,5 +1,6 @@
 package com.plantia.ui.screens
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -36,7 +37,7 @@ fun AboutScreen(
 
     Scaffold(
         topBar = {
-            PlantTopBar(title = "Acerca de", onBack = onBack)
+            PlantTopBar(title = stringResource(R.string.ui_acerca_de), onBack = onBack)
         },
     ) { padding ->
         Column(
@@ -49,7 +50,7 @@ fun AboutScreen(
         ) {
             Image(
                 painter = painterResource(R.drawable.logo),
-                contentDescription = "PlantIA",
+                contentDescription = stringResource(R.string.ui_planet_ia),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
@@ -57,19 +58,19 @@ fun AboutScreen(
             )
 
             Text(
-                "PlantIA",
+                stringResource(R.string.ui_planet_ia),
                 style = MaterialTheme.typography.headlineSmall,
             )
 
             Text(
-                "Identifica plantas a partir de fotografías con Google Gemini, guarda cada ficha en tu colección personal y lleva un cuaderno de observaciones con riegos, trasplantes y notas de cuidado.",
+                stringResource(R.string.ui_identifica_plantas_a_partir_de_fotografias_con_googl),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Text(
-                "Conecta con tu servidor PlantIA en la red local para sincronizar tus plantas entre el móvil y la web.",
+                stringResource(R.string.ui_conecta_con_tu_servidor_plantia_en_la_red_local_para),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -82,14 +83,14 @@ fun AboutScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Ver en GitHub")
+                Text(stringResource(R.string.ui_ver_en_github))
             }
 
             OutlinedButton(
                 onClick = onBack,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Volver")
+                Text(stringResource(R.string.ui_volver))
             }
         }
     }

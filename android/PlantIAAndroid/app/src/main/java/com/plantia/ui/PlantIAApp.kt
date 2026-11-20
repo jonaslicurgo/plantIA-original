@@ -1,5 +1,7 @@
 package com.plantia.ui
 
+import androidx.compose.ui.res.stringResource
+import com.plantia.R
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
@@ -35,12 +37,12 @@ import com.plantia.ui.screens.DetailScreen
 import com.plantia.ui.screens.PlantsScreen
 import com.plantia.ui.screens.SettingsScreen
 
-sealed class Screen(val route: String, val label: String) {
-    data object Plants : Screen("plants", "Mis plantas")
-    data object Camera : Screen("camera", "Identificar")
-    data object Settings : Screen("settings", "Ajustes")
-    data object About : Screen("about", "Acerca de")
-    data object Detail : Screen("detail/{id}", "Detalle") {
+sealed class Screen(val route: String, val label: Int) {
+    data object Plants : Screen("plants", R.string.planet_plants)
+    data object Camera : Screen("camera", R.string.planet_identify)
+    data object Settings : Screen("settings", R.string.planet_settings)
+    data object About : Screen("about", R.string.planet_about)
+    data object Detail : Screen("detail/{id}", R.string.planet_detail) {
         fun route(id: Int) = "detail/$id"
     }
 }
@@ -99,7 +101,7 @@ fun PlantIAApp(
                                     else -> {}
                                 }
                             },
-                            label = { Text(screen.label) },
+                            label = { Text(stringResource(screen.label)) },
                         )
                     }
                 }
