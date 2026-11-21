@@ -214,8 +214,9 @@ def serialize(event):
     data.pop("mime", None)
     actions, days = plan(data) if event.kind == "triage" else (data.get("actions", []), None)
     date = datetime.fromtimestamp(event.created_at, timezone.utc).isoformat()
+    review_at = event.created_at + days * 86400 if days else None
     return {"id": event.id, "created_at": event.created_at, "date": date, "kind": event.kind, "has_photo": has_photo,
-            "data": data, "actions": actions, "review_at": event.created_at + days * 86400 if days else None}
+            "data": data, "actions": actions, "review_at": review_at, "review_date": datetime.fromtimestamp(review_at, timezone.utc).date().isoformat() if review_at else None}
 
 
 def latest_assessments(plant_id, owner_id):

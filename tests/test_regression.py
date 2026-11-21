@@ -412,6 +412,56 @@ class Regression(unittest.TestCase):
         self.assertEqual(Image.open(BytesIO(encoded)).size, (1440, 720))
         self.assertIn("prevention", result.json()["actions"])
 
+    def test_garden_profiles_and_private_care_lifecycle(self):
+        a = self.account(self.a, "garden-owner@example.com")
+        b = self.account(self.b, "garden-other@example.com")
+        plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+        path = f"/api/jardim/{plant}"
+        self.assertEqual(self.a.get("/api/jardim").status_code, 401)
+        self.assertEqual(self.a.get("/api/jardim", headers=a).json()["plants"][0]["id"], plant)
+        self.assertEqual(self.b.get("/api/jardim", headers=b).json()["plants"], [])
+        form = {"nickname": "  Minha   samambaia  ", "location": "Varanda Hélice"}
+        self.assertEqual(self.b.post(path + "/perfil", data=form, headers=b).status_code, 404)
+        profile = self.a.post(path + "/perfil", data=form, headers=a)
+        self.assertEqual(profile.json()["nickname"], "Minha samambaia")
+        view = self.a.get("/api/jardim", params={"location":"varanda helice"}, headers=a).json()
+        self.assertEqual([item["id"] for item in view["plants"]], [plant])
+        self.assertEqual(self.b.get("/api/jardim", headers=b).json()["locations"], [])
+        self.assertEqual(self.b.get(path, headers=b).status_code, 404)
+        data = {"kind":"water", "due_on":"2026-11-25"}
+        task = self.a.post(path + "/tarefas", data=data, headers=a)
+        self.assertEqual(task.status_code, 201, task.text)
+        task_id = task.json()["id"]
+        self.assertEqual(self.a.post(path + "/tarefas", data=data, headers=a).json()["id"], task_id)
+        self.assertEqual(self.b.post(path + "/tarefas", data=data, headers=b).status_code, 404)
+        action = path + f"/tarefas/{task_id}"
+        self.assertEqual(self.b.post(action + "/concluir", headers=b).status_code, 404)
+        self.assertEqual(self.b.post(action + "/reagendar", data={"due_on":"2026-11-26"}, headers=b).status_code, 404)
+        self.assertEqual(self.a.post(action + "/reagendar", data={"due_on":"2026-11-26"}, headers=a).json()["due_on"], "2026-11-26")
+        self.assertTrue(self.a.post(action + "/concluir", headers=a).json()["completed"])
+        self.assertTrue(self.a.post(action + "/concluir", headers=a).json()["completed"])
+        self.assertEqual(self.a.get("/api/jardim", headers=a).json()["tasks"], [])
+        self.assertEqual(self.a.get("/api/jardim", headers=a, params={"done":True}).json()["tasks"][0]["id"], task_id)
+        self.assertEqual(self.a.get(f"/jardim/{plant}", headers={**a,"Accept-Language":"ar"}).status_code, 200)
+        self.assertEqual(self.a.delete(f"/api/plantas/{plant}", headers=a).status_code, 204)
+        self.assertEqual(self.a.get("/api/jardim", headers=a, params={"done":True}).json()["tasks"], [])
+
+    def test_garden_prefills_health_review_without_creating_task(self):
+        a = self.account(self.a, "garden-review@example.com")
+        plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+        with patch("plantia.services.health.analyze", return_value=Triage(
+            status="possible", concern="high", signs=["spots"], findings=["fungal"]
+        )):
+            response = self.a.post(f"/api/plantas/{plant}/saude/avaliar", files={"photo":photo()["file"]}, headers=a)
+        self.assertEqual(response.status_code, 201)
+        review = response.json()["review_date"]
+        self.assertIn(f"/jardim/{plant}?kind=review", self.a.get(f"/plantas/{plant}/saude", headers=a).text)
+        view = self.a.get(f"/api/jardim/{plant}", params={"kind":"review","due_on":review}, headers=a).json()
+        self.assertEqual(view["suggested_date"], review)
+        self.assertEqual(view["selected_kind"], "review")
+        self.assertEqual(view["tasks"], [])
+        self.assertEqual(self.a.post(f"/api/jardim/{plant}/tarefas", data={"kind":"unknown","due_on":review}, headers=a).status_code, 422)
+
     def test_gemini_request_uses_selected_model_and_language(self):
         self.mock.stop()
         with patch.object(GeminiService, "_get_client") as client:

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("garden.title") }} · PLANET-IA{% endblock %}
+{% block content %}
+<header class="page-header"><h1>{{ tr("garden.title") }}</h1></header>
+<form class="plant-garden-filter" method="get" action="/jardim">
+    <label>{{ tr("garden.location") }}
+        <select name="location">
+            <option value="">{{ tr("garden.all") }}</option>
+            {% for item in locations %}<option value="{{ item }}"{% if item == location %} selected{% endif %}>{{ item }}</option>{% endfor %}
+        </select>
+    </label>
+    <label>{{ tr("garden.agenda") }}
+        <select name="done">
+            <option value="false"{% if not done %} selected{% endif %}>{{ tr("garden.pending") }}</option>
+            <option value="true"{% if done %} selected{% endif %}>{{ tr("garden.done") }}</option>
+        </select>
+    </label>
+    <button class="btn btn-primary">{{ tr("garden.filter") }}</button>
+</form>
+{% set query = {'location': location, 'done': 'true' if done else 'false'} | urlencode %}
+<div class="plant-garden-grid">
+    <section>
+        <h2>{{ tr("garden.plants") }}</h2>
+        {% if plants %}
+        <ul class="botany-results">
+            {% for plant in plants %}
+            <li><a href="/jardim/{{ plant.id }}">
+                <span><strong>{{ plant.nickname or plant.name }}</strong>{% if plant.scientific_name %}<br><i>{{ plant.scientific_name }}</i>{% endif %}</span>
+                <span>{{ plant.location or tr("garden.unassigned") }}</span>
+            </a></li>
+            {% endfor %}
+        </ul>
+        {% else %}<p>{{ tr("garden.no_plants") }}</p><a href="/">{{ tr("Identificar") }}</a>{% endif %}
+        <nav class="pagination" aria-label="{{ tr('garden.plants') }}">
+            {% if page > 1 %}<a href="?{{ query }}&amp;page={{ page - 1 }}&amp;agenda_page={{ agenda_page }}">{{ tr("garden.previous") }}</a>{% endif %}
+            {% if more %}<a href="?{{ query }}&amp;page={{ page + 1 }}&amp;agenda_page={{ agenda_page }}">{{ tr("garden.next") }}</a>{% endif %}
+        </nav>
+    </section>
+    <section>
+        <h2>{{ tr("garden.agenda") }}</h2>
+        {% if tasks %}
+        <ul class="botany-results">
+            {% for task in tasks %}
+            <li><a href="/jardim/{{ task.plant_id }}">
+                <span><strong>{{ tr("garden.kind." ~ task.kind) }}</strong><br>{{ task.name }}</span>
+                <time datetime="{{ task.due_on }}">{{ task.due_on }}</time>
+            </a></li>
+            {% endfor %}
+        </ul>
+        {% else %}<p>{{ tr("garden.no_tasks") }}</p>{% endif %}
+        <nav class="pagination" aria-label="{{ tr('garden.agenda') }}">
+            {% if agenda_page > 1 %}<a href="?{{ query }}&amp;page={{ page }}&amp;agenda_page={{ agenda_page - 1 }}">{{ tr("garden.previous") }}</a>{% endif %}
+            {% if agenda_more %}<a href="?{{ query }}&amp;page={{ page }}&amp;agenda_page={{ agenda_page + 1 }}">{{ tr("garden.next") }}</a>{% endif %}
+        </nav>
+    </section>
+</div>
+{% endblock %}

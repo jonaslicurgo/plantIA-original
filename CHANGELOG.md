@@ -1,5 +1,11 @@
 # Changelog
 
+## Etapa 4 · Jardim Virtual
+
+- Jardim privado na web e na API, com os exemplares já existentes, apelidos, locais de cultivo e filtro por local. As fichas mantêm atalhos para identificação, enciclopédia e saúde do mesmo registro.
+- Agenda de rega, adubação, poda, transplante e reavaliação de saúde. Usuários podem agendar, reagendar e concluir cuidados e consultar os cuidados concluídos. As sugestões de reavaliação abrem um formulário preenchido e exigem que o usuário salve o agendamento.
+- Migração aditiva, vínculo por exemplar, controle de acesso e exclusão em cascata das tarefas quando a planta é removida. Interface web nos 12 idiomas.
+
 ## Etapa 3 · Diagnóstico, recuperação e acompanhamento
 
 - Web e Android oferecem triagem fotográfica com sinais visíveis, hipóteses de doenças fúngicas, bacterianas e virais, pragas e fatores ambientais. O formulário recebe sintomas, rega, luz, local, solo, umidade, temperatura e contexto. Folhas secas, lagartas, problemas de substrato e temperatura têm códigos próprios.

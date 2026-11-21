@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ plant.nickname or plant.name }} · {{ tr("garden.title") }}{% endblock %}
+{% block content %}
+<a href="/jardim">{{ tr("garden.title") }}</a>
+<header class="page-header">
+    <h1>{{ plant.nickname or plant.name }}</h1>
+    {% if plant.scientific_name %}<p><i>{{ plant.scientific_name }}</i></p>{% endif %}
+</header>
+<nav class="botany-actions" aria-label="{{ tr('garden.plants') }}">
+    <a href="/plantas/{{ plant.id }}">{{ tr("botany.record") }}</a>
+    <a href="/plantas/{{ plant.id }}/saude">{{ tr("health.title") }}</a>
+    <a href="/enciclopedia/{{ plant.id }}">{{ tr("botany.open") }}</a>
+</nav>
+<div class="plant-health plant-garden-grid">
+    <details class="botany-group" open>
+        <summary>{{ tr("garden.profile") }}</summary>
+        <form method="post" action="/jardim/{{ plant.id }}/perfil">
+            <label>{{ tr("garden.nickname") }} <input name="nickname" maxlength="80" value="{{ plant.nickname }}"></label>
+            <label>{{ tr("garden.location") }} <input name="location" maxlength="80" value="{{ plant.location }}"></label>
+            <button class="btn btn-primary">{{ tr("garden.save") }}</button>
+        </form>
+    </details>
+    <details class="botany-group" open>
+        <summary>{{ tr("garden.schedule") }}</summary>
+        <form method="post" action="/jardim/{{ plant.id }}/tarefas">
+            <label>{{ tr("garden.care") }}
+                <select name="kind">{% for kind in kinds %}<option value="{{ kind }}"{% if kind == selected_kind %} selected{% endif %}>{{ tr("garden.kind." ~ kind) }}</option>{% endfor %}</select>
+            </label>
+            <label>{{ tr("garden.date") }} <input type="date" name="due_on" value="{{ suggested_date }}" required></label>
+            <button class="btn btn-primary">{{ tr("garden.schedule") }}</button>
+        </form>
+    </details>
+</div>
+<h2>{{ tr("garden.agenda") }}</h2>
+{% for task in tasks %}
+<section class="botany-group health-event">
+    <strong>{{ tr("garden.kind." ~ task.kind) }}</strong> · <time datetime="{{ task.due_on }}">{{ task.due_on }}</time>
+    {% if task.completed %}<p>{{ tr("garden.done") }}</p>
+    {% else %}<form method="post" action="/jardim/{{ plant.id }}/tarefas/{{ task.id }}/concluir">
+        <button class="btn btn-outline">{{ tr("garden.complete") }}</button>
+    </form>
+    <details><summary>{{ tr("garden.reschedule") }}</summary>
+        <form method="post" action="/jardim/{{ plant.id }}/tarefas/{{ task.id }}/reagendar">
+            <label>{{ tr("garden.date") }} <input type="date" name="due_on" value="{{ task.due_on }}" required></label>
+            <button class="btn btn-outline">{{ tr("garden.reschedule") }}</button>
+        </form>
+    </details>{% endif %}
+</section>
+{% else %}<p>{{ tr("garden.no_tasks") }}</p>{% endfor %}
+<nav class="pagination" aria-label="{{ tr('garden.agenda') }}">
+    {% if page > 1 %}<a href="?page={{ page - 1 }}">{{ tr("garden.previous") }}</a>{% endif %}
+    {% if more %}<a href="?page={{ page + 1 }}">{{ tr("garden.next") }}</a>{% endif %}
+</nav>
+{% endblock %}

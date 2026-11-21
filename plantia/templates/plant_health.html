@@ -112,7 +112,7 @@
     {% endif %}
     <details open><summary>{{ tr("health.recovery") }}</summary>
     <ul>{% for action in event.actions %}<li>{{ tr("health.action." ~ action) }}</li>{% endfor %}</ul>
-    {% if event.review_at %}<p>{{ tr("health.review") }} <time data-health-time="{{ event.review_at }}"></time></p>{% endif %}
+    {% if event.review_at %}<p>{{ tr("health.review") }} <time data-health-time="{{ event.review_at }}"></time> · <a data-garden-review="{{ event.review_at }}" href="/jardim/{{ plant_id }}?kind=review&amp;due_on={{ event.review_date }}">{{ tr("garden.schedule") }}</a></p>{% endif %}
     </details>
     {% elif event.kind == "assistant" %}
     <h3>{{ tr("health.assistant") }}</h3>
@@ -145,6 +145,13 @@ for (const element of document.querySelectorAll("time[data-health-time]")) {
     const date = new Date(Number(element.dataset.healthTime) * 1000);
     element.dateTime = date.toISOString();
     element.textContent = new Intl.DateTimeFormat(document.documentElement.lang, {dateStyle: "medium", timeStyle: "short"}).format(date);
+}
+for (const link of document.querySelectorAll("[data-garden-review]")) {
+    const date = new Date(Number(link.dataset.gardenReview) * 1000);
+    const params = new URL(link.href);
+    params.searchParams.set("due_on", [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+        .map(part => String(part).padStart(2, "0")).join("-"));
+    link.href = params.href;
 }
 </script>
 {% endblock %}

@@ -2181,3 +2181,15 @@ nav {
 .health-sources { padding: 0 2rem 1rem; }
 .plant-health form { grid-template-columns: minmax(0, 1fr); }
 .plant-health select { min-width: 0; }
+
+.plant-garden-filter { display: flex; align-items: end; flex-wrap: wrap; gap: .8rem; margin-block: 1rem; }
+.plant-garden-filter label { display: grid; gap: .3rem; min-width: 0; }
+.plant-garden-filter select, .plant-garden-grid input, .plant-garden-grid select {
+    max-width: 100%; padding: .55rem; border: 1px solid var(--border); border-radius: .55rem;
+    background: var(--surface); color: inherit;
+}
+.plant-garden-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.plant-garden-grid form label { display: grid; gap: .35rem; }
+@media (max-width: 700px) {
+    .plant-garden-grid { grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+}
