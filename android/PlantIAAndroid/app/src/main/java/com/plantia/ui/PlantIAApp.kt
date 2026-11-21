@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +37,8 @@ import com.plantia.ui.screens.AboutScreen
 import com.plantia.ui.screens.BotanicalProfileScreen
 import com.plantia.ui.screens.CameraScreen
 import com.plantia.ui.screens.EncyclopediaScreen
+import com.plantia.ui.screens.GardenScreen
+import com.plantia.ui.screens.GardenPlantScreen
 import com.plantia.ui.screens.DetailScreen
 import com.plantia.ui.screens.PlantsScreen
 import com.plantia.ui.screens.PlantHealthScreen
@@ -51,6 +54,10 @@ sealed class Screen(val route: String, val label: Int) {
     data object BotanicalProfile : Screen("botanical/{id}", R.string.botany_open) {
         fun route(id: Int) = "botanical/$id"
     }
+    data object Garden : Screen("garden", R.string.garden_title)
+    data object GardenPlant : Screen("garden/{id}?review={review}", R.string.garden_title) {
+        fun route(id: Int, review: String? = null) = "garden/$id" + if (review == null) "" else "?review=$review"
+    }
     data object Settings : Screen("settings", R.string.planet_settings)
     data object About : Screen("about", R.string.planet_about)
     data object Detail : Screen("detail/{id}", R.string.planet_detail) {
@@ -63,7 +70,7 @@ private fun shouldShowBottomBar(route: String?): Boolean {
     if (route.startsWith("detail/")) return false
     if (route.startsWith("camera/refine/")) return false
     if (route == Screen.About.route) return false
-    return route in listOf(Screen.Plants.route, Screen.Camera.route, Screen.Encyclopedia.route, Screen.Settings.route)
+    return route in listOf(Screen.Plants.route, Screen.Camera.route, Screen.Encyclopedia.route, Screen.Garden.route, Screen.Settings.route)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +97,7 @@ fun PlantIAApp(
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
-                    val items = listOf(Screen.Plants, Screen.Camera, Screen.Encyclopedia, Screen.Settings)
+                    val items = listOf(Screen.Plants, Screen.Camera, Screen.Encyclopedia, Screen.Garden, Screen.Settings)
                     items.forEach { screen ->
                         val selected = currentRoute == screen.route
                         NavigationBarItem(
@@ -110,6 +117,7 @@ fun PlantIAApp(
                                     Screen.Plants -> Icon(Icons.Default.Home, contentDescription = stringResource(screen.label))
                                     Screen.Camera -> Icon(Icons.Default.CameraAlt, contentDescription = stringResource(screen.label))
                                     Screen.Settings -> Icon(Icons.Default.Settings, contentDescription = stringResource(screen.label))
+                                    Screen.Garden -> Icon(Icons.Default.LocalFlorist, contentDescription = stringResource(screen.label))
                                     Screen.Encyclopedia -> Icon(Icons.Default.Book, contentDescription = stringResource(screen.label))
                                     else -> {}
                                 }
@@ -132,9 +140,24 @@ fun PlantIAApp(
                     onOpenDetail = { id -> navController.navigate(Screen.Detail.route(id)) },
                 )
             }
+            composable(Screen.Garden.route) {
+                GardenScreen { id -> navController.navigate(Screen.GardenPlant.route(id)) }
+            }
+            composable(Screen.GardenPlant.route, arguments = listOf(
+                navArgument("id") { type = NavType.IntType },
+                navArgument("review") { type = NavType.StringType; nullable = true; defaultValue = null },
+            )) { entry ->
+                val id = entry.arguments?.getInt("id") ?: return@composable
+                GardenPlantScreen(id, entry.arguments?.getString("review"),
+                    onBack = { navController.popBackStack() },
+                    onRecord = { navController.navigate(Screen.Detail.route(id)) },
+                    onHealth = { navController.navigate(Screen.Health.route(id)) },
+                    onBotany = { navController.navigate(Screen.BotanicalProfile.route(id)) })
+            }
             composable(Screen.Health.route, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
                 val id = entry.arguments?.getInt("id") ?: return@composable
-                PlantHealthScreen(id, onOpenBotany = { navController.navigate(Screen.BotanicalProfile.route(id)) }) { navController.popBackStack() }
+                PlantHealthScreen(id, onOpenBotany = { navController.navigate(Screen.BotanicalProfile.route(id)) },
+                    onScheduleReview = { date -> navController.navigate(Screen.GardenPlant.route(id, date)) }) { navController.popBackStack() }
             }
             composable(Screen.Encyclopedia.route) {
                 EncyclopediaScreen { id -> navController.navigate(Screen.BotanicalProfile.route(id)) }
@@ -170,6 +193,7 @@ fun PlantIAApp(
                     onBack = { navController.popBackStack() },
                     onReIdentify = { navController.navigate("camera/refine/$id") },
                     onOpenHealth = { navController.navigate(Screen.Health.route(id)) },
+                    onOpenGarden = { navController.navigate(Screen.GardenPlant.route(id)) },
                     onOpenBotany = { navController.navigate(Screen.BotanicalProfile.route(id)) },
                 )
             }

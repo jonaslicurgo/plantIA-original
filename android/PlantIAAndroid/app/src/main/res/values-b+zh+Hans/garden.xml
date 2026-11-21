@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">虚拟花园</string>
+    <string name="garden_schedule">安排护理</string>
+    <string name="garden_error">无法访问花园养护日程。</string>
+</resources>

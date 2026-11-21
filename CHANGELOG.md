@@ -1,5 +1,11 @@
 # Changelog
 
+## Jardim Virtual no Android
+
+- Aba Jardim Virtual com filtro de local, perfis dos exemplares, agenda, criação, reagendamento e conclusão de tarefas usando os mesmos registros da web.
+- O diagnóstico abre o agendamento de reavaliação com a data selecionada. Os lembretes locais de rega aproveitam a data de conclusão do servidor ao concluir uma rega ou abrir o jardim. Uma conclusão antiga não retrocede o lembrete local.
+- A interface acompanha o idioma do aplicativo. O servidor devolve a mesma data em confirmações repetidas, por conta e exemplar.
+
 ## Etapa 4 · Jardim Virtual
 
 - Jardim privado na web e na API, com os exemplares já existentes, apelidos, locais de cultivo e filtro por local. As fichas mantêm atalhos para identificação, enciclopédia e saúde do mesmo registro.

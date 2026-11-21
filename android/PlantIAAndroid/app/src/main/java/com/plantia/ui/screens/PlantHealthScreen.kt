@@ -68,7 +68,7 @@ private val actions = listOf("observe", "inspect", "separate", "check_moisture",
     "drain", "review_watering", "review_light", "stable_temperature", "review_soil", "prevention", "retake", "physical_removal")
 
 @Composable
-fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onBack: () -> Unit) {
+fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onScheduleReview: (String) -> Unit, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
@@ -233,7 +233,13 @@ fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onBack: () -> Unit) {
                             }
                             HealthSection(tr("recovery"), initiallyOpen = true) {
                                 event.actions.forEach { Text(tr("action.$it")) }
-                                event.review_at?.let { Text(tr("review") + " " + date.format(Instant.ofEpochSecond(it))) }
+                                event.review_at?.let {
+                                    val suggested = Instant.ofEpochSecond(it)
+                                    Text(tr("review") + " " + date.format(suggested))
+                                    OutlinedButton(onClick = { onScheduleReview(suggested.atZone(ZoneId.systemDefault()).toLocalDate().toString()) }) {
+                                        Text(stringResource(R.string.garden_schedule))
+                                    }
+                                }
                             }
                         } else if (event.kind == "assistant") {
                             Text(tr("assistant"), style = MaterialTheme.typography.titleMedium)

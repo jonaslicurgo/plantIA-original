@@ -59,6 +59,17 @@ class WaterReminderStore(private val context: Context) {
         }
     }
 
+    // Replayed completions must not move an existing reminder backward.
+    fun syncWatered(plantId: Int, plantName: String, millis: Long, expectedScope: String?) {
+        if (expectedScope == null || ServerPreferences(context).reminderOwner != expectedScope) return
+        val current = get(plantId) ?: return
+        if (millis > current.lastWateredMillis) {
+            val updated = current.copy(lastWateredMillis = millis, plantName = plantName)
+            save(updated)
+            if (!isDue(updated)) NotificationHelper.dismissWaterReminder(context, plantId)
+        }
+    }
+
     fun shouldNotifyNow(reminder: WaterReminder): Boolean {
         if (!isDue(reminder)) return false
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)

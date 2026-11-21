@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">आभासी उद्यान</string>
+    <string name="garden_schedule">अनुसूची देखभाल</string>
+    <string name="garden_error">बगीचे की देखभाल सूची नहीं खुल सकी।</string>
+</resources>

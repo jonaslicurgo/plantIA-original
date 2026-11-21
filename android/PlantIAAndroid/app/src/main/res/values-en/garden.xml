@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">Virtual garden</string>
+    <string name="garden_schedule">Schedule care</string>
+    <string name="garden_error">The garden agenda could not be accessed.</string>
+</resources>

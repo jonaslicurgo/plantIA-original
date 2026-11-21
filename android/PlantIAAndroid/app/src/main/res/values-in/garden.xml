@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">Taman maya</string>
+    <string name="garden_schedule">Jadwalkan perawatan</string>
+    <string name="garden_error">Agenda kebun tidak dapat diakses.</string>
+</resources>

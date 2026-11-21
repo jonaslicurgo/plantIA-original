@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">가상 정원</string>
+    <string name="garden_schedule">진료 예약</string>
+    <string name="garden_error">정원 관리 일정에 접근할 수 없습니다.</string>
+</resources>

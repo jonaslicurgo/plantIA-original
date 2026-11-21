@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">バーチャルガーデン</string>
+    <string name="garden_schedule">ケアのスケジュールを立てる</string>
+    <string name="garden_error">庭のお手入れ予定にアクセスできませんでした。</string>
+</resources>

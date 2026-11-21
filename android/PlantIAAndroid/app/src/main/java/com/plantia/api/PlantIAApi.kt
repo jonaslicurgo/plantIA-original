@@ -3,6 +3,11 @@ package com.plantia.api
 import com.plantia.api.models.BotanyFavorite
 import com.plantia.api.models.BotanyList
 import com.plantia.api.models.BotanyProfile
+import com.plantia.api.models.GardenCompletion
+import com.plantia.api.models.GardenOverview
+import com.plantia.api.models.GardenPlant
+import com.plantia.api.models.GardenSpecimen
+import com.plantia.api.models.GardenTask
 import com.plantia.api.models.PlantHealthEvent
 import com.plantia.api.models.PlantHealthHistory
 import com.plantia.api.models.PlantaListResponse
@@ -47,6 +52,36 @@ interface PlantIAApi {
 
     @PATCH("api/enciclopedia/{id}/favorito")
     suspend fun botanicalFavorite(@Path("id") id: Int, @Body favorite: BotanyFavorite): BotanyFavorite
+
+    @GET("api/jardim")
+    suspend fun garden(
+        @Query("location") location: String, @Query("done") done: Boolean,
+        @Query("page") page: Int, @Query("agenda_page") agendaPage: Int,
+    ): GardenOverview
+
+    @GET("api/jardim/{id}")
+    suspend fun gardenPlant(
+        @Path("id") id: Int, @Query("page") page: Int,
+        @Query("kind") kind: String, @Query("due_on") dueDate: String?,
+    ): GardenSpecimen
+
+    @FormUrlEncoded
+    @POST("api/jardim/{id}/perfil")
+    suspend fun gardenProfile(@Path("id") id: Int, @Field("nickname") nickname: String,
+        @Field("location") location: String): GardenPlant
+
+    @FormUrlEncoded
+    @POST("api/jardim/{id}/tarefas")
+    suspend fun gardenAddTask(@Path("id") id: Int, @Field("kind") kind: String,
+        @Field("due_on") dueDate: String): GardenTask
+
+    @POST("api/jardim/{id}/tarefas/{task}/concluir")
+    suspend fun gardenCompleteTask(@Path("id") id: Int, @Path("task") task: Int): GardenCompletion
+
+    @FormUrlEncoded
+    @POST("api/jardim/{id}/tarefas/{task}/reagendar")
+    suspend fun gardenRescheduleTask(@Path("id") id: Int, @Path("task") task: Int,
+        @Field("due_on") dueDate: String): GardenTask
 
     @GET("api/plantas/{id}/saude")
     suspend fun healthHistory(@Path("id") id: Int, @Query("before") before: Int? = null): PlantHealthHistory

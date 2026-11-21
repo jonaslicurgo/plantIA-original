@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">Jardin virtuel</string>
+    <string name="garden_schedule">Planifier les soins</string>
+    <string name="garden_error">Impossible d’accéder au calendrier du jardin.</string>
+</resources>

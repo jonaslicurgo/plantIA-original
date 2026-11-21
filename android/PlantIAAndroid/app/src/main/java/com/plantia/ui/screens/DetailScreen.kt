@@ -91,6 +91,7 @@ fun DetailScreen(
     plantaId: Int,
     onBack: () -> Unit,
     onReIdentify: () -> Unit = {},
+    onOpenGarden: () -> Unit = {},
     onOpenHealth: () -> Unit = {},
     onOpenBotany: () -> Unit = {},
 ) {
@@ -293,6 +294,9 @@ fun DetailScreen(
                         ErrorBanner(message = error!!)
                     }
 
+                    OutlinedButton(onClick = onOpenGarden, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.garden_title))
+                    }
                     OutlinedButton(onClick = onOpenHealth, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.health_title))
                     }

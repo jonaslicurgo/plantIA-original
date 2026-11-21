@@ -8,6 +8,7 @@ from sqlalchemy import func, select, update
 from starlette.responses import RedirectResponse
 
 from plantia.database import session_scope
+from plantia.i18n import catalog, locale_for
 from plantia.models import GardenProfile, GardenTask, Planta
 from plantia.utils.taxon import normalize
 
@@ -32,6 +33,14 @@ def _plant_card(plant, profile):
             "nickname": profile.nickname if profile else "", "location": profile.location if profile else ""}
 
 
+def _latest_water(db, plants, owner):
+    dates = db.execute(select(GardenTask.plant_id, func.max(GardenTask.completed_at)).join(Planta).where(
+        _owned(owner), GardenTask.plant_id.in_(plants), GardenTask.kind == "water",
+        GardenTask.completed_at.is_not(None),
+    ).group_by(GardenTask.plant_id))
+    return {plant_id: timestamp.replace(tzinfo=timezone.utc).isoformat() for plant_id, timestamp in dates}
+
+
 def _task_row(task, plant):
     return {"id": task.id, "plant_id": plant.id, "name": plant.nombre_comun, "kind": task.kind,
             "due_on": task.due_on.isoformat(), "completed": task.completed_at is not None}
@@ -43,7 +52,7 @@ def _is_api(request):
 
 def _view(request, template, data):
     if _is_api(request):
-        return data
+        return {**data, "labels": {k: v for k, v in catalog(locale_for(request)).items() if k.startswith("garden.")}}
     from plantia.api.routes import templates
     return templates.TemplateResponse(request, template, data)
 
@@ -71,7 +80,8 @@ def garden(request: Request, location: str = Query("", max_length=80),
         data = {"plants": [_plant_card(*row) for row in plant_rows[:24]],
                 "tasks": [_task_row(*row) for row in task_rows[:24]], "locations": locations,
                 "location": location, "page": page, "more": len(plant_rows) > 24,
-                "done": done, "agenda_page": agenda_page, "agenda_more": len(task_rows) > 24}
+                "done": done, "agenda_page": agenda_page, "agenda_more": len(task_rows) > 24,
+                "last_watered": _latest_water(db, [item[0].id for item in plant_rows[:24]], owner)}
     return _view(request, "garden.html", data)
 
 
@@ -87,7 +97,8 @@ def specimen(request: Request, plant_id: int, page: int = Query(1, ge=1, le=100_
             .offset((page - 1) * 24).limit(25)))
         data = {"plant": _plant_card(plant, profile), "tasks": [_task_row(task, plant) for task in tasks[:24]],
                 "kinds": CARE_TYPES, "page": page, "more": len(tasks) > 24,
-                "selected_kind": kind, "suggested_date": due_on.isoformat() if due_on else ""}
+                "selected_kind": kind, "suggested_date": due_on.isoformat() if due_on else "",
+                "last_watered": _latest_water(db, [plant_id], request.state.account_id).get(plant_id)}
     return _view(request, "garden_plant.html", data)
 
 
@@ -132,6 +143,7 @@ def add_task(request: Request, plant_id: int, kind: CareType = Form(...), due_on
 def complete(request: Request, plant_id: int, task_id: int):
     with session_scope() as db:
         owner = request.state.account_id
+        db.connection().exec_driver_sql("BEGIN IMMEDIATE")
         query = select(GardenTask).join(Planta).where(
             GardenTask.id == task_id, GardenTask.plant_id == plant_id, _owned(owner))
         task = db.scalar(query)
@@ -142,7 +154,9 @@ def complete(request: Request, plant_id: int, task_id: int):
             GardenTask.plant_id.in_(select(Planta.id).where(_owned(owner))),
             GardenTask.completed_at.is_(None),
         ).values(completed_at=datetime.now(timezone.utc)))
-    return {"completed": True} if _is_api(request) else RedirectResponse(f"/jardim/{plant_id}", 303)
+        db.refresh(task)
+        receipt = {"completed": True, "kind": task.kind, "completed_at": task.completed_at.replace(tzinfo=timezone.utc).isoformat()}
+    return receipt if _is_api(request) else RedirectResponse(f"/jardim/{plant_id}", 303)
 
 
 @router.post("/jardim/{plant_id}/tarefas/{task_id}/reagendar")

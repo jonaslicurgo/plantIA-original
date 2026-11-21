@@ -56,6 +56,10 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_BASE + plantId, notification)
     }
 
+    fun dismissWaterReminder(context: Context, plantId: Int) {
+        NotificationManagerCompat.from(context).cancel(NOTIFICATION_ID_BASE + plantId)
+    }
+
     fun daysSince(millis: Long): Long =
         TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - millis)
 }

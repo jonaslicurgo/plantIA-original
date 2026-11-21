@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="garden_title">حديقة افتراضية</string>
+    <string name="garden_schedule">جدولة الرعاية</string>
+    <string name="garden_error">تعذّر الوصول إلى جدول العناية بالحديقة.</string>
+</resources>
