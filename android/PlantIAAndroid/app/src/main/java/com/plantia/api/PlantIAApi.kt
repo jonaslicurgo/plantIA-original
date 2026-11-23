@@ -13,6 +13,7 @@ import com.plantia.api.models.PlantHealthHistory
 import com.plantia.api.models.PlantaListResponse
 import com.plantia.api.models.PlantaResponse
 import com.plantia.api.models.PlantaUpdateRequest
+import com.plantia.api.models.SubscriptionSummary
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -52,6 +53,9 @@ interface PlantIAApi {
 
     @PATCH("api/enciclopedia/{id}/favorito")
     suspend fun botanicalFavorite(@Path("id") id: Int, @Body favorite: BotanyFavorite): BotanyFavorite
+
+    @GET("api/assinatura")
+    suspend fun subscriptionSummary(): SubscriptionSummary
 
     @GET("api/jardim")
     suspend fun garden(

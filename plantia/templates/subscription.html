@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("commercial.title") }} · PLANET-IA{% endblock %}
+{% block content %}
+<header class="page-header">
+    <h1>{{ tr("commercial.title") }}</h1>
+    <p>{{ tr("commercial.test_mode") }}</p>
+</header>
+{% if operator %}<p><a href="/admin/comercial">{{ tr("commercial.dashboard") }}</a></p>{% endif %}
+<section class="commercial-panel">
+    <h2>{{ tr("commercial.current") }} · {{ tr("commercial.plan." ~ usage.plan) }}</h2>
+    <p>{{ tr("commercial.remaining") }} <strong>{{ usage.remaining }} / {{ usage.limit }}</strong></p>
+    <p>{{ tr("commercial.reset") }}</p>
+    {% if subscription %}
+    <p>{{ tr("commercial.status." ~ subscription.status) }}
+        {% if subscription.cancel_pending %} · {{ tr("commercial.cancel_pending") }}{% endif %}
+        {% if subscription.period_end %} · {{ tr("commercial.period_end") }}
+        <time class="billing-date" datetime="{{ subscription.period_end }}">{{ subscription.period_end[:10] }}</time>{% endif %}
+    </p>
+    {% endif %}
+    {% if portal %}
+    <form method="post" action="/assinatura/portal"><button class="btn btn-outline">{{ tr("commercial.manage") }}</button></form>
+    {% endif %}
+</section>
+<form class="plant-garden-filter" method="get" action="/assinatura">
+    <label>{{ tr("commercial.market") }}
+        <select name="market">{% for item in markets %}<option value="{{ item }}"{% if item == market %} selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+    </label>
+    <button class="btn btn-outline">{{ tr("commercial.show_prices") }}</button>
+</form>
+<div class="commercial-plans">
+    <section class="commercial-panel"><h2>{{ tr("commercial.plan.free") }}</h2>
+        <p>{{ tr("commercial.free") }}</p><p>{{ free_limit }} {{ tr("commercial.requests_month") }}</p>
+    </section>
+    {% for price in prices %}
+    <section class="commercial-panel commercial-paid">
+        <h2>{{ tr("commercial.plan." ~ price.plan) }}</h2>
+        {% set amount = price.amount if price.currency in ('JPY','KRW') else price.amount / 100 %}
+        <p class="commercial-price"><span data-currency="{{ price.currency }}" data-money="{{ amount }}">{{ price.currency }} {{ amount }}</span></p>
+        <p>{{ tr("commercial.term." ~ price.plan) }}</p>
+        <p>{{ price.limit }} {{ tr("commercial.requests_month") }}</p>
+        {% if price.checkout %}
+        <form method="post" action="/assinatura/checkout">
+            <input type="hidden" name="price" value="{{ price.id }}">
+            <button class="btn btn-primary">{{ tr("commercial.upgrade") }}</button>
+        </form>
+        {% endif %}
+    </section>
+    {% endfor %}
+</div>
+{% if history %}
+<details class="botany-group"><summary>{{ tr("commercial.history") }}</summary>
+<ul class="commercial-list">{% for event in history %}<li>
+    <time class="billing-date" datetime="{{ event.date }}">{{ event.date[:10] }}</time> · {{ tr("commercial.status." ~ event.status) }}
+</li>{% endfor %}</ul>
+</details>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/js/commercial.js"></script>{% endblock %}

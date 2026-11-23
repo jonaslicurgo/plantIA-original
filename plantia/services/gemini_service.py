@@ -13,6 +13,7 @@ from google import genai
 from google.genai import types
 from PIL import Image
 
+from plantia.services import ai_meter
 from plantia.config import (
     MAX_IMAGE_DIMENSION,
     MAX_IMAGE_SIZE_BYTES,
@@ -240,6 +241,7 @@ class GeminiService:
                             response_mime_type="application/json",
                         ),
                     )
+                    ai_meter.capture(response)
                     text = response.text
                     if not text:
                         raise ValueError("Gemini no devolvió ninguna respuesta.")

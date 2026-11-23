@@ -32,6 +32,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,11 +45,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.plantia.api.PlantIAClient
+import com.plantia.api.models.SubscriptionSummary
 import com.plantia.data.ServerPreferences
 import com.plantia.data.ThemeMode
 import com.plantia.ui.components.ErrorBanner
 import com.plantia.ui.components.PlantTopBar
 import com.plantia.util.userMessage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,6 +90,7 @@ fun SettingsScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            if (signedIn) SubscriptionSummaryCard()
             Text(stringResource(R.string.ui_conexion_lan), style = MaterialTheme.typography.titleLarge)
             Text(
                 stringResource(R.string.ui_introduce_la_url_de_tu_servidor_plantia_ip_y_puerto),
@@ -309,6 +313,38 @@ fun SettingsScreen(
                     }
                     androidx.compose.material3.Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
                 }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun SubscriptionSummaryCard() {
+    val context = LocalContext.current
+    val account = PlantIAClient.accountScope(context)
+    var summary by remember(account) { mutableStateOf<SubscriptionSummary?>(null) }
+    LaunchedEffect(account) {
+        if (account == null) return@LaunchedEffect
+        try {
+            val response = PlantIAClient.api(context).subscriptionSummary()
+            if (PlantIAClient.accountScope(context) == account) summary = response
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            // Older servers have no subscription snapshot. Keep settings available.
+        }
+    }
+    val result = summary ?: return
+    fun label(key: String) = result.labels["commercial.$key"].orEmpty()
+    OutlinedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label("title"), style = MaterialTheme.typography.titleMedium)
+            Text(label("plan.${result.usage.plan}"))
+            Text("${label("remaining")} ${result.usage.remaining} / ${result.usage.limit}")
+            result.subscription?.let {
+                Text(label("status.${it.status}"))
+                if (it.cancel_pending) Text(label("cancel_pending"))
             }
         }
     }

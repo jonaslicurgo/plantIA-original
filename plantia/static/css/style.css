@@ -1706,7 +1706,7 @@ nav {
     margin: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
     .nav-toggle {
         display: flex;
     }
@@ -2118,7 +2118,7 @@ nav {
 .account-panel input { width: 100%; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [dir="rtl"] .toast-root { right: auto; left: 1rem; }
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
     #main-nav { visibility: hidden; }
     #main-nav.is-open { visibility: visible; max-height: calc(100dvh - 60px); overflow-y: auto; }
 }
@@ -2192,4 +2192,25 @@ nav {
 .plant-garden-grid form label { display: grid; gap: .35rem; }
 @media (max-width: 700px) {
     .plant-garden-grid { grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+}
+
+.commercial-plans, .commercial-metrics {
+    display: grid; gap: .8rem; margin-block: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+.commercial-panel {
+    padding: 1rem; border: 1px solid var(--border); border-radius: .8rem;
+    background: var(--surface); overflow-wrap: anywhere;
+}
+.commercial-panel > * + * { margin-block-start: .55rem; }
+.commercial-paid { border-block-start: .25rem solid var(--green-700); }
+.commercial-price { font-size: 1.5rem; font-weight: 700; }
+.commercial-list { padding: .45rem 2rem; overflow-wrap: anywhere; }
+.commercial-list li { margin-block: .5rem; }
+.commercial-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }
+.commercial-settings { padding: .8rem 1rem; }
+.commercial-controls label { flex: 1 1 10rem; min-width: 0; }
+.commercial-controls input:not([type=checkbox]), .commercial-controls select {
+    display: block; width: 100%; min-width: 0; padding: .45rem;
+    background: var(--surface); color: inherit; border: 1px solid var(--border); border-radius: .4rem;
 }

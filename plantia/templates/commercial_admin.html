@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("commercial.dashboard") }} · PLANET-IA{% endblock %}
+{% block content %}
+<header class="page-header"><h1>{{ tr("commercial.dashboard") }}</h1><p>{{ tr("commercial.test_mode") }}</p></header>
+<div class="commercial-metrics">
+    {% for key,value in stats.items() %}<div class="commercial-panel"><strong>{{ value }}</strong><p>{{ tr("commercial.metric." ~ key) }}</p></div>{% endfor %}
+</div>
+<section class="commercial-panel">
+    <h2>{{ tr("commercial.mrr") }}</h2>
+    {% for row in revenue %}
+    {% set amount = row.minor if row.currency in ('JPY','KRW') else row.minor / 100 %}
+    <p><span data-currency="{{ row.currency }}" data-money="{{ amount }}">{{ row.currency }} {{ amount }}</span></p>
+    {% else %}<p>—</p>{% endfor %}
+    <p>{{ tr("commercial.cost") }} <span data-currency="BRL" data-money="{{ cost_brl }}">BRL {{ cost_brl }}</span></p>
+    <p>{{ tr("commercial.margin") }} {% if margin_brl is not none %}
+        <span data-currency="BRL" data-money="{{ margin_brl }}">BRL {{ margin_brl }}</span>
+        {% if margin_percent is not none %} · <span data-percent="{{ margin_percent }}">{{ (margin_percent * 100)|round(1) }}%</span>{% endif %}
+        {% else %}—{% endif %}
+    </p>
+    <p>{{ tr("commercial.margin_note") }}</p>
+</section>
+<details class="botany-group" open><summary>{{ tr("commercial.features") }}</summary>
+<ul class="commercial-list">{% for row in usage %}<li>
+    <strong>{{ tr("commercial.feature." ~ row.feature) }}</strong> · {{ row.requests }} {{ tr("commercial.requests") }}
+    · {{ row.input_tokens }} / {{ row.output_tokens }} {{ tr("commercial.tokens") }} ({{ row.reports }}/{{ row.requests }})
+    · <span data-currency="BRL" data-money="{{ row.cost / 1000000 }}">BRL {{ row.cost / 1000000 }}</span>
+    · {{ row.errors }} {{ tr("commercial.errors") }}
+</li>{% else %}<li>—</li>{% endfor %}</ul>
+</details>
+<details class="botany-group"><summary>{{ tr("commercial.history") }}</summary>
+<ul class="commercial-list">{% for item in history %}<li>#{{ item.account_id }} · {{ tr("commercial.status." ~ item.status) }} ·
+    <time class="billing-date" datetime="{{ timestamp(item.received_at) }}">{{ timestamp(item.received_at)[:10] }}</time>
+</li>{% else %}<li>—</li>{% endfor %}</ul>
+</details>
+<details class="botany-group"><summary>{{ tr("commercial.audit") }}</summary>
+<ul class="commercial-list">{% for entry in audit %}<li>
+    <time class="billing-date" datetime="{{ timestamp(entry.created_at) }}">{{ timestamp(entry.created_at)[:10] }}</time>
+    · #{{ entry.actor }} · {{ tr("commercial.event." ~ entry.action) }} · {{ entry.target }}
+    <details><summary>{{ tr("commercial.details") }}</summary><code>{{ entry.details }}</code></details>
+</li>{% else %}<li>—</li>{% endfor %}</ul>
+</details>
+<details class="botany-group"><summary>{{ tr("commercial.accounts") }}</summary>
+    <ul class="commercial-list">{% for account in users %}
+    <li>#{{ account.id }} · {% if editable %}{{ account.email }} · {% endif %}{{ tr("commercial.role." ~ account.commercial_role) }}
+        {% if account.suspended %} · {{ tr("commercial.suspend") }}{% endif %}
+        {% if editable %}
+        <form class="commercial-controls" method="post" action="/admin/comercial/contas/{{ account.id }}">
+            <label>{{ tr("commercial.role") }}
+                <select name="role">{% for option in ("member","auditor","admin") %}<option value="{{ option }}"{% if option == account.commercial_role %} selected{% endif %}>{{ tr("commercial.role." ~ option) }}</option>{% endfor %}</select>
+            </label>
+            <label><input type="checkbox" name="suspended" value="true"{% if account.suspended %} checked{% endif %}> {{ tr("commercial.suspend") }}</label>
+            <button class="btn btn-outline">{{ tr("commercial.save") }}</button>
+        </form>
+        {% endif %}
+    </li>{% endfor %}</ul>
+</details>
+<nav class="pagination">
+    {% if page > 1 %}<a href="?page={{ page - 1 }}">{{ tr("garden.previous") }}</a>{% endif %}
+    {% if more %}<a href="?page={{ page + 1 }}">{{ tr("garden.next") }}</a>{% endif %}
+</nav>
+{% if editable %}
+<details class="botany-group"><summary>{{ tr("commercial.settings") }}</summary>
+<form class="commercial-controls commercial-settings" method="post" action="/admin/comercial/configuracao">
+    {% for key,value in config.items() %}
+    <label>
+        {% if value is boolean %}<input type="checkbox" name="{{ key }}" value="true"{% if value %} checked{% endif %}> {{ tr("commercial.setting." ~ key) }}
+        {% else %}{{ tr("commercial.setting." ~ key) }} <input required type="number" min="0" name="{{ key }}" value="{{ value }}">{% endif %}
+    </label>
+    {% endfor %}
+    <button class="btn btn-primary">{{ tr("commercial.save") }}</button>
+</form>
+</details>
+<details class="botany-group"><summary>{{ tr("commercial.prices") }}</summary>
+<ul class="commercial-list">{% for price in prices %}<li>
+    {{ price.market }} · {{ tr("commercial.plan." ~ price.plan) }} · {{ price.currency }} {{ price.amount }} · {{ price.stripe_price or "—" }}
+</li>{% endfor %}</ul>
+<form class="commercial-controls commercial-settings" method="post" action="/admin/comercial/preco">
+    <label>{{ tr("commercial.market") }} <input required name="market" maxlength="2" pattern="[A-Z]{2}" value="BR"></label>
+    <label>{{ tr("commercial.plan") }}
+        <select name="plan"><option value="monthly">{{ tr("commercial.plan.monthly") }}</option><option value="annual">{{ tr("commercial.plan.annual") }}</option></select>
+    </label>
+    <label>{{ tr("commercial.currency") }} <select name="currency">{% for code in currencies %}<option>{{ code }}</option>{% endfor %}</select></label>
+    <label>{{ tr("commercial.minor_units") }} <input type="number" name="amount" min="1" required></label>
+    <label>{{ tr("commercial.stripe_price") }} <input name="stripe_price" maxlength="100" placeholder="price_…"></label>
+    <label><input type="checkbox" name="enabled" value="true" checked> {{ tr("commercial.enabled") }}</label>
+    <button class="btn btn-primary">{{ tr("commercial.save") }}</button>
+</form>
+</details>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/js/commercial.js"></script>{% endblock %}

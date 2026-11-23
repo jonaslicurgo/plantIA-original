@@ -10,6 +10,7 @@ from google.genai import types
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 
+from plantia.services import ai_meter
 from plantia.config import get_gemini_model
 from plantia.database import session_scope
 from plantia.models import HealthEvent, Planta
@@ -120,6 +121,7 @@ def _generate(schema, content):
             config=types.GenerateContentConfig(temperature=0, response_mime_type="application/json",
                                                 response_json_schema=schema.model_json_schema()),
         )
+        ai_meter.capture(response)
         return schema.model_validate_json(response.text or "")
     except Exception as exc:
         raise GeminiUnavailable("Plant health request unavailable") from exc

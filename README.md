@@ -259,3 +259,32 @@ La identificación por IA es **orientativa**. Gemini puede equivocarse, especial
 ## Licencia
 
 GNU GPL v3.0
+
+### Homologação comercial
+
+Use um banco separado por meio de `PLANET_DATA_DIR` e configure `PLANET_PUBLIC_ORIGIN`
+com a origem HTTPS da homologação. Crie uma conta nesse ambiente e habilite o primeiro
+administrador a partir do identificador numérico da conta, usando o mesmo diretório de dados.
+
+```bash
+python -m scripts.commercial_bootstrap ID_DA_CONTA
+```
+
+Abra `/admin/comercial` para configurar franquias mensais, custos estimados, mercados,
+preços, funções de usuário e acesso aos recursos de IA. Para habilitar o Checkout,
+crie os preços recorrentes mensal e anual no Stripe em modo de teste e associe os
+IDs `price_…` aos respectivos planos no painel. Configure o Customer Portal de teste
+no Stripe com os preços habilitados e as opções de mudança e cancelamento.
+
+Defina `PLANET_STRIPE_KEY` com uma chave de teste e `PLANET_STRIPE_WEBHOOK_SECRET`
+com o segredo de teste do endpoint `/api/stripe/webhook`. O endpoint recebe
+`customer.subscription.created`, `customer.subscription.updated`,
+`customer.subscription.deleted`, `customer.subscription.paused` e
+`customer.subscription.resumed`. O Checkout exige uma chave de teste. O webhook
+rejeita eventos de produção. Use credenciais somente no ambiente de homologação.
+
+O catálogo é selecionado por mercado e a receita recorrente estimada é exibida por
+moeda. A margem em BRL desconta o custo estimado de IA e dispensa conversão das
+demais moedas. Os limites mensais seguem UTC. O Android exibe a franquia e o plano
+com dados do servidor. A integração de compra e validação de recibos da Play Store
+e da App Store exige implementação específica antes de habilitar vendas nas lojas.

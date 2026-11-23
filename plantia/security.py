@@ -27,7 +27,7 @@ async def enforce_security(request, call_next):
     method = request.method
     web = not path.startswith(("/api/", "/uploads/"))
     request.state.account_id = None
-    if path.startswith("/static/") or path == "/health":
+    if path.startswith("/static/") or path == "/health" or (path == "/api/stripe/webhook" and method == "POST"):
         return await call_next(request)
     if path in {"/salir", "/configuracion", "/docs", "/redoc", "/openapi.json"}:
         return JSONResponse({"detail": catalog(locale_for(request)).get("Not found", "Not found")}, 404)

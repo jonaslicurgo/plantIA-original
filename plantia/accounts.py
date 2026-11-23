@@ -65,7 +65,7 @@ def _issue(db, account_id, purpose, age):
 
 def login(email, password):
     with get_engine().connect() as db:
-        row = db.execute(text("SELECT id,password FROM accounts WHERE email=:email"), {"email": email}).first()
+        row = db.execute(text("SELECT id,password FROM accounts WHERE email=:email AND suspended=0"), {"email": email}).first()
     try:
         with HASH_SLOTS:
             HASHER.verify(row.password if row else DUMMY_HASH, password)
@@ -76,7 +76,7 @@ def login(email, password):
     # Recheck after hashing so a concurrent password reset cannot issue a stale session.
     with get_engine().begin() as db:
         db.exec_driver_sql("BEGIN IMMEDIATE")
-        current = db.execute(text("SELECT password FROM accounts WHERE id=:id"), {"id": row.id}).scalar()
+        current = db.execute(text("SELECT password FROM accounts WHERE id=:id AND suspended=0"), {"id": row.id}).scalar()
         if current == row.password:
             db.execute(text("DELETE FROM account_tokens WHERE expires<=:now"), {"now": int(time.time())})
             return _issue(db, row.id, "session", SESSION_AGE)
@@ -88,7 +88,7 @@ def account_for(token):
         return None
     with get_engine().connect() as db:
         return db.execute(text("""SELECT account_id FROM account_tokens
-            WHERE digest=:digest AND expires>:now AND purpose='session'"""),
+            WHERE digest=:digest AND expires>:now AND purpose='session' AND account_id IN (SELECT id FROM accounts WHERE suspended=0)"""),
             {"digest": digest(token), "now": int(time.time())}).scalar()
 
 

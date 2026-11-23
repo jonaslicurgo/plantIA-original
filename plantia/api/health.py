@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse, Response
 from plantia import accounts
 from plantia.config import ALLOWED_IMAGE_TYPES, get_gemini_model
 from plantia.i18n import catalog, locale_for
-from plantia.services import health, health_usage
+from plantia.services import ai_meter, health, health_usage
 from plantia.services.gemini_service import GeminiService, GeminiUnavailable
 
 router = APIRouter()
@@ -131,7 +131,12 @@ def _ai_run(plant_id, owner, operation, kind, context, compute, image=None, mime
         health_usage.finish(usage, "rejected")
         raise HTTPException(429, "Too many requests")
     try:
-        event = _save(plant_id, owner, kind, compute(), image, mime)
+        with ai_meter.measure(owner, "diagnosis" if operation == "assess" else "assistant"):
+            payload = compute()
+        event = _save(plant_id, owner, kind, payload, image, mime)
+    except HTTPException as exc:
+        health_usage.finish(usage, "rejected" if exc.detail in {"commercial.disabled", "commercial.quota"} else "failed")
+        raise
     except GeminiUnavailable:
         health_usage.finish(usage, "failed")
         raise HTTPException(503, "health.unavailable") from None

@@ -1,5 +1,13 @@
 # Changelog
 
+## Assinaturas, consumo de IA e administração
+
+- Planos Gratuito, Premium Mensal e Premium Anual com catálogo por mercado, moeda e ciclo. Os valores iniciais para o Brasil são R$ 29,90 por mês e R$ 199,90 por ano. Preços, disponibilidade, franquias e estimativas de custo são configuráveis no painel.
+- Stripe Checkout e Customer Portal em modo de teste. Webhooks assinados reconciliam o estado da assinatura com o Stripe, registram alterações e descartam repetições. A franquia Premium acompanha a vigência registrada no servidor.
+- Medição de identificação e diagnóstico por conta e operação, com limites mensais em UTC, estimativa de custo e captura de tokens quando o Gemini fornece os dados. Resultados reutilizados dispensam nova reserva. A franquia restante aparece na web e no Android.
+- Painel web com usuários, assinaturas, receita recorrente por moeda, margem estimada em BRL, erros, consumo e trilha de auditoria. Administradores editam regras e contas. Auditores consultam indicadores e registros.
+- Interface web comercial nos 12 idiomas do aplicativo, incluindo RTL em árabe. O Android consulta o estado da assinatura. A estrutura de assinaturas aceita a origem do pagamento e prepara a integração futura com as lojas.
+
 ## Jardim Virtual no Android
 
 - Aba Jardim Virtual com filtro de local, perfis dos exemplares, agenda, criação, reagendamento e conclusão de tarefas usando os mesmos registros da web.

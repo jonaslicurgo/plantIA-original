@@ -17,8 +17,9 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from plantia import accounts
+from plantia import accounts, commercial
 from plantia.api.auth import router as auth_router
+from plantia.api.commercial import router as commercial_router
 from plantia.api.garden import router as garden_router
 from plantia.api.health import router as health_router
 from plantia.api.encyclopedia import router as encyclopedia_router
@@ -28,6 +29,7 @@ from plantia.security import enforce_security, secure_cookie
 from plantia.database import init_database
 from plantia.schemas.planta import PlantaListResponse, PlantaResponse, PlantaUpdate
 from plantia.utils.taxon import species_name
+from plantia.services import ai_meter
 from plantia.services.gemini_service import GeminiService, GeminiUnavailable, PROMPT
 from plantia.services.planta_service import PlantaService
 from plantia.utils.jinja_filters import detalle_json_fields
@@ -92,7 +94,8 @@ def _identify(content, mime_type, owner, locale):
         cached = PlantaService.find_cached_identification(owner, cache_key)
         if cached and (UPLOADS_DIR / Path(cached.image_path).name).is_file():
             return cached
-        result = GeminiService.identificar(prepared, actual_type, LANGUAGES[locale][1], already_prepared=True)
+        with ai_meter.measure(owner, "identify"):
+            result = GeminiService.identificar(prepared, actual_type, LANGUAGES[locale][1], already_prepared=True)
         if (result.estado_identificacion == "inconclusive" or result.confianza == "bajo"
                 or not result.nombre_comun.strip() or not species_name(result.nombre_cientifico)):
             raise HTTPException(422, "botany.inconclusive")
@@ -113,7 +116,7 @@ def health():
 def set_language(request: Request, language: str = Form(...), page: str = Form("/")):
     if language not in LANGUAGES:
         raise HTTPException(400, "Invalid language")
-    allowed = {"/", "/plantas", "/enciclopedia", "/jardim", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir"}
+    allowed = {"/", "/plantas", "/enciclopedia", "/jardim", "/assinatura", "/admin/comercial", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir"}
     response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:(?:plantas|enciclopedia|jardim)/[0-9]+|plantas/[0-9]+/saude)", page) else "/", 303)
     response.set_cookie("planet_language", language, max_age=31536000, httponly=True,
                         secure=secure_cookie(), samesite="lax")
@@ -328,6 +331,7 @@ def create_app():
     init_database()
 
     accounts.initialize_accounts()
+    commercial.init()
     app = FastAPI(
         docs_url=None, redoc_url=None, openapi_url=None,
         title="PLANET-IA",
@@ -351,6 +355,7 @@ def create_app():
     app.add_exception_handler(RequestValidationError, error_handler)
     app.middleware("http")(enforce_security)
     app.include_router(auth_router)
+    app.include_router(commercial_router)
     app.include_router(health_router)
     app.include_router(garden_router)
     app.include_router(encyclopedia_router)

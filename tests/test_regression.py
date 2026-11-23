@@ -468,6 +468,177 @@ class Regression(unittest.TestCase):
         self.assertEqual(view["tasks"], [])
         self.assertEqual(self.a.post(f"/api/jardim/{plant}/tarefas", data={"kind":"unknown","due_on":review}, headers=a).status_code, 422)
 
+    def test_commercial_monthly_quota_caches_and_token_cost(self):
+        from types import SimpleNamespace
+        from time import time
+        from plantia import commercial
+        from plantia.services import ai_meter
+
+        a = self.account(self.a, "commercial-quota@example.com")
+        b = self.account(self.b, "commercial-quota-other@example.com")
+        owner = accounts.account_for(a["Authorization"].split()[1])
+        with commercial.transaction() as db:
+            baseline = commercial.rules(db)
+            config = baseline.model_copy(update={"free_limit":1, "monthly_limit":3,
+                "request_micro_brl":20, "input_per_million_micro_brl":1_000_000})
+            db.execute(text("UPDATE commercial_rules SET payload=:value"), {"value":config.model_dump_json()})
+        def reset():
+            with commercial.transaction() as db:
+                db.execute(text("UPDATE commercial_rules SET payload=:value"), {"value":baseline.model_dump_json()})
+        self.addCleanup(reset)
+
+        value = self.a.post("/api/plantas/identificar", files=photo(), headers=a)
+        self.assertEqual(value.status_code, 200, value.text)
+        cached = self.a.post("/api/plantas/identificar", files=photo(), headers=a)
+        self.assertEqual(cached.json()["id"], value.json()["id"])
+        exhausted = self.a.post("/api/plantas/identificar", files=photo(), headers={**a,"Accept-Language":"en"})
+        self.assertEqual(exhausted.status_code, 429)
+        self.assertEqual(self.identify.call_count, 1)
+        self.assertEqual(self.a.get("/api/assinatura", headers=a).json()["usage"]["remaining"], 0)
+        self.assertEqual(self.b.get("/api/assinatura", headers=b).json()["usage"]["remaining"], 1)
+        snapshot = commercial.SubscriptionSnapshot(
+            provider="google_play", external_id="test_entitlement", account_id=owner,
+            plan="monthly", status="active", period_end=int(time())+86400, cancel_pending=True,
+            currency="BRL", amount=2990, market="BR", checked_at=1)
+        with commercial.transaction() as db:
+            commercial.apply_subscription(db, snapshot)
+        with ai_meter.measure(owner, "assistant"):
+            ai_meter.capture(SimpleNamespace(usage_metadata=SimpleNamespace(
+                prompt_token_count=500, candidates_token_count=100, thoughts_token_count=20)))
+        datum = self.a.get("/api/assinatura", headers=a).json()
+        self.assertEqual(datum["usage"], {"plan":"monthly","limit":3,"used":2,"remaining":1})
+        self.assertTrue(datum["subscription"]["cancel_pending"])
+        with get_engine().connect() as db:
+            accounted = db.execute(text("""SELECT input_tokens,output_tokens,estimated_cost FROM ai_meter
+                WHERE account_id=:owner AND feature='assistant'"""), {"owner":owner}).one()
+        self.assertEqual(tuple(accounted), (500,120,520))
+        with commercial.transaction() as db:
+            commercial.apply_subscription(db, snapshot.model_copy(update={"period_end":int(time())-1,"checked_at":2}))
+        datum = self.a.get("/api/assinatura", headers=a).json()
+        self.assertEqual(datum["usage"]["plan"], "free")
+        self.assertEqual(datum["subscription"]["status"], "expired")
+
+    def test_commercial_admin_permissions_and_audit(self):
+        from plantia import commercial
+
+        a = self.account(self.a, "commercial-admin@example.com")
+        b = self.account(self.b, "commercial-auditor@example.com")
+        owner = accounts.account_for(a["Authorization"].split()[1])
+        other = accounts.account_for(b["Authorization"].split()[1])
+        self.assertEqual(self.b.get("/admin/comercial", headers=b).status_code, 403)
+        with commercial.transaction() as db:
+            db.execute(text("UPDATE accounts SET commercial_role='admin' WHERE id=:id"), {"id":owner})
+            db.execute(text("UPDATE accounts SET commercial_role='auditor' WHERE id=:id"), {"id":other})
+        view = self.a.get("/admin/comercial", headers=a)
+        self.assertEqual(view.status_code, 200, view.text)
+        self.assertIn("commercial-admin@example.com", view.text)
+        self.assertNotIn("commercial-admin@example.com", self.b.get("/admin/comercial", headers=b).text)
+        price = {"market":"US","plan":"annual","currency":"USD","amount":"4499",
+                 "stripe_price":"price_adminUSD","enabled":"true"}
+        self.assertEqual(self.b.post("/admin/comercial/preco", headers=b, data=price).status_code, 403)
+        self.assertEqual(self.a.post("/admin/comercial/preco", headers=a, data=price, follow_redirects=False).status_code, 303)
+        user_view = self.b.get("/api/assinatura?market=US", headers=b).json()
+        self.assertEqual(user_view["prices"][0]["currency"], "USD")
+        self.assertNotIn("price_adminUSD", str(user_view))
+        with get_engine().connect() as db:
+            baseline = commercial.rules(db)
+        settings = baseline.model_dump()
+        settings["diagnosis"] = False
+        self.assertEqual(self.b.post("/admin/comercial/configuracao", headers=b, data=settings).status_code, 403)
+        self.assertEqual(self.a.post("/admin/comercial/configuracao", headers=a, data=settings, follow_redirects=False).status_code, 303)
+        try:
+            plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
+            with patch("plantia.services.health.analyze") as analyze:
+                barred = self.a.post(f"/api/plantas/{plant}/saude/avaliar", files={"photo":photo()["file"]}, headers=a)
+                self.assertEqual(barred.status_code, 403, barred.text)
+                analyze.assert_not_called()
+        finally:
+            with commercial.transaction() as db:
+                db.execute(text("UPDATE commercial_rules SET payload=:value"), {"value":baseline.model_dump_json()})
+        self.assertEqual(self.a.post(f"/admin/comercial/contas/{owner}", headers=a,
+            data={"role":"member","suspended":"true"}).status_code, 409)
+        self.assertEqual(self.a.post(f"/admin/comercial/contas/{other}", headers=a,
+            data={"role":"member","suspended":"true"}, follow_redirects=False).status_code, 303)
+        self.assertEqual(self.b.get("/api/assinatura", headers=b).status_code, 401)
+        self.assertEqual(self.b.post("/api/auth/login", data={"email":"commercial-auditor@example.com","password":PASSWORD}).status_code, 401)
+        with get_engine().connect() as db:
+            events = db.execute(text("SELECT action FROM commercial_audit WHERE actor=:owner ORDER BY id"),
+                                {"owner":owner}).scalars().all()
+        self.assertEqual(events, ["price.edit","rules.edit","account.edit"])
+
+    def test_stripe_signed_idempotent_lifecycle_and_test_checkout(self):
+        import hashlib, hmac, json
+        from time import time
+        from plantia import commercial
+        from plantia.services import stripe_billing
+
+        a = self.account(self.a, "commercial-stripe@example.com")
+        b = self.account(self.b, "commercial-stripe-other@example.com")
+        owner = accounts.account_for(a["Authorization"].split()[1])
+        with commercial.transaction() as db:
+            commercial.put_price(db, owner, "CA", "monthly", "CAD", 2990, "price_testCA")
+        offer = self.a.get("/api/assinatura?market=CA", headers=a).json()["prices"][0]["id"]
+        fake_secret = "whsec_fixture_only"
+        values = {"PLANET_STRIPE_KEY":"sk_test_fixture", "PLANET_STRIPE_WEBHOOK_SECRET":fake_secret}
+
+        def signed(event, age=0):
+            body = json.dumps(event).encode()
+            stamp = str(int(time()) - age)
+            digest = hmac.new(fake_secret.encode(), stamp.encode()+b"."+body, hashlib.sha256).hexdigest()
+            return {"content":body, "headers":{"Stripe-Signature":f"t={stamp},v1={digest}"}}
+
+        def request(path, data=None, idempotency=None):
+            if path.startswith("/prices/"):
+                return {"active":True,"currency":"cad","unit_amount":2990,"recurring":{"interval":"month","interval_count":1}}
+            if path == "/customers":
+                return {"id":"cus_fixture"}
+            if path == "/checkout/sessions":
+                self.assertIn("planet-test-checkout-", idempotency)
+                self.assertEqual(data["mode"], "subscription")
+                return {"url":"https://checkout.stripe.com/c/pay/test"}
+            if path == "/billing_portal/sessions":
+                self.assertEqual(data["customer"], "cus_fixture")
+                return {"url":"https://billing.stripe.com/p/session/test"}
+            raise AssertionError(path)
+
+        with patch.dict(os.environ, values), patch.object(stripe_billing, "send", side_effect=request) as stripe:
+            upgraded = self.a.post("/assinatura/checkout", data={"price":offer}, headers=a, follow_redirects=False)
+            self.assertEqual(upgraded.status_code, 303, upgraded.text)
+            self.assertTrue(upgraded.headers["location"].startswith("https://checkout.stripe.com/"))
+            self.assertEqual(self.a.post("/assinatura/checkout", data={"price":offer}, headers=a, follow_redirects=False).status_code,303)
+            self.assertEqual(stripe.call_count, 3)
+            self.assertEqual(self.a.post("/assinatura/portal", headers=a, follow_redirects=False).headers["location"],
+                             "https://billing.stripe.com/p/session/test")
+            self.assertEqual(self.b.post("/assinatura/portal", headers=b, follow_redirects=False).status_code, 503)
+
+        base_event = {"id":"evt_fixture1","type":"customer.subscription.created","livemode":False,
+                      "data":{"object":{"id":"sub_fixture"}}}
+        active = {"id":"sub_fixture","livemode":False,"customer":"cus_fixture","status":"active",
+                  "items":{"data":[{"quantity":1, "price":{"id":"price_testCA","unit_amount":2990,"currency":"cad",
+                     "recurring":{"interval":"month","interval_count":1}}, "current_period_end":int(time())+30*86400}]}}
+        path = "/api/stripe/webhook"
+        with patch.dict(os.environ, values), patch.object(stripe_billing, "send", return_value=active) as stripe:
+            self.assertEqual(self.a.post(path, content=b"{}").status_code,400)
+            self.assertEqual(self.a.post(path, **signed(base_event, age=600)).status_code,400)
+            self.assertEqual(self.a.post(path, **signed({**base_event,"livemode":True})).status_code,400)
+            self.assertEqual(self.a.post(path, **signed(base_event)).status_code,200)
+            self.assertEqual(self.a.post(path, **signed(base_event)).status_code,200)
+            self.assertEqual(stripe.call_count,1)
+            self.assertEqual(self.a.get("/api/assinatura",headers=a).json()["usage"]["plan"],"monthly")
+            self.assertEqual(self.b.get("/api/assinatura",headers=b).json()["usage"]["plan"],"free")
+            stripe.return_value = {**active,"cancel_at_period_end":True}
+            update = {**base_event,"id":"evt_fixture2","type":"customer.subscription.updated"}
+            self.assertEqual(self.a.post(path, **signed(update)).status_code,200)
+            self.assertTrue(self.a.get("/api/assinatura",headers=a).json()["subscription"]["cancel_pending"])
+            stripe.return_value = {**active,"status":"canceled"}
+            cancel = {**base_event,"id":"evt_fixture3","type":"customer.subscription.deleted"}
+            self.assertEqual(self.a.post(path, **signed(cancel)).status_code,200)
+            self.assertEqual(self.a.get("/api/assinatura",headers=a).json()["usage"]["plan"],"free")
+            self.assertEqual(len(self.a.get("/api/assinatura",headers=a).json()["history"]),3)
+        with patch.dict(os.environ,{**values,"PLANET_STRIPE_KEY":"sk_live_fixture"}):
+            with self.assertRaises(stripe_billing.BillingError):
+                stripe_billing.send("/customers",{})
+
     def test_gemini_request_uses_selected_model_and_language(self):
         self.mock.stop()
         with patch.object(GeminiService, "_get_client") as client:
