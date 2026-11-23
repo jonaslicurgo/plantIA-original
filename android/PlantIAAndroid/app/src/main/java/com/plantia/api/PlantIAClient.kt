@@ -9,7 +9,6 @@ import coil.request.ImageRequest
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
@@ -54,16 +53,12 @@ object PlantIAClient {
             val base = current?.url?.toHttpUrlOrNull()
             if (current != null && base != null && request.url.isHttps && request.url.host == base.host &&
                 request.url.port == base.port && request.url.encodedPath.startsWith(base.encodedPath) &&
-                !request.url.encodedPath.endsWith("/api/auth/login")) {
+                request.url.encodedPath != "/api/auth/login" && request.url.encodedPath != "/health") {
                 builder.header("Authorization", "Bearer ${current.value.access_token}")
             }
             chain.proceed(builder.build())
         }
-        .addInterceptor(
-            HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
-            }
-        )
+        .followRedirects(false)
         .build()
 
     @Volatile

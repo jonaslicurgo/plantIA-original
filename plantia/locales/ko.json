@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 식물 노트",
   "🧪 Abonada": "🧪 구독자",
   "🪴 Trasplantada": "🪴 이식됨",
-  "🪴 Época de trasplante": "🪴 이식 시간"
+  "🪴 Época de trasplante": "🪴 이식 시간",
+  "privacy.title": "개인정보 및 계정",
+  "privacy.verify": "이메일 인증",
+  "privacy.code": "인증 코드",
+  "privacy.sent": "계정 인증이 필요하면 이메일로 코드를 보내드립니다.",
+  "privacy.required": "로그인하기 전에 이메일을 인증하세요.",
+  "privacy.unavailable": "인증 코드를 보낼 수 없습니다.",
+  "privacy.resend": "코드 다시 보내기",
+  "privacy.invalid": "코드가 유효하지 않거나 만료되었습니다.",
+  "privacy.verified": "인증되었습니다. 로그인하세요.",
+  "privacy.unverified": "이메일이 인증되지 않았습니다.",
+  "privacy.data": "계정에는 이메일, 사진, 식물 기록, 작업, 구독 정보가 저장됩니다.",
+  "privacy.processing": "Gemini는 분석을 위해 보낸 이미지와 정보를 처리합니다. 결제 페이지를 열면 Stripe가 결제를 처리합니다.",
+  "privacy.delete": "계정 삭제",
+  "privacy.deletion": "계정을 삭제하면 기록이 지워지고 세션이 종료됩니다. 결제 또는 관리 역할과 연결된 계정은 담당자의 확인이 필요합니다.",
+  "privacy.confirm": "계정을 영구 삭제하는 데 동의합니다.",
+  "privacy.password": "현재 비밀번호가 올바르지 않습니다.",
+  "privacy.blocked": "계정 삭제 지원은 서비스 관리자에게 문의하세요."
 }

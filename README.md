@@ -288,3 +288,7 @@ moeda. A margem em BRL desconta o custo estimado de IA e dispensa conversão das
 demais moedas. Os limites mensais seguem UTC. O Android exibe a franquia e o plano
 com dados do servidor. A integração de compra e validação de recibos da Play Store
 e da App Store exige implementação específica antes de habilitar vendas nas lojas.
+
+O roteiro de [homologação isolada no Railway](docs/HOMOLOGACAO-RAILWAY.md)
+inclui a instalação do APK, a autorização GitHub e os testes com provedores
+reais de homologação. Consulte também o [checklist de lançamento web](docs/CHECKLIST-LANCAMENTO.md).

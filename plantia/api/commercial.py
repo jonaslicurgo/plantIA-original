@@ -10,7 +10,7 @@ from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 from starlette.responses import RedirectResponse
 
-from plantia import commercial as billing
+from plantia import accounts, commercial as billing
 from plantia.database import get_engine
 from plantia.i18n import catalog, locale_for
 from plantia.services import stripe_billing as stripe
@@ -206,11 +206,15 @@ def edit_account(request: Request, owner: int, role: Literal["member", "auditor"
         actor, _ = _require(db, request, write=True)
         if actor == owner and (role != "admin" or suspended):
             raise HTTPException(409, "commercial.self_role")
+        target = db.execute(text("SELECT commercial_role,email_verified FROM accounts WHERE id=:owner"),
+                            {"owner": owner}).first()
+        if target and role != "member" and accounts.verification_required() and not target.email_verified:
+            raise HTTPException(409, "privacy.required")
         result = db.execute(text("""UPDATE accounts SET commercial_role=:role,suspended=:suspended WHERE id=:owner"""),
                             {"role": role, "suspended": int(suspended), "owner": owner})
         if not result.rowcount:
             raise HTTPException(404, "Not found")
-        if suspended:
+        if suspended or (accounts.verification_required() and role != target.commercial_role):
             db.execute(text("DELETE FROM account_tokens WHERE account_id=:owner"), {"owner": owner})
         billing.audit(db, actor, "account.edit", owner, {"role": role, "suspended": suspended})
     return RedirectResponse("/admin/comercial", 303)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <!-- App LAN: permite HTTP a IPs locales configurables en Ajustes -->
-    <base-config cleartextTrafficPermitted="true">
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>

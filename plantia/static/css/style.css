@@ -2116,6 +2116,8 @@ nav {
 .account-panel form, .account-panel label { display: grid; gap: .65rem; }
 .account-panel form, .account-links, .account-message { margin-block-start: 1rem; }
 .account-panel input { width: 100%; }
+.account-panel .privacy-confirm { display: flex; align-items: center; }
+.account-panel .privacy-confirm input { width: auto; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [dir="rtl"] .toast-root { right: auto; left: 1rem; }
 @media (max-width: 1080px) {

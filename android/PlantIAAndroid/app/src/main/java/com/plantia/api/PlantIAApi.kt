@@ -32,7 +32,12 @@ import retrofit2.http.Query
 
 data class AccountSession(val access_token: String, val account_id: Int)
 
+data class HealthStatus(val status: String)
+
 interface PlantIAApi {
+    @GET("health")
+    suspend fun health(): HealthStatus
+
     @FormUrlEncoded
     @POST("api/auth/login")
     suspend fun login(@Field("email") email: String, @Field("password") password: String): AccountSession

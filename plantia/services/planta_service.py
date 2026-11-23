@@ -107,6 +107,11 @@ class PlantaService:
     @staticmethod
     def crear(datos: PlantaCreate, owner_id: int, cache_key: str | None = None) -> Planta:
         with session_scope() as session:
+            session.connection().exec_driver_sql("BEGIN IMMEDIATE")
+            if not session.connection().exec_driver_sql(
+                "SELECT 1 FROM accounts WHERE id=? AND suspended=0", (owner_id,)
+            ).first():
+                raise LookupError("Account no longer available")
             planta = Planta(
                 owner_id=owner_id,
                 identification_cache_key=cache_key,

@@ -2,6 +2,7 @@ package com.plantia.data
 
 import android.content.Context
 import com.plantia.Config
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class ServerPreferences(context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -9,7 +10,7 @@ class ServerPreferences(context: Context) {
     var baseUrl: String
         get() {
             val stored = prefs.getString(KEY_BASE_URL, null)?.trim().orEmpty()
-            return normalizeBaseUrl(if (stored.isBlank()) Config.DEFAULT_BASE_URL else stored)
+            return runCatching { normalizeBaseUrl(stored) }.getOrDefault(Config.DEFAULT_BASE_URL)
         }
         set(value) {
             prefs.edit().putString(KEY_BASE_URL, normalizeBaseUrl(value)).apply()
@@ -40,12 +41,13 @@ class ServerPreferences(context: Context) {
         private const val KEY_BASE_URL = "base_url"
 
         fun normalizeBaseUrl(raw: String): String {
-            var url = raw.trim()
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "http://$url"
-            }
-            if (!url.endsWith("/")) url += "/"
-            return url
+            val input = raw.trim()
+            require(input.isNotEmpty())
+            val candidate = if ("://" in input) input else "https://$input"
+            val url = requireNotNull(candidate.toHttpUrlOrNull())
+            require(url.isHttps && url.username.isEmpty() && url.password.isEmpty() &&
+                url.query == null && url.fragment == null && url.encodedPath == "/")
+            return url.toString()
         }
     }
 }

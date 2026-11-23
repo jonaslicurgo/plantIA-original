@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 Quaderno delle piante",
   "🧪 Abonada": "🧪 Abbonato",
   "🪴 Trasplantada": "🪴 Trapiantato",
-  "🪴 Época de trasplante": "🪴 Tempo di trapianto"
+  "🪴 Época de trasplante": "🪴 Tempo di trapianto",
+  "privacy.title": "Privacy e account",
+  "privacy.verify": "Verifica email",
+  "privacy.code": "Codice di verifica",
+  "privacy.sent": "Se serve verificare l’account, invieremo un codice via email.",
+  "privacy.required": "Verifica l’email prima di accedere.",
+  "privacy.unavailable": "L’invio del codice non è disponibile.",
+  "privacy.resend": "Invia di nuovo il codice",
+  "privacy.invalid": "Codice non valido o scaduto.",
+  "privacy.verified": "Email verificata. Accedi al tuo account.",
+  "privacy.unverified": "Email non verificata.",
+  "privacy.data": "L’account conserva email, foto, schede delle piante, attività e dati dell’abbonamento.",
+  "privacy.processing": "Gemini elabora immagini e contesto inviati per l’analisi. Stripe elabora i pagamenti quando apri la pagina di pagamento.",
+  "privacy.delete": "Elimina account",
+  "privacy.deletion": "L’eliminazione rimuove i tuoi dati e chiude le sessioni. Gli account con fatturazione o ruoli amministrativi richiedono una verifica manuale.",
+  "privacy.confirm": "Confermo l’eliminazione definitiva del mio account.",
+  "privacy.password": "La password attuale è errata.",
+  "privacy.blocked": "Contatta il gestore del servizio per richiedere l’eliminazione."
 }

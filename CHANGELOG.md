@@ -1,5 +1,12 @@
 # Changelog
 
+## Homologação, PWA e privacidade
+
+- Configuração Railway separada com volume para SQLite e fotos, HTTPS e verificação de prontidão. Gemini, Stripe de teste e SMTP são configurados no ambiente.
+- PWA com instalação, ícones, tela de abertura e página offline pública. Páginas de conta e dados privados dependem da rede.
+- Verificação de e-mail com código de uso único e confirmação de senha, exclusão de contas sem vínculo de cobrança ou função administrativa, página de privacidade e proteção de privilégios em homologação.
+- Android de depuração com identificador separado, servidor configurável por HTTPS e teste de conexão. Atualizados os roteiros de testes, implantação e lançamento.
+
 ## Assinaturas, consumo de IA e administração
 
 - Planos Gratuito, Premium Mensal e Premium Anual com catálogo por mercado, moeda e ciclo. Os valores iniciais para o Brasil são R$ 29,90 por mês e R$ 199,90 por ano. Preços, disponibilidade, franquias e estimativas de custo são configuráveis no painel.

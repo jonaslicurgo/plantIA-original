@@ -1,6 +1,15 @@
+import java.net.URI
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+}
+
+val stagingOrigin = providers.gradleProperty("planetStagingOrigin").orElse("https://staging.invalid/").get()
+val stagingUri = URI(stagingOrigin)
+require(stagingUri.scheme == "https" && stagingUri.host != null && stagingUri.userInfo == null &&
+    stagingUri.rawQuery == null && stagingUri.rawFragment == null && stagingUri.path in listOf("", "/")) {
+    "planetStagingOrigin must be an HTTPS origin"
 }
 
 android {
@@ -14,10 +23,16 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
+        buildConfigField("String", "DEFAULT_BASE_URL", "\"${stagingOrigin.trimEnd('/')}/\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildTypes {
+        debug { applicationIdSuffix = ".staging" }
+    }
+
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 

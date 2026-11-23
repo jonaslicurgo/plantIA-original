@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 Plant notebook",
   "🧪 Abonada": "🧪 Subscriber",
   "🪴 Trasplantada": "🪴 Transplanted",
-  "🪴 Época de trasplante": "🪴 Transplant time"
+  "🪴 Época de trasplante": "🪴 Transplant time",
+  "privacy.title": "Privacy and account",
+  "privacy.verify": "Verify email",
+  "privacy.code": "Verification code",
+  "privacy.sent": "If the account needs verification, we will email a code.",
+  "privacy.required": "Verify your email before signing in.",
+  "privacy.unavailable": "Verification email is unavailable.",
+  "privacy.resend": "Resend code",
+  "privacy.invalid": "Invalid or expired code.",
+  "privacy.verified": "Email verified. Sign in to your account.",
+  "privacy.unverified": "Email has not been verified.",
+  "privacy.data": "Your account stores your email, photos, plant records, tasks and subscription data.",
+  "privacy.processing": "Gemini processes images and context submitted for analysis. Stripe processes payments when you open checkout.",
+  "privacy.delete": "Delete account",
+  "privacy.deletion": "Deletion removes your records and ends your sessions. Accounts linked to billing or with an operator role require manual review.",
+  "privacy.confirm": "I confirm permanent deletion of my account.",
+  "privacy.password": "The current password is incorrect.",
+  "privacy.blocked": "Contact the service operator for assisted deletion."
 }

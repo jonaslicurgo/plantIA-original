@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 Caderno de plantas",
   "🧪 Abonada": "🧪 Adubada",
   "🪴 Trasplantada": "🪴 Transplantado",
-  "🪴 Época de trasplante": "🪴 Hora do transplante"
+  "🪴 Época de trasplante": "🪴 Hora do transplante",
+  "privacy.title": "Privacidade e conta",
+  "privacy.verify": "Verificar e-mail",
+  "privacy.code": "Código de verificação",
+  "privacy.sent": "Se a conta precisar de verificação, enviaremos um código por e-mail.",
+  "privacy.required": "Verifique seu e-mail antes de entrar.",
+  "privacy.unavailable": "O envio de códigos está indisponível.",
+  "privacy.resend": "Reenviar código",
+  "privacy.invalid": "Código inválido ou expirado.",
+  "privacy.verified": "E-mail verificado. Entre na sua conta.",
+  "privacy.unverified": "E-mail ainda não verificado.",
+  "privacy.data": "Sua conta guarda seu e-mail, fotos, registros das plantas, tarefas e dados da assinatura.",
+  "privacy.processing": "O Gemini processa as imagens e o contexto enviados para análise. O Stripe processa pagamentos quando você abre o checkout.",
+  "privacy.delete": "Excluir conta",
+  "privacy.deletion": "A exclusão remove seus registros e encerra suas sessões. Contas com vínculo de cobrança ou função administrativa precisam de análise manual.",
+  "privacy.confirm": "Confirmo a exclusão permanente da minha conta.",
+  "privacy.password": "A senha atual está incorreta.",
+  "privacy.blocked": "Solicite a exclusão assistida ao responsável pelo serviço."
 }

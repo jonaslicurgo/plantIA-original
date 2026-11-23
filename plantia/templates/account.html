@@ -5,24 +5,31 @@
     <h1>{{ tr(heading) }}</h1>
     {% if message_key %}<p class="account-message" role="status">{{ tr(message_key) }}</p>{% endif %}
     <form method="post" action="/conta/{{ action }}">
-        {% if action != "redefinir" %}
+        {% if action not in ("redefinir", "verificar") %}
         <label>{{ tr("Email") }}
             <input type="email" name="email" autocomplete="email" maxlength="254" required>
         </label>
         {% endif %}
-        {% if action == "redefinir" %}
-        <label>{{ tr("Recovery code") }}
+        {% if action in ("redefinir", "verificar") %}
+        <label>{{ tr("privacy.code" if action == "verificar" else "Recovery code") }}
             <input name="token" autocomplete="one-time-code" maxlength="64" dir="ltr" required>
         </label>
         {% endif %}
         {% if action != "recuperar" %}
         <label>{{ tr("Password") }}
-            <input type="password" name="password" autocomplete="{{ 'current-password' if action == 'entrar' else 'new-password' }}" maxlength="128" {% if action != "entrar" %}minlength="12"{% endif %} required>
+            <input type="password" name="password" autocomplete="{{ 'current-password' if action in ('entrar', 'verificar') else 'new-password' }}" maxlength="128" {% if action != "entrar" %}minlength="12"{% endif %} required>
         </label>
         {% endif %}
         <button class="btn btn-primary">{{ tr(heading) }}</button>
     </form>
+    {% if action == "verificar" %}
+    <form method="post" action="/conta/reenviar">
+        <label>{{ tr("Email") }}<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
+        <button class="btn btn-outline">{{ tr("privacy.resend") }}</button>
+    </form>
+    {% endif %}
     <div class="account-links">
+        {% if action != "verificar" %}<a href="/conta/verificar">{{ tr("privacy.verify") }}</a>{% endif %}
         {% if action != "entrar" %}<a href="/conta/entrar">{{ tr("Sign in") }}</a>{% endif %}
         {% if action != "cadastro" %}<a href="/conta/cadastro">{{ tr("Create account") }}</a>{% endif %}
         {% if action != "recuperar" %}<a href="/conta/recuperar">{{ tr("Recover password") }}</a>{% endif %}

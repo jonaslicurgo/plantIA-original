@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 Pflanzennotizbuch",
   "🧪 Abonada": "🧪 Abonnent",
   "🪴 Trasplantada": "🪴Transplantiert",
-  "🪴 Época de trasplante": "🪴 Transplantationszeit"
+  "🪴 Época de trasplante": "🪴 Transplantationszeit",
+  "privacy.title": "Datenschutz und Konto",
+  "privacy.verify": "E-Mail bestätigen",
+  "privacy.code": "Bestätigungscode",
+  "privacy.sent": "Wenn das Konto bestätigt werden muss, senden wir einen Code per E-Mail.",
+  "privacy.required": "Bestätige deine E-Mail-Adresse vor der Anmeldung.",
+  "privacy.unavailable": "Der Codeversand ist nicht verfügbar.",
+  "privacy.resend": "Code erneut senden",
+  "privacy.invalid": "Ungültiger oder abgelaufener Code.",
+  "privacy.verified": "E-Mail bestätigt. Melde dich an.",
+  "privacy.unverified": "E-Mail-Adresse ist unbestätigt.",
+  "privacy.data": "Dein Konto speichert E-Mail, Fotos, Pflanzendaten, Aufgaben und Abodaten.",
+  "privacy.processing": "Gemini verarbeitet die zur Analyse gesendeten Bilder und Angaben. Stripe verarbeitet Zahlungen beim Öffnen der Zahlungsseite.",
+  "privacy.delete": "Konto löschen",
+  "privacy.deletion": "Die Löschung entfernt deine Daten und beendet deine Sitzungen. Konten mit Abrechnung oder Verwaltungsrolle werden manuell geprüft.",
+  "privacy.confirm": "Ich bestätige die dauerhafte Löschung meines Kontos.",
+  "privacy.password": "Das aktuelle Passwort ist falsch.",
+  "privacy.blocked": "Wende dich zur Löschung an den Betreiber."
 }

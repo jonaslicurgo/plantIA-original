@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLANET-IA</title>
+<style>
+body{min-height:100dvh;margin:0;display:grid;place-items:center;background:#173c2c;color:#fff;font:1rem system-ui,sans-serif}
+main{text-align:center;padding:1.5rem}h1{font-size:clamp(2rem,9vw,3rem)}
+</style>
+<main><h1>PLANET-IA</h1><p id="notice">Sem conexão. Conecte-se e abra o aplicativo novamente.</p></main>
+<script>
+const messages = {
+  pt:"Sem conexão. Conecte-se e abra o aplicativo novamente.",
+  en:"You're offline. Reconnect and open the app again.",
+  es:"Sin conexión. Conéctate y vuelve a abrir la aplicación.",
+  fr:"Hors connexion. Reconnectez-vous et ouvrez à nouveau l’application.",
+  de:"Keine Verbindung. Stelle die Verbindung wieder her und öffne die App erneut.",
+  it:"Sei offline. Riconnettiti e apri di nuovo l’app.",
+  hi:"इंटरनेट कनेक्शन नहीं है। कनेक्ट करें और ऐप फिर से खोलें।",
+  id:"Sedang offline. Sambungkan kembali dan buka lagi aplikasi.",
+  ar:"لا يوجد اتصال. أعد الاتصال وافتح التطبيق من جديد.",
+  ja:"オフラインです。接続してアプリを開き直してください。",
+  ko:"오프라인 상태입니다. 연결한 뒤 앱을 다시 열어 주세요.",
+  zh:"当前离线。请重新连接网络并打开应用。"
+};
+const language = navigator.language.split("-")[0];
+document.documentElement.lang = Object.hasOwn(messages,language) ? language : "en";
+document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+document.getElementById("notice").textContent = messages[document.documentElement.lang];
+</script>
+</html>

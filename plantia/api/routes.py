@@ -26,7 +26,7 @@ from plantia.api.encyclopedia import router as encyclopedia_router
 from plantia.config import ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE_BYTES, PAGE_SIZE, UPLOADS_DIR, ensure_directories, get_gemini_model
 from plantia.i18n import LANGUAGES, catalog, locale_for, translations
 from plantia.security import enforce_security, secure_cookie
-from plantia.database import init_database
+from plantia.database import get_engine, init_database
 from plantia.schemas.planta import PlantaListResponse, PlantaResponse, PlantaUpdate
 from plantia.utils.taxon import species_name
 from plantia.services import ai_meter
@@ -109,14 +109,28 @@ def _identify(content, mime_type, owner, locale):
 
 @router.get("/health")
 def health():
-    return {"status": "ok"}
+    from sqlalchemy.exc import SQLAlchemyError
+    try:
+        with get_engine().connect() as db:
+            db.exec_driver_sql("SELECT id FROM accounts LIMIT 1")
+        if not UPLOADS_DIR.is_dir():
+            raise OSError("Uploads directory unavailable")
+    except (SQLAlchemyError, OSError):
+        return JSONResponse({"status": "unavailable"}, status_code=503, headers={"Cache-Control": "no-store"})
+    return JSONResponse({"status": "ok"}, headers={"Cache-Control": "no-store"})
+
+
+@router.get("/sw.js")
+def service_worker():
+    return FileResponse(STATIC_DIR / "pwa/sw.js", media_type="text/javascript",
+                        headers={"Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"})
 
 
 @router.post("/idioma")
 def set_language(request: Request, language: str = Form(...), page: str = Form("/")):
     if language not in LANGUAGES:
         raise HTTPException(400, "Invalid language")
-    allowed = {"/", "/plantas", "/enciclopedia", "/jardim", "/assinatura", "/admin/comercial", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir"}
+    allowed = {"/", "/plantas", "/enciclopedia", "/jardim", "/assinatura", "/admin/comercial", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir", "/conta/verificar", "/privacidade"}
     response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:(?:plantas|enciclopedia|jardim)/[0-9]+|plantas/[0-9]+/saude)", page) else "/", 303)
     response.set_cookie("planet_language", language, max_age=31536000, httponly=True,
                         secure=secure_cookie(), samesite="lax")
@@ -332,6 +346,7 @@ def create_app():
 
     accounts.initialize_accounts()
     commercial.init()
+    accounts.clean_deleted_photos()
     app = FastAPI(
         docs_url=None, redoc_url=None, openapi_url=None,
         title="PLANET-IA",

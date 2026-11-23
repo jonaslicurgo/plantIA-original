@@ -103,10 +103,10 @@ fun SettingsScreen(
                 onValueChange = { serverUrl = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.ui_url_del_servidor)) },
-                placeholder = { Text("http://192.168.1.96:8000/") },
+                placeholder = { Text("https://staging.example.com/") },
                 singleLine = true,
                 supportingText = {
-                    Text(stringResource(R.string.ui_ejemplo_http_192_168_1_96_8000), fontFamily = FontFamily.Monospace)
+                    Text(stringResource(R.string.native_usa_la_url_https_de_planet_ia), fontFamily = FontFamily.Monospace)
                 },
             )
 
@@ -158,8 +158,8 @@ fun SettingsScreen(
                                 prefs.baseUrl = normalized
                                 PlantIAClient.invalidate()
                                 serverUrl = normalized
-                                val resp = PlantIAClient.api(context).listar(page = 1, pageSize = 1)
-                                result = context.getString(R.string.native_conectado_count_planta_s).replace("{count}", resp.total.toString())
+                                check(PlantIAClient.api(context).health().status == "ok")
+                                result = context.getString(R.string.planet_staging_connected)
                             } catch (e: Exception) {
                                 error = e.userMessage(context, context.getString(R.string.native_no_se_pudo_conectar))
                             } finally {

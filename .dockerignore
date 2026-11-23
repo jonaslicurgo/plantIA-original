@@ -1,0 +1,13 @@
+**
+!requirements.txt
+!main.py
+!plantia/
+!plantia/**
+!scripts/
+!scripts/**
+!ops/
+!ops/staging/
+!ops/staging/Dockerfile
+**/__pycache__
+**/*.pyc
+**/.env*

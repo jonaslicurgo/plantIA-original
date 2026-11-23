@@ -4,7 +4,8 @@ import logging
 import os
 
 from email_validator import EmailNotValidError, validate_email
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, HTTPException, Request
+from starlette.background import BackgroundTask
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from plantia import accounts
@@ -17,6 +18,7 @@ PAGES = {
     "cadastro": "Create account",
     "recuperar": "Recover password",
     "redefinir": "Reset password",
+    "verificar": "privacy.verify",
 }
 
 
@@ -50,7 +52,10 @@ def register(request: Request, email: str = Form(...), password: str = Form(...)
     email = normalized(email)
     if not email or not 12 <= len(password) <= 128:
         return render(request, "cadastro", "Enter a valid email and a password of 12–128 characters", 400)
-    accounts.register(email, password)
+    created = accounts.register(email, password)
+    if accounts.verification_required():
+        response = render(request, "verificar", "privacy.sent", 202)
+        return _verification_delivery(request, email, response) if created else response
     if request.url.path.startswith("/api/"):
         return render(request, "entrar", "You can now try signing in", 202)
     return render(request, "entrar", "You can now try signing in")
@@ -65,6 +70,9 @@ def login(request: Request, email: str = Form(...), password: str = Form(...)):
     token = accounts.login(email, password) if email and len(password) <= 128 else None
     if not token:
         return render(request, "entrar", "Invalid email or password", 401)
+    if accounts.verification_required() and not accounts.verified(accounts.account_for(token)):
+        accounts.logout(token)
+        return render(request, "verificar", "privacy.required", 403)
     if request.url.path.startswith("/api/"):
         return JSONResponse({"access_token": token, "token_type": "bearer", "account_id": accounts.account_for(token)})
     accounts.logout(request.state.token)
@@ -93,8 +101,6 @@ def recover(request: Request, email: str = Form(...)):
     if email and accounts.allow_request(f"recover:{accounts.digest(email)}", 2, 60):
         token = accounts.issue_recovery(email)
         if token:
-            from starlette.background import BackgroundTask
-
             locale = locale_for(request)
 
             def deliver():
@@ -115,3 +121,64 @@ def reset(request: Request, token: str = Form(...), password: str = Form(...)):
     if not 12 <= len(password) <= 128 or not accounts.reset_password(token.strip(), password):
         return render(request, "redefinir", "Invalid or expired code, or password length outside 12–128 characters", 400)
     return render(request, "entrar", "Password updated. Sign in again")
+
+
+def _verification_delivery(request, email, response):
+    if not all(os.getenv(k) for k in ("PLANET_PUBLIC_ORIGIN", "PLANET_SMTP_HOST", "PLANET_SMTP_FROM")):
+        return render(request, "verificar", "privacy.unavailable", 503)
+    if email and accounts.allow_request(f"verify:{accounts.digest(email)}", 2, 60):
+        token = accounts.issue_verification(email)
+        if token:
+            locale = locale_for(request)
+
+            def deliver():
+                try:
+                    accounts.send_verification(email, token, locale)
+                except (OSError, ValueError, KeyError):
+                    logging.getLogger(__name__).warning("PLANET-IA verification email delivery failed")
+
+            response.background = BackgroundTask(deliver)
+    return response
+
+
+@router.post("/conta/reenviar")
+@router.post("/api/auth/resend-verification")
+def resend_verification(request: Request, email: str = Form(...)):
+    return _verification_delivery(request, normalized(email), render(request, "verificar", "privacy.sent", 202))
+
+
+@router.post("/conta/verificar")
+@router.post("/api/auth/verify")
+def verify(request: Request, token: str = Form(..., max_length=64), password: str = Form(..., max_length=128)):
+    if not accounts.verify_email(token.strip(), password):
+        return render(request, "verificar", "privacy.invalid", 400)
+    return render(request, "entrar", "privacy.verified")
+
+
+@router.get("/privacidade")
+def privacy(request: Request):
+    from plantia.api.routes import templates
+    owner = request.state.account_id
+    return templates.TemplateResponse(request, "privacy.html", {
+        "email_verified": accounts.verified(owner) if owner else False,
+        "privacy_contact": normalized(os.getenv("PLANET_PRIVACY_CONTACT", "")),
+    })
+
+
+@router.post("/privacidade/excluir")
+@router.post("/api/auth/delete")
+def delete(request: Request, password: str = Form(..., max_length=128), confirm: bool = Form(False)):
+    owner = request.state.account_id
+    if not confirm:
+        raise HTTPException(400, "privacy.confirm")
+    if not accounts.allow_request(f"delete:{owner}", 4, 60):
+        raise HTTPException(429, "Too many requests")
+    try:
+        if not accounts.delete_account(owner, password):
+            raise HTTPException(403, "privacy.password")
+    except accounts.AccountDeletionBlocked:
+        raise HTTPException(409, "privacy.blocked") from None
+    response = (JSONResponse({"ok": True}) if request.url.path.startswith("/api/")
+                else RedirectResponse("/privacidade", 303))
+    response.delete_cookie(COOKIE)
+    return response

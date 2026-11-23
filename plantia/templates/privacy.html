@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ tr("privacy.title") }} · PLANET-IA{% endblock %}
+{% block content %}
+<section class="account-panel">
+    <h1>{{ tr("privacy.title") }}</h1>
+    <p>{{ tr("privacy.data") }}</p>
+    <p>{{ tr("privacy.processing") }}</p>
+    {% if privacy_contact %}<p><a href="mailto:{{ privacy_contact }}">{{ privacy_contact }}</a></p>{% endif %}
+    {% if request.state.account_id %}
+    <p>{{ tr("privacy.verified") if email_verified else tr("privacy.unverified") }}</p>
+    {% if not email_verified %}<p><a href="/conta/verificar">{{ tr("privacy.verify") }}</a></p>{% endif %}
+    <h2>{{ tr("privacy.delete") }}</h2>
+    <p>{{ tr("privacy.deletion") }}</p>
+    <form method="post" action="/privacidade/excluir">
+        <label>{{ tr("Password") }}<input name="password" type="password" autocomplete="current-password" maxlength="128" required></label>
+        <label class="privacy-confirm"><input type="checkbox" name="confirm" value="true" required> {{ tr("privacy.confirm") }}</label>
+        <button class="btn btn-outline">{{ tr("privacy.delete") }}</button>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

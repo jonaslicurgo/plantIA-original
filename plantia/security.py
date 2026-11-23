@@ -13,8 +13,9 @@ from plantia.i18n import catalog, locale_for
 
 COOKIE = "planet_session"
 PUBLIC_PAGES = {"/", "/conta/entrar", "/conta/cadastro", "/conta/recuperar",
-                "/conta/redefinir", "/idioma", "/health"}
-AUTH_API = {"/api/auth/login", "/api/auth/register", "/api/auth/recover", "/api/auth/reset"}
+                "/conta/redefinir", "/conta/verificar", "/conta/reenviar", "/privacidade", "/idioma", "/health"}
+AUTH_API = {"/api/auth/login", "/api/auth/register", "/api/auth/recover", "/api/auth/reset",
+            "/api/auth/verify", "/api/auth/resend-verification"}
 UPLOAD_ROUTES = {"/identificar", "/api/plantas/identificar"}
 
 
@@ -27,7 +28,7 @@ async def enforce_security(request, call_next):
     method = request.method
     web = not path.startswith(("/api/", "/uploads/"))
     request.state.account_id = None
-    if path.startswith("/static/") or path == "/health" or (path == "/api/stripe/webhook" and method == "POST"):
+    if path.startswith("/static/") or path in {"/health", "/sw.js"} or (path == "/api/stripe/webhook" and method == "POST"):
         return await call_next(request)
     if path in {"/salir", "/configuracion", "/docs", "/redoc", "/openapi.json"}:
         return JSONResponse({"detail": catalog(locale_for(request)).get("Not found", "Not found")}, 404)
@@ -69,6 +70,13 @@ async def enforce_security(request, call_next):
             return RedirectResponse("/conta/entrar", 303)
         return _reject(request, "Sign in to continue", 401)
 
+    if (request.state.account_id and accounts.verification_required()
+            and path not in PUBLIC_PAGES | AUTH_API | {"/conta/sair", "/api/auth/logout", "/privacidade/excluir", "/api/auth/delete"}
+            and not await run_in_threadpool(accounts.verified, request.state.account_id)):
+        if web and method == "GET":
+            return RedirectResponse("/conta/verificar", 303)
+        return _reject(request, "privacy.required", 403)
+
     if method == "POST" and (path in AUTH_API or path.startswith("/conta/") and path != "/conta/sair"):
         if not await run_in_threadpool(accounts.allow_request, "auth:global", 120, 60):
             return _reject(request, "Too many requests", 429)
@@ -90,6 +98,7 @@ async def enforce_security(request, call_next):
 
 def _reject(request, key, status):
     if request.url.path.startswith(("/api/", "/uploads/")):
-        return JSONResponse({"detail": catalog(locale_for(request)).get(key, key)}, status)
+        return JSONResponse({"detail": catalog(locale_for(request)).get(key, key)}, status,
+                            headers={"Cache-Control": "private, no-store"})
     from plantia.api.routes import templates
-    return templates.TemplateResponse(request, "error.html", {"message_key": key}, status_code=status)
+    return templates.TemplateResponse(request, "error.html", {"message_key": key}, status_code=status, headers={"Cache-Control": "private, no-store"})

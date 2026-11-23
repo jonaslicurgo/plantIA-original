@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 植物笔记本",
   "🧪 Abonada": "🧪 订阅者",
   "🪴 Trasplantada": "🪴移植了",
-  "🪴 Época de trasplante": "🪴移植时间"
+  "🪴 Época de trasplante": "🪴移植时间",
+  "privacy.title": "隐私与账户",
+  "privacy.verify": "验证电子邮箱",
+  "privacy.code": "验证码",
+  "privacy.sent": "如果账户需要验证，我们会通过电子邮件发送验证码。",
+  "privacy.required": "请验证电子邮箱后再登录。",
+  "privacy.unavailable": "暂时无法发送验证码。",
+  "privacy.resend": "重新发送验证码",
+  "privacy.invalid": "验证码无效或已过期。",
+  "privacy.verified": "邮箱已验证，请登录账户。",
+  "privacy.unverified": "电子邮箱尚未验证。",
+  "privacy.data": "账户保存您的邮箱、照片、植物记录、任务和订阅信息。",
+  "privacy.processing": "Gemini 处理提交分析的图片和信息。打开结账页面后，Stripe 处理付款。",
+  "privacy.delete": "删除账户",
+  "privacy.deletion": "删除账户将清除记录并结束会话。关联账单或管理角色的账户需要人工审核。",
+  "privacy.confirm": "我确认永久删除账户。",
+  "privacy.password": "当前密码错误。",
+  "privacy.blocked": "请联系服务运营方协助删除账户。"
 }

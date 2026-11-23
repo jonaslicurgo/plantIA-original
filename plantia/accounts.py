@@ -1,6 +1,8 @@
 """SQLite account, session and one-time password recovery storage."""
 
 import hashlib
+import logging
+from pathlib import Path
 import os
 import secrets
 import smtplib
@@ -14,6 +16,7 @@ from argon2.exceptions import VerifyMismatchError
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
+from plantia.config import UPLOADS_DIR
 from plantia.database import get_engine
 from plantia.i18n import catalog
 
@@ -31,6 +34,9 @@ def initialize_accounts():
         db.execute(text("""CREATE TABLE IF NOT EXISTS account_tokens (
             digest TEXT PRIMARY KEY, account_id INTEGER NOT NULL,
             purpose TEXT NOT NULL, expires INTEGER NOT NULL)"""))
+        if "email_verified" not in {row[1] for row in db.exec_driver_sql("PRAGMA table_info(accounts)")}:
+            db.exec_driver_sql("ALTER TABLE accounts ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0")
+        db.exec_driver_sql("CREATE TABLE IF NOT EXISTS account_photo_cleanup (name TEXT PRIMARY KEY)")
         db.execute(text("CREATE INDEX IF NOT EXISTS ix_tokens_account ON account_tokens(account_id)"))
         db.execute(text("""CREATE TABLE IF NOT EXISTS rate_windows (
             bucket TEXT PRIMARY KEY, window INTEGER NOT NULL, hits INTEGER NOT NULL)"""))
@@ -129,15 +135,135 @@ def reset_password(token, password):
     return True
 
 
+def verification_required():
+    return os.getenv("PLANET_REQUIRE_VERIFIED_EMAIL") == "1"
+
+
+def verified(account_id):
+    with get_engine().connect() as db:
+        return bool(db.execute(text("SELECT email_verified FROM accounts WHERE id=:id"), {"id": account_id}).scalar())
+
+
+def issue_verification(email):
+    with get_engine().begin() as db:
+        db.exec_driver_sql("BEGIN IMMEDIATE")
+        account = db.execute(text("""SELECT id FROM accounts
+            WHERE email=:email AND suspended=0 AND email_verified=0"""), {"email": email}).scalar()
+        if account:
+            db.execute(text("DELETE FROM account_tokens WHERE account_id=:id AND purpose='verify'"), {"id": account})
+            return _issue(db, account, "verify", 1800)
+    return None
+
+
+def verify_email(token, password):
+    if len(token) != 43:
+        return False
+    params = {"digest": digest(token), "now": int(time.time())}
+    with get_engine().connect() as db:
+        row = db.execute(text("""SELECT a.password FROM account_tokens t JOIN accounts a ON a.id=t.account_id
+            WHERE t.digest=:digest AND t.purpose='verify' AND t.expires>:now AND a.suspended=0"""), params).first()
+    if not row:
+        return False
+    try:
+        with HASH_SLOTS:
+            HASHER.verify(row.password, password)
+    except VerifyMismatchError:
+        return False
+    with get_engine().begin() as db:
+        account = db.execute(text("""DELETE FROM account_tokens WHERE digest=:digest AND purpose='verify'
+            AND expires>:now AND account_id IN (SELECT id FROM accounts WHERE suspended=0 AND password=:password)
+            RETURNING account_id"""), {**params, "now": int(time.time()), "password": row.password}).scalar()
+        if not account:
+            return False
+        db.execute(text("UPDATE accounts SET email_verified=1 WHERE id=:id"), {"id": account})
+        # Sessions that predate proof of mailbox ownership must never acquire its privileges.
+        db.execute(text("DELETE FROM account_tokens WHERE account_id=:id AND purpose='session'"), {"id": account})
+    return True
+
+
+class AccountDeletionBlocked(Exception):
+    pass
+
+
+def delete_account(owner, password):
+    with get_engine().connect() as db:
+        old_hash = db.execute(text("SELECT password FROM accounts WHERE id=:id AND suspended=0"), {"id": owner}).scalar()
+    try:
+        with HASH_SLOTS:
+            HASHER.verify(old_hash or DUMMY_HASH, password)
+    except VerifyMismatchError:
+        return False
+    with get_engine().begin() as db:
+        db.exec_driver_sql("BEGIN IMMEDIATE")
+        params = {"id": owner, "now": int(time.time())}
+        account = db.execute(text("""SELECT password,commercial_role FROM accounts
+            WHERE id=:id AND suspended=0"""), params).first()
+        if not account or account.password != old_hash:
+            return False
+        if account.commercial_role != "member" or db.execute(text("""SELECT 1 FROM billing_customers WHERE account_id=:id
+                UNION ALL SELECT 1 FROM subscriptions WHERE account_id=:id
+                UNION ALL SELECT 1 FROM checkout_pending WHERE account_id=:id AND expires>:now"""), params).first():
+            raise AccountDeletionBlocked
+        for path in db.execute(text("SELECT image_path FROM plantas WHERE owner_id=:id"), params).scalars():
+            name = Path(path).name
+            if name and name not in {".", ".."}:
+                db.execute(text("INSERT OR IGNORE INTO account_photo_cleanup VALUES (:name)"), {"name": name})
+        for table in ("plantas", "health_ai_usage"):
+            db.exec_driver_sql(f"DELETE FROM {table} WHERE owner_id=?", (owner,))
+        for table in ("account_tokens", "checkout_pending", "ai_meter"):
+            db.exec_driver_sql(f"DELETE FROM {table} WHERE account_id=?", (owner,))
+        db.execute(text("UPDATE billing_events SET account_id=NULL WHERE account_id=:id"), params)
+        db.execute(text("DELETE FROM commercial_audit WHERE target=:target AND action='account.edit'"), {"target": str(owner)})
+        db.execute(text("DELETE FROM accounts WHERE id=:id"), params)
+    clean_deleted_photos()
+    return True
+
+
+def clean_deleted_photos():
+    with get_engine().begin() as db:
+        db.exec_driver_sql("BEGIN IMMEDIATE")
+        names = db.execute(text("SELECT name FROM account_photo_cleanup")).scalars().all()
+        for name in names:
+            try:
+                referenced = db.execute(text("""SELECT 1 FROM plantas
+                    WHERE image_path=:name OR substr(image_path,-length(:name)-1)='/'||:name LIMIT 1"""),
+                    {"name": name}).first()
+                if referenced:
+                    continue
+                (UPLOADS_DIR / name).unlink(missing_ok=True)
+                db.execute(text("DELETE FROM account_photo_cleanup WHERE name=:name"), {"name": name})
+            except OSError:
+                logging.getLogger(__name__).warning("PLANET-IA pending photo cleanup")
+
+
 def send_recovery(email, token, locale):
+    _send_code(email, token, locale, "Reset password", "Recovery code", "redefinir")
+
+
+def send_verification(email, token, locale):
+    _send_code(email, token, locale, "privacy.verify", "privacy.code", "verificar")
+
+
+def _send_code(email, token, locale, subject, code, page):
     strings = catalog(locale)
     message = EmailMessage()
     message["From"] = os.environ["PLANET_SMTP_FROM"]
     message["To"] = email
-    message["Subject"] = f"PLANET-IA · {strings['Reset password']}"
-    message.set_content(f"{os.environ['PLANET_PUBLIC_ORIGIN'].rstrip('/')}/conta/redefinir\n\n"
-                        f"{strings['Recovery code']}\n{token}")
-    with smtplib.SMTP_SSL(os.environ["PLANET_SMTP_HOST"], int(os.getenv("PLANET_SMTP_PORT", "465")), timeout=10, context=ssl.create_default_context()) as smtp:
+    message["Subject"] = f"PLANET-IA · {strings[subject]}"
+    message.set_content(f"{os.environ['PLANET_PUBLIC_ORIGIN'].rstrip('/')}/conta/{page}\n\n"
+                        f"{strings[code]}\n{token}")
+    security = os.getenv("PLANET_SMTP_SECURITY", "ssl")
+    if security not in {"ssl", "starttls"}:
+        raise ValueError("Invalid SMTP security mode")
+    host = os.environ["PLANET_SMTP_HOST"]
+    context = ssl.create_default_context()
+    if security == "ssl":
+        client = smtplib.SMTP_SSL(host, int(os.getenv("PLANET_SMTP_PORT", "465")), timeout=10, context=context)
+    else:
+        client = smtplib.SMTP(host, int(os.getenv("PLANET_SMTP_PORT", "587")), timeout=10)
+    with client as smtp:
+        if security == "starttls":
+            smtp.starttls(context=context)
         if os.getenv("PLANET_SMTP_USER"):
             smtp.login(os.environ["PLANET_SMTP_USER"], os.environ["PLANET_SMTP_PASSWORD"])
         smtp.send_message(message)

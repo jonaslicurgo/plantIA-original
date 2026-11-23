@@ -527,5 +527,22 @@
   "📓 Cuaderno de la planta": "📓 Buku catatan tanaman",
   "🧪 Abonada": "🧪 Pelanggan",
   "🪴 Trasplantada": "🪴 Ditransplantasikan",
-  "🪴 Época de trasplante": "🪴 Waktu transplantasi"
+  "🪴 Época de trasplante": "🪴 Waktu transplantasi",
+  "privacy.title": "Privasi dan akun",
+  "privacy.verify": "Verifikasi email",
+  "privacy.code": "Kode verifikasi",
+  "privacy.sent": "Jika akun perlu diverifikasi, kami akan mengirimkan kode melalui email.",
+  "privacy.required": "Verifikasi email sebelum masuk.",
+  "privacy.unavailable": "Pengiriman kode tidak tersedia.",
+  "privacy.resend": "Kirim ulang kode",
+  "privacy.invalid": "Kode tidak valid atau kedaluwarsa.",
+  "privacy.verified": "Email terverifikasi. Masuk ke akun Anda.",
+  "privacy.unverified": "Email belum terverifikasi.",
+  "privacy.data": "Akun menyimpan email, foto, catatan tanaman, tugas, dan data langganan.",
+  "privacy.processing": "Gemini memproses gambar dan konteks yang dikirim untuk analisis. Stripe memproses pembayaran saat Anda membuka halaman pembayaran.",
+  "privacy.delete": "Hapus akun",
+  "privacy.deletion": "Penghapusan menghapus catatan dan mengakhiri sesi. Akun dengan tagihan atau peran pengelola harus diperiksa secara manual.",
+  "privacy.confirm": "Saya mengonfirmasi penghapusan permanen akun.",
+  "privacy.password": "Kata sandi saat ini salah.",
+  "privacy.blocked": "Hubungi pengelola layanan untuk bantuan penghapusan."
 }

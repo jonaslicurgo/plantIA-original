@@ -18,9 +18,10 @@ def main():
         if db.execute(text("SELECT 1 FROM accounts WHERE commercial_role='admin' AND suspended=0")).first():
             parser.error("An active commercial admin already exists")
         changed = db.execute(text("""UPDATE accounts SET commercial_role='admin'
-            WHERE id=:id AND suspended=0"""), {"id": account_id})
+            WHERE id=:id AND suspended=0 AND (email_verified=1 OR :required=0)"""),
+                             {"id": account_id, "required": int(accounts.verification_required())})
         if not changed.rowcount:
-            parser.error("Account not found or suspended")
+            parser.error("Account not found, suspended, or email verification required")
         commercial.audit(db, account_id, "account.bootstrap", account_id, {"role": "admin"})
 
 
