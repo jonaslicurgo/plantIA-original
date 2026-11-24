@@ -19,6 +19,7 @@ from sqlalchemy import text
 data = tempfile.TemporaryDirectory(prefix="planet-ia-test-")
 os.environ["PLANET_DATA_DIR"] = data.name
 os.environ["GEMINI_API_KEY"] = ""
+os.environ["PLANET_BOTANICAL_ENRICHMENT"] = "0"
 os.environ["GEMINI_MODEL"] = "gemini-3.1-flash-lite"
 os.environ["PLANET_PUBLIC_ORIGIN"] = "https://testserver"
 os.environ["PLANET_INSECURE_LOCAL_HTTP"] = "0"
@@ -208,7 +209,9 @@ class Regression(unittest.TestCase):
         self.assertIn("<details", web.text)
         self.assertEqual(len(doc["groups"]), len(GROUPS))
         fields = {row["key"]: row for group in doc["groups"] for row in group["items"]}
-        self.assertEqual(len(fields), 31)
+        self.assertTrue({field for group in GROUPS.values() for field in group} <= fields.keys())
+        self.assertIn("propagation", fields)
+        self.assertEqual(web.text.count(catalog("ar")["enrichment.gap_notice"]), 1)
         self.assertEqual(fields["family"]["source"]["label"], "GBIF")
         self.assertEqual(fields["animal_toxicity"]["source"]["label"], "ASPCA Poison Control")
         self.assertIsNone(fields["panc"]["value"])

@@ -1,5 +1,10 @@
 # Changelog
 
+## Evidências botânicas sob demanda
+
+- Integração WCVP, atributos factuais da NC State Extension e avisos de toxicidade com fontes por espécie. Costela-de-adão é priorizado em português brasileiro.
+- Cache compartilhado, revalidação opcional em staging e seção única para lacunas de evidência na web e no Android.
+
 ## Biblioteca botânica em escala internacional
 
 - Importação automatizada do GBIF Backbone, índice SQLite FTS5, busca de nomes comuns via GBIF, ocorrências e fotografias licenciadas com atribuição. As 23 fichas revisadas são preservadas.

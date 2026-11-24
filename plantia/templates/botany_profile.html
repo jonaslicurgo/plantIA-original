@@ -38,22 +38,37 @@
 <aside class="botany-notices" aria-label="{{ tr('botany.group.risks') }}">
     {% for notice in profile.notices %}<p>{{ notice }}</p>{% endfor %}
 </aside>
+{% set missing = namespace(any=false) %}
 {% for group in profile.groups %}
-<details class="botany-group"{% if loop.first %} open{% endif %}>
+{% set known = group["items"] | selectattr("value") | list %}
+{% if known | length < group["items"] | length %}{% set missing.any = true %}{% endif %}
+{% if known %}
+<details class="botany-group"{% if loop.first or group.key == "risks" %} open{% endif %}>
     <summary>{{ group.title }}</summary>
     <dl>
-        {% for item in group["items"] %}
+        {% for item in known %}
         <dt>{{ item.label }}</dt>
         <dd>
-            <p>{{ item.value or item.evidence }}</p>
-            {% if item.value %}
+            <p>{{ item.value }}</p>
             <small>{{ item.evidence }}{% if item.source %} ·
                 <a href="{{ item.source.url }}" rel="noreferrer noopener" target="_blank">{{ item.source.label }}</a>
             {% endif %}</small>
-            {% endif %}
         </dd>
         {% endfor %}
     </dl>
 </details>
+{% endif %}
 {% endfor %}
+{% if missing.any %}
+<details class="botany-group">
+    <summary>{{ tr("enrichment.gaps") }}</summary>
+    <p>{{ tr("enrichment.gap_notice") }}</p>
+    <ul>
+    {% for group in profile.groups %}
+        {% set unknown = group["items"] | rejectattr("value") | map(attribute="label") | list %}
+        {% if unknown %}<li><strong>{{ group.title }}</strong> · {{ unknown | join(" · ") }}</li>{% endif %}
+    {% endfor %}
+    </ul>
+</details>
+{% endif %}
 {% endblock %}

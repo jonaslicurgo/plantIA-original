@@ -35,7 +35,7 @@ def _profile(request, plant_id):
     plant = PlantaService.obtener_por_id(plant_id, request.state.account_id)
     if plant is None:
         raise HTTPException(404, "Not found")
-    return profile(plant, translations(request)["tr"])
+    return profile(plant, translations(request)["tr"], locale_for(request))
 
 
 @router.get("/enciclopedia")

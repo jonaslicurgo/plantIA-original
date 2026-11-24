@@ -6,7 +6,7 @@ import json
 from sqlalchemy import text
 
 from plantia.database import get_engine
-from plantia.services import botanical_backbone as backbone
+from plantia.services import botanical_backbone as backbone, botanical_enrichment as enrichment
 from plantia.services.botany import FILTERS, GROUPS, SOURCES, SPECIES
 from plantia.utils.taxon import normalize
 
@@ -19,6 +19,9 @@ PAGE_SIZE = 20
 
 
 def common_name(item, locale):
+    if (locale == "pt-BR" and normalize(item["name"]) == "monstera deliciosa"
+            and normalize(item.get("family")) == "araceae"):
+        return "Costela-de-adão"
     names = item["labels"]
     tag = locale.split("-")[0]
     iso3 = {"pt": "por", "en": "eng", "es": "spa", "fr": "fra", "de": "deu", "it": "ita",
@@ -64,14 +67,15 @@ def search(owner, locale, q, category, favorites, page):
     total = len(matches)
     if not category:
         keys = [key for value in saved if (key := backbone.taxon_key(value)) is not None] if favorites else None
-        external, indexed = backbone.query(q, PAGE_SIZE - len(curated), max(0, offset - total), keys)
+        indexed_term = "Monstera deliciosa" if term.replace("-", " ") == "costela de adao" else q
+        external, indexed = backbone.query(indexed_term, PAGE_SIZE - len(curated), max(0, offset - total), keys)
         if term and not total and not external and not favorites:
             external, remote = backbone.remote_names(q.strip(), page)
             curated.extend({"id": item["id"], "scientific_name": item["name"],
                             "common_name": common_name(item, locale), "favorite": item["id"] in saved,
                             "kind": "taxonomy"} for item in remote)
         else:
-            curated.extend({"id": f"gbif-{row['id']}", "scientific_name": row["name"], "common_name": row["name"],
+            curated.extend({"id": f"gbif-{row['id']}", "scientific_name": row["name"], "common_name": ("Costela-de-adão" if locale == "pt-BR" and row["id"] == 2868241 else row["name"]),
                             "favorite": f"gbif-{row['id']}" in saved, "kind": "taxonomy"} for row in indexed)
         total += external
     return {"items": curated, "total": total, "page": page,
@@ -95,7 +99,8 @@ def profile(item, owner, locale, tr):
         rows[key] = {"value": value, "source": {"label": publisher, "url": url},
                      "evidence": tr(f"botany.evidence.{evidence}")}
 
-    for key, fact in SPECIES.get(item["name"].lower(), {}).items():
+    curated = SPECIES.get(item["name"].lower(), {})
+    for key, fact in curated.items():
         add(key, tr(fact.message), SOURCES[fact.source], fact.evidence)
     add("scientific_name", item.get("scientific", item["name"]))
     if item["family"]:
@@ -120,14 +125,21 @@ def profile(item, owner, locale, tr):
         add("plant_parts", tr("library.part_" + item["food"]))
     for key, fact in item.get("facts", {}).items():
         add(key, tr("library." + fact["message"]), (fact["publisher"], fact["url"]), fact["evidence"])
-    groups = {**GROUPS, "garden": (*GROUPS["garden"], "drainage"),
-              "risks": (*GROUPS["risks"], "contraindications")}
+    family = item["family"] or (curated["family"].message if "family" in curated else "")
+    for key, value, reference in enrichment.facts({**item, "family": family}, locale, tr):
+        if key not in rows or key in {"common_name", *enrichment.SAFETY.get(normalize(item["name"]), {})}:
+            add(key, value, reference)
+    groups = {group: (*fields, *enrichment.EXTRA_FIELDS.get(group, ())) for group, fields in GROUPS.items()}
     if gbif_key:
         groups["taxonomy"] += ("lineage", "synonyms", "observations")
-    extras = {"drainage", "contraindications", "lineage", "synonyms", "observations"}
-    field_label = lambda field: tr(("library." if field in extras else "botany.field.") + field)
+    legacy = {"drainage", "contraindications", "lineage", "synonyms", "observations"}
+    extras = {field for fields in enrichment.EXTRA_FIELDS.values() for field in fields}
+    def field_label(field):
+        prefix = "library." if field in legacy else "enrichment." if field in extras else "botany.field."
+        return tr(prefix + field)
     return {
         "id": item["id"], "kind": "taxonomy" if gbif_key else "reviewed", "license": backbone.LICENSE if gbif_key else None,
+        "gap_label": tr("enrichment.gaps"), "gap_notice": tr("enrichment.gap_notice"),
         "favorite": item["id"] in favorite_ids(owner), "photo": item.get("photo"),
         "notices": [tr("library.basic" if gbif_key else "library.verified"), *(tr(f"botany.notice.{kind}") for kind in ("identity", "risk", "emergency"))],
         "groups": [

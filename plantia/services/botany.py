@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 from sqlalchemy import text
 
 from plantia.database import get_engine
+from plantia.services import botanical_enrichment
 from plantia.utils.taxon import species_name
 
 GROUPS = {
@@ -177,7 +178,7 @@ def get_taxon(name: str) -> dict:
         return facts
 
 
-def profile(plant, translate):
+def profile(plant, translate, locale="en"):
     name = species_name(plant.nombre_cientifico) if plant.confianza in {"alto", "medio"} else None
     curated = SPECIES.get(name, {})
     taxon = get_taxon(name) if name else {}
@@ -199,21 +200,39 @@ def profile(plant, translate):
         if value and field not in rows:
             rows[field] = {"value": value, "evidence": translate("botany.evidence.suggested"), "source": None}
 
+    if taxon or curated:
+        evidence = botanical_enrichment.facts(
+            {"name": taxon.get("scientific_name", name),
+             "family": taxon.get("family") or (curated["family"].message if curated else "")},
+            locale, translate,
+        )
+        for field, value, (publisher, url) in evidence:
+            if field not in rows or field == "common_name":
+                rows[field] = {"value": value, "evidence": translate("botany.evidence.botanical"),
+                               "source": {"label": publisher, "url": url}}
     notices = [translate(f"botany.notice.{kind}") for kind in ("identity", "risk", "emergency")]
     if not (taxon or curated):
         notices.append(translate("botany.unverified"))
+    extra_groups = botanical_enrichment.EXTRA_FIELDS
+    fields_by_group = {key: (*fields, *extra_groups.get(key, ())) for key, fields in GROUPS.items()}
+    extra_labels = {field for fields in extra_groups.values() for field in fields}
+    def label(field):
+        prefix = ("library." if field in {"drainage", "contraindications"} else
+                  "enrichment." if field in extra_labels else "botany.field.")
+        return translate(prefix + field)
     return {
         "id": plant.id,
+        "gap_label": translate("enrichment.gaps"), "gap_notice": translate("enrichment.gap_notice"),
         "favorite": plant.encyclopedia_favorite,
         "matched_taxon": bool(taxon or curated),
         "notices": notices,
         "groups": [
             {"key": group, "title": translate(f"botany.group.{group}"), "items": [
-                {"key": field, "label": translate(f"botany.field.{field}"), **(
+                {"key": field, "label": label(field), **(
                     rows.get(field) or {"value": None, "evidence": translate("botany.evidence.unknown"), "source": None}
                 )}
                 for field in fields
             ]}
-            for group, fields in GROUPS.items()
+            for group, fields in fields_by_group.items()
         ],
     }

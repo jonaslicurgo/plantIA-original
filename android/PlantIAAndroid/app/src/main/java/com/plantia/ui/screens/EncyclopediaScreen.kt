@@ -243,20 +243,37 @@ fun BotanicalProfileScreen(id: String, global: Boolean = false, onBack: () -> Un
                     }
                     current.notices.forEach { Text(it, modifier = Modifier.padding(vertical = 4.dp)) }
                 }
-                items(current.groups, key = { it.key }) { group ->
-                    var expanded by remember(id, group.key) { mutableStateOf(group.key == "taxonomy") }
+                items(current.groups.filter { group -> group.items.any { !it.value.isNullOrBlank() } }, key = { it.key }) { group ->
+                    var expanded by remember(id, group.key) { mutableStateOf(group.key == "taxonomy" || group.key == "risks") }
                     OutlinedButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
                         Text(group.title + if (expanded) " −" else " +")
                     }
-                    if (expanded) group.items.forEach { fact ->
+                    if (expanded) group.items.filter { !it.value.isNullOrBlank() }.forEach { fact ->
                         Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                             Text(fact.label, style = MaterialTheme.typography.titleSmall)
-                            Text(fact.value ?: fact.evidence)
+                            Text(fact.value.orEmpty())
                             if (fact.value != null) Text(fact.evidence, style = MaterialTheme.typography.bodySmall)
                             if (fact.source != null) {
                                 TextButton(onClick = { uri.openUri(fact.source.url) }) { Text(fact.source.label) }
                             }
                         }
+                    }
+                }
+                val gaps = current.groups.mapNotNull { group ->
+                    val missing = group.items.filter { it.value.isNullOrBlank() }.map { it.label }
+                    if (missing.isEmpty()) null else group.title to missing
+                }
+                if (gaps.isNotEmpty()) item {
+                    var expanded by remember(id) { mutableStateOf(false) }
+                    val label = current.gap_label.ifBlank {
+                        current.groups.flatMap { it.items }.first { it.value.isNullOrBlank() }.evidence
+                    }
+                    OutlinedButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
+                        Text(label + if (expanded) " −" else " +")
+                    }
+                    if (expanded) {
+                        if (current.gap_notice.isNotBlank()) Text(current.gap_notice)
+                        gaps.forEach { (title, fields) -> Text("$title · " + fields.joinToString(" · ")) }
                     }
                 }
             }

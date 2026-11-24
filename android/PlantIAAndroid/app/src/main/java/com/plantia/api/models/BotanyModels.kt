@@ -19,6 +19,8 @@ data class BotanyProfile(
     val license: String? = null,
     val summary_available: Boolean = false,
     val summary_label: String = "",
+    val gap_label: String = "",
+    val gap_notice: String = "",
 )
 
 data class BotanyGroup(val key: String, val title: String, val items: List<BotanyFact>)

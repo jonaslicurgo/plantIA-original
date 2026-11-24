@@ -47,6 +47,18 @@ def refresh_catalog(hours, target):
             sleep(hours * 3600)
 
 
+def refresh_evidence(hours):
+    # Give the main process time to initialize the application database first.
+    sleep(60)
+    while True:
+        try:
+            subprocess.run([sys.executable, "-B", "-m", "scripts.refresh_botanical_evidence"],
+                           check=True, timeout=180)
+        except (OSError, subprocess.SubprocessError):
+            print("Botanical evidence refresh failed", flush=True)
+        sleep(hours * 3600)
+
+
 if __name__ == "__main__":
     import uvicorn
 
@@ -60,4 +72,9 @@ if __name__ == "__main__":
             raise SystemExit("Use a botanical refresh interval of at least 24 hours")
         index_path = Path(os.getenv("PLANET_BOTANICAL_INDEX", str(Path(os.environ["PLANET_DATA_DIR"]) / "botanical.sqlite")))
         Thread(target=refresh_catalog, args=(int(interval), index_path), daemon=True).start()
+    evidence_interval = os.getenv("PLANET_BOTANICAL_EVIDENCE_REFRESH_HOURS", "").strip()
+    if evidence_interval:
+        if not evidence_interval.isdecimal() or int(evidence_interval) < 24:
+            raise SystemExit("Use a botanical evidence refresh interval of at least 24 hours")
+        Thread(target=refresh_evidence, args=(int(evidence_interval),), daemon=True).start()
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", "8000")), workers=1)

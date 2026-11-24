@@ -14,7 +14,8 @@ from plantia.services.gemini_service import GeminiService
 
 # Exclude medical, food-safety and toxicological interpretations from the AI view.
 ALLOWED = {"scientific_name", "family", "origin", "traits", "habitat", "lineage",
-           "observations", "light", "drainage", "ornamental", "landscaping", "pollinators", "conservation"}
+           "observations", "light", "drainage", "ornamental", "landscaping", "pollinators",
+           "conservation", "growth_form", "biome", "soil", "propagation", "watering"}
 
 
 class Selection(BaseModel):
