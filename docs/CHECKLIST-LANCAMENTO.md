@@ -3,7 +3,7 @@
 - [ ] Confirmar que o projeto Railway de staging é isolado, com volume,
   backup testado, domínio HTTPS, alertas de disponibilidade e orçamento de IA.
 - [ ] Executar em staging o roteiro de aceitação da documentação. Anexar
-  evidências de entrega SMTP, Gemini real com fotos autorizadas, Stripe em
+  evidências de entrega via Resend, Gemini real com fotos autorizadas, Stripe em
   sandbox e testes no Android e Safari iOS físicos.
 - [ ] Revisar termos, política de privacidade e exercício de direitos do
   titular com o responsável pelo produto. Publicar contato monitorado,

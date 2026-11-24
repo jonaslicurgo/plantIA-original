@@ -24,8 +24,8 @@ def validate(environ):
         raise ValueError("PLANET_PUBLIC_ORIGIN must match the service's Railway domain")
     if environ.get("PLANET_REQUIRE_VERIFIED_EMAIL") != "1":
         raise ValueError("Set PLANET_REQUIRE_VERIFIED_EMAIL=1 for staging")
-    if not all(environ.get(k) for k in ("PLANET_SMTP_HOST", "PLANET_SMTP_FROM")):
-        raise ValueError("Configure SMTP before starting email-verified staging")
+    if not all(environ.get(k, "").strip() for k in ("PLANET_RESEND_API_KEY", "PLANET_RESEND_FROM")):
+        raise ValueError("Configure Resend credentials and sender before starting email-verified staging")
     if (environ.get("PLANET_STRIPE_KEY") and
             not environ["PLANET_STRIPE_KEY"].startswith(("sk_test_", "rk_test_"))):
         raise ValueError("Use only Stripe test credentials in staging")

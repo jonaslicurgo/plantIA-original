@@ -176,7 +176,7 @@ Para identificar plantas, configura la variable del servidor `GEMINI_API_KEY` co
 | `PLANTIA_PORT` | Puerto del iniciador local, por defecto `8000` |
 | `PLANET_DATA_DIR` | Directorio con SQLite y fotografías, por defecto `~/.plantia` |
 | `PLANET_PUBLIC_ORIGIN` | Origen HTTPS del entorno, necesario para recuperación de contraseña |
-| `PLANET_SMTP_*` | Transporte de recuperación de contraseña. Consulta [CHANGELOG.md](CHANGELOG.md) |
+| `PLANET_RESEND_API_KEY`, `PLANET_RESEND_FROM` | Verificação de e-mail e recuperação de senha via Resend. Consulte o [guia de homologação](docs/HOMOLOGACAO-RAILWAY.md). |
 
 ## Datos locales
 

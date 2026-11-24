@@ -95,7 +95,7 @@ def logout(request: Request):
 @router.post("/conta/recuperar")
 @router.post("/api/auth/recover")
 def recover(request: Request, email: str = Form(...)):
-    if not all(os.getenv(k) for k in ("PLANET_PUBLIC_ORIGIN", "PLANET_SMTP_HOST", "PLANET_SMTP_FROM")):
+    if not accounts.email_delivery_configured():
         return render(request, "recuperar", "Password recovery is unavailable", 503)
     email = normalized(email)
     if email and accounts.allow_request(f"recover:{accounts.digest(email)}", 2, 60):
@@ -124,7 +124,7 @@ def reset(request: Request, token: str = Form(...), password: str = Form(...)):
 
 
 def _verification_delivery(request, email, response):
-    if not all(os.getenv(k) for k in ("PLANET_PUBLIC_ORIGIN", "PLANET_SMTP_HOST", "PLANET_SMTP_FROM")):
+    if not accounts.email_delivery_configured():
         return render(request, "verificar", "privacy.unavailable", 503)
     if email and accounts.allow_request(f"verify:{accounts.digest(email)}", 2, 60):
         token = accounts.issue_verification(email)

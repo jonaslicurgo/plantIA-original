@@ -1,5 +1,9 @@
 # Changelog
 
+## Envio de e-mails via Resend
+
+- Verificação de cadastro, reenvio e recuperação usam o Resend via HTTPS. Mantidos os códigos de uso único, a expiração e os limites. Staging requer `PLANET_RESEND_API_KEY` e `PLANET_RESEND_FROM`.
+
 ## Homologação, PWA e privacidade
 
 - Configuração Railway separada com volume para SQLite e fotos, HTTPS e verificação de prontidão. Gemini, Stripe de teste e SMTP são configurados no ambiente.
@@ -62,7 +66,7 @@
 
 Instale `requirements.txt` em um ambiente virtual. Exporte `PLANET_STAGING_DATA_DIR` apontando para um diretório novo ou volume exclusivo. Execute `scripts/homologacao.sh`. O launcher usa a porta 8081 e interface local por padrão. Para teste HTTP local, defina `PLANET_STAGING_INSECURE_LOCAL_HTTP=1`. Para uma homologação HTTPS, deixe o padrão seguro e configure `PLANET_STAGING_PUBLIC_ORIGIN` com a origem HTTPS exata do proxy e a interface de escuta adequada à rede privada. Configure limitação de corpo e taxa também no proxy e só confie em cabeçalhos de encaminhamento de proxies conhecidos.
 
-Use `PLANET_STAGING_GEMINI_API_KEY` para uma chave própria de homologação. A chave é opcional para navegar. A recuperação real requer `PLANET_STAGING_SMTP_HOST`, `PLANET_STAGING_SMTP_FROM` e, quando aplicável, usuário e senha dedicados. O servidor retorna indisponível sem SMTP configurado. Use a página web para cadastro e recuperação; no Android atualizado, configure o endereço HTTPS e entre em Ajustes. O app mantém o token de sessão em memória, usa a mesma API de plantas e mantém lembretes locais separados por conta e servidor. Clientes antigos sem login recebem 401 nos endpoints privados.
+Use `PLANET_STAGING_GEMINI_API_KEY` para uma chave própria de homologação. A chave é opcional para navegar. No script local de homologação, configure `PLANET_STAGING_RESEND_API_KEY` e `PLANET_STAGING_RESEND_FROM` para enviar e-mails. Use a página web para cadastro e recuperação; no Android atualizado, configure o endereço HTTPS e entre em Ajustes. O app mantém o token de sessão em memória, usa a mesma API de plantas e mantém lembretes locais separados por conta e servidor. Clientes antigos sem login recebem 401 nos endpoints privados.
 
 A migração SQLite é aditiva e deve ser executada primeiro sobre uma cópia dos dados, com backup consistente do banco e das fotos. Os registros antigos recebem proprietário nulo; só faça uma atribuição depois de verificar a correspondência de usuários e registros fora da interface pública. Mantenha o banco e as fotos no mesmo volume persistente e use uma instância SQLite. Para reverter, restaure a cópia pré-migração em isolamento, pois o servidor original não aplica a autorização por conta.
 

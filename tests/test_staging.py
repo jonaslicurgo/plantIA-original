@@ -1,5 +1,6 @@
 """HTTP journeys for staging controls with isolated SQLite and simulated providers."""
 
+import json
 import os
 import tempfile
 import unittest
@@ -105,7 +106,7 @@ class Staging(unittest.TestCase):
                 "PLANET_DEPLOYMENT": "staging", "PLANET_DATA_DIR": mount,
                 "RAILWAY_VOLUME_MOUNT_PATH": mount, "PLANET_PUBLIC_ORIGIN": "https://stage.example.com",
                 "RAILWAY_PUBLIC_DOMAIN": "stage.example.com", "PLANET_REQUIRE_VERIFIED_EMAIL": "1",
-                "PLANET_SMTP_HOST": "mail.example.com", "PLANET_SMTP_FROM": "stage@example.com",
+                "PLANET_RESEND_API_KEY": "re_fixture", "PLANET_RESEND_FROM": "onboarding@resend.dev",
                 "PLANET_STRIPE_KEY": "sk_test_fixture",
             }
             validate(valid)
@@ -113,24 +114,46 @@ class Staging(unittest.TestCase):
                 ("PLANET_DEPLOYMENT", "production"), ("RAILWAY_ENVIRONMENT_NAME", "production"), ("PLANET_DATA_DIR", "/other"),
                 ("PLANET_PUBLIC_ORIGIN", "http://stage.example.com"), ("PLANET_INSECURE_LOCAL_HTTP", "1"),
                 ("RAILWAY_PUBLIC_DOMAIN", "production.example.com"), ("PLANET_REQUIRE_VERIFIED_EMAIL", "0"),
-                ("PLANET_STRIPE_KEY", "sk_live_fixture"), ("PLANET_SMTP_HOST", ""),
+                ("PLANET_STRIPE_KEY", "sk_live_fixture"), ("PLANET_RESEND_API_KEY", ""), ("PLANET_RESEND_FROM", ""),
             ):
                 with self.subTest(key=key), self.assertRaises(ValueError):
                     validate({**valid, key: value})
 
-    def test_smtp_starttls_precedes_authentication_and_message_delivery(self):
-        with patch.dict(os.environ, {
-            "PLANET_SMTP_SECURITY": "starttls", "PLANET_SMTP_PORT": "587",
-            "PLANET_SMTP_USER": "fixture", "PLANET_SMTP_PASSWORD": "fixture-only",
-        }), patch("plantia.accounts.smtplib.SMTP") as smtp:
-            fixture.accounts.send_verification("recipient@example.com", "fixture-code", "pt-BR")
-        smtp.assert_called_once_with("mail.invalid", 587, timeout=10)
-        client = smtp.return_value.__enter__.return_value
-        self.assertEqual([name for name, _, _ in client.method_calls], ["starttls", "login", "send_message"])
-        mail = client.send_message.call_args.args[0]
-        self.assertEqual(mail["To"], "recipient@example.com")
-        self.assertIn("https://testserver/conta/verificar", mail.get_content())
-        self.assertIn("fixture-code", mail.get_content())
+    def test_resend_sends_localized_codes_and_rejects_redirects(self):
+        with patch("plantia.accounts.HTTPSConnection") as https:
+            conn = https.return_value
+            response = conn.getresponse.return_value
+            response.status = 200
+            for send, page in ((fixture.accounts.send_verification, "verificar"),
+                               (fixture.accounts.send_recovery, "redefinir")):
+                send("recipient@example.com", "fixture-code", "pt-BR")
+                args, kwargs = conn.request.call_args
+                self.assertEqual(args, ("POST", "/emails"))
+                mail = json.loads(kwargs["body"])
+                self.assertEqual(mail["from"], "onboarding@resend.dev")
+                self.assertEqual(mail["to"], ["recipient@example.com"])
+                self.assertEqual(kwargs["headers"]["Authorization"], "Bearer re_fixture")
+                self.assertIn(f"https://testserver/conta/{page}\n", mail["text"])
+                self.assertTrue(mail["text"].endswith("fixture-code"))
+            https.assert_called_with("api.resend.com", timeout=10)
+            for status in (307, 403, 429, 500):
+                response.status = status
+                with self.assertRaisesRegex(OSError, rf"^Resend rejected email \(HTTP {status}\)$"):
+                    fixture.accounts.send_verification("recipient@example.com", "fixture-code", "pt-BR")
+            self.assertEqual(conn.request.call_count, 6)
+            response.read.assert_not_called()
+
+    def test_resend_error_does_not_expose_response_body_or_change_public_reply(self):
+        self.client.post("/api/auth/register", data={
+            "email": "resend-failure@example.com", "password": fixture.PASSWORD,
+        })
+        with patch("plantia.accounts.HTTPSConnection") as https, self.assertLogs("plantia.api.auth", "WARNING") as logs:
+            response = https.return_value.getresponse.return_value
+            response.status = 403
+            result = self.client.post("/api/auth/recover", data={"email": "resend-failure@example.com"})
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(logs.output, ["WARNING:plantia.api.auth:PLANET-IA recovery email delivery failed"])
+        response.read.assert_not_called()
 
     def test_public_pwa_and_private_cache_headers(self):
         self.assertEqual(self.client.get("/health").json(), {"status": "ok"})

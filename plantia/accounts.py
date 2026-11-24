@@ -1,14 +1,14 @@
 """SQLite account, session and one-time password recovery storage."""
 
+from contextlib import closing
 import hashlib
+from http.client import HTTPException, HTTPSConnection
+import json
 import logging
 from pathlib import Path
 import os
 import secrets
-import smtplib
-import ssl
 import time
-from email.message import EmailMessage
 from threading import BoundedSemaphore
 
 from argon2 import PasswordHasher
@@ -236,6 +236,12 @@ def clean_deleted_photos():
                 logging.getLogger(__name__).warning("PLANET-IA pending photo cleanup")
 
 
+def email_delivery_configured():
+    return all(os.getenv(key, "").strip() for key in (
+        "PLANET_PUBLIC_ORIGIN", "PLANET_RESEND_API_KEY", "PLANET_RESEND_FROM",
+    ))
+
+
 def send_recovery(email, token, locale):
     _send_code(email, token, locale, "Reset password", "Recovery code", "redefinir")
 
@@ -246,27 +252,26 @@ def send_verification(email, token, locale):
 
 def _send_code(email, token, locale, subject, code, page):
     strings = catalog(locale)
-    message = EmailMessage()
-    message["From"] = os.environ["PLANET_SMTP_FROM"]
-    message["To"] = email
-    message["Subject"] = f"PLANET-IA · {strings[subject]}"
-    message.set_content(f"{os.environ['PLANET_PUBLIC_ORIGIN'].rstrip('/')}/conta/{page}\n\n"
-                        f"{strings[code]}\n{token}")
-    security = os.getenv("PLANET_SMTP_SECURITY", "ssl")
-    if security not in {"ssl", "starttls"}:
-        raise ValueError("Invalid SMTP security mode")
-    host = os.environ["PLANET_SMTP_HOST"]
-    context = ssl.create_default_context()
-    if security == "ssl":
-        client = smtplib.SMTP_SSL(host, int(os.getenv("PLANET_SMTP_PORT", "465")), timeout=10, context=context)
-    else:
-        client = smtplib.SMTP(host, int(os.getenv("PLANET_SMTP_PORT", "587")), timeout=10)
-    with client as smtp:
-        if security == "starttls":
-            smtp.starttls(context=context)
-        if os.getenv("PLANET_SMTP_USER"):
-            smtp.login(os.environ["PLANET_SMTP_USER"], os.environ["PLANET_SMTP_PASSWORD"])
-        smtp.send_message(message)
+    payload = {
+        "from": os.environ["PLANET_RESEND_FROM"].strip(),
+        "to": [email],
+        "subject": f"PLANET-IA · {strings[subject]}",
+        "text": f"{os.environ['PLANET_PUBLIC_ORIGIN'].rstrip('/')}/conta/{page}\n\n{strings[code]}\n{token}",
+    }
+    headers = {
+        "Authorization": "Bearer " + os.environ["PLANET_RESEND_API_KEY"].strip(),
+        "Content-Type": "application/json",
+        "User-Agent": "PLANET-IA/1.0",
+    }
+    # Use system TLS verification and never follow redirects with the key or code.
+    try:
+        with closing(HTTPSConnection("api.resend.com", timeout=10)) as connection:
+            connection.request("POST", "/emails", body=json.dumps(payload).encode("utf-8"), headers=headers)
+            with closing(connection.getresponse()) as response:
+                if not 200 <= response.status < 300:
+                    raise OSError(f"Resend rejected email (HTTP {response.status})")
+    except HTTPException:
+        raise OSError("Invalid response from Resend") from None
 
 
 def allow_request(bucket, limit, seconds):

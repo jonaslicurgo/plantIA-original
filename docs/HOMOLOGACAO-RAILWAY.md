@@ -70,18 +70,23 @@ git -c credential.helper= -c 'credential.helper=!gh auth git-credential' \
 | `GEMINI_API_KEY` | Chave em projeto Google separado, com controle de orçamento e acesso |
 | `PLANET_STRIPE_KEY` | Chave `sk_test_` ou `rk_test_` de uma conta de testes |
 | `PLANET_STRIPE_WEBHOOK_SECRET` | Segredo do endpoint de teste no Stripe |
-| `PLANET_SMTP_HOST`, `PLANET_SMTP_FROM` | Host do provedor e remetente verificado |
-| `PLANET_SMTP_USER`, `PLANET_SMTP_PASSWORD` | Credenciais SMTP do ambiente |
-| `PLANET_SMTP_SECURITY`, `PLANET_SMTP_PORT` | `ssl` e `465`, ou `starttls` e `587` |
+| `PLANET_RESEND_API_KEY` | Chave do Resend com permissão de envio, exclusiva de staging |
+| `PLANET_RESEND_FROM` | Remetente autorizado na conta do Resend |
 
-Grave segredos nas variáveis do serviço. Confirme se o plano Railway e o
-provedor permitem saída SMTP na porta escolhida. A entrega real precisa ser
-testada a partir do serviço. O SMTP usa validação de certificado e autenticação
-depois do estabelecimento do TLS. Deixe `PLANET_INSECURE_LOCAL_HTTP` ausente.
+Grave a chave nas variáveis do serviço. O envio usa a API HTTPS do Resend.
+Para o primeiro teste, configure `PLANET_RESEND_FROM=onboarding@resend.dev`
+e cadastre-se com o endereço de e-mail da própria conta Resend. Esse remetente
+de teste só pode entregar para esse endereço. A aplicação mantém o destinatário
+da solicitação e o Resend aplica a restrição. Para testar com outras caixas,
+verifique um domínio no Resend e use um remetente desse domínio.
+
+Após validar em staging, remova `PLANET_SMTP_HOST`, `PLANET_SMTP_PORT`,
+`PLANET_SMTP_FROM`, `PLANET_SMTP_USER`, `PLANET_SMTP_PASSWORD` e
+`PLANET_SMTP_SECURITY` desse serviço. Deixe `PLANET_INSECURE_LOCAL_HTTP` ausente.
 
 ## Roteiro de aceitação em homologação
 
-- Confira `/health` em HTTPS. Registre duas contas de QA, confirme a entrega dos
+- Confira `/health` em HTTPS. Com domínio verificado, registre duas contas de QA. Confirme a entrega dos
   códigos em caixas autorizadas, verifique acesso, recuperação e expiração de
   código. A verificação usa o código recebido e a senha da conta. Confirme
   que os dados permanecem após reiniciar ou redeployar o serviço.

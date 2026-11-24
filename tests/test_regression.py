@@ -25,8 +25,8 @@ os.environ["PLANET_INSECURE_LOCAL_HTTP"] = "0"
 os.environ["PLANET_REQUIRE_VERIFIED_EMAIL"] = "0"
 os.environ["PLANET_STRIPE_KEY"] = ""
 os.environ["PLANET_STRIPE_WEBHOOK_SECRET"] = ""
-os.environ["PLANET_SMTP_HOST"] = "mail.invalid"
-os.environ["PLANET_SMTP_FROM"] = "planet@example.com"
+os.environ["PLANET_RESEND_API_KEY"] = "re_fixture"
+os.environ["PLANET_RESEND_FROM"] = "onboarding@resend.dev"
 
 from main import app
 from plantia import accounts
