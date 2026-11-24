@@ -1,6 +1,10 @@
 """Start the isolated staging build with fail-closed deployment configuration."""
 
 import os
+import subprocess
+import sys
+from threading import Thread
+from time import sleep
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -31,6 +35,18 @@ def validate(environ):
         raise ValueError("Use only Stripe test credentials in staging")
 
 
+def refresh_catalog(hours, target):
+    while True:
+        try:
+            subprocess.run([sys.executable, "-B", "-m", "scripts.import_botanical_backbone", "--output", str(target)],
+                           check=True, timeout=1800)
+        except (OSError, subprocess.SubprocessError):
+            print("Botanical refresh failed; keeping existing snapshot", flush=True)
+            sleep(3600)
+        else:
+            sleep(hours * 3600)
+
+
 if __name__ == "__main__":
     import uvicorn
 
@@ -38,4 +54,10 @@ if __name__ == "__main__":
         validate(os.environ)
     except ValueError as error:
         raise SystemExit(str(error)) from None
+    interval = os.getenv("PLANET_BOTANICAL_REFRESH_HOURS", "").strip()
+    if interval:
+        if not interval.isdecimal() or int(interval) < 24:
+            raise SystemExit("Use a botanical refresh interval of at least 24 hours")
+        index_path = Path(os.getenv("PLANET_BOTANICAL_INDEX", str(Path(os.environ["PLANET_DATA_DIR"]) / "botanical.sqlite")))
+        Thread(target=refresh_catalog, args=(int(interval), index_path), daemon=True).start()
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", "8000")), workers=1)

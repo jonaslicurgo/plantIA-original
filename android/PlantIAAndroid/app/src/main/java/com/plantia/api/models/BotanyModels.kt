@@ -16,6 +16,9 @@ data class BotanyProfile(
     val notices: List<String>,
     val groups: List<BotanyGroup>,
     val photo: LibraryPhoto? = null,
+    val license: String? = null,
+    val summary_available: Boolean = false,
+    val summary_label: String = "",
 )
 
 data class BotanyGroup(val key: String, val title: String, val items: List<BotanyFact>)
@@ -29,3 +32,5 @@ data class LibraryList(
 )
 data class LibraryItem(val id: String, val common_name: String, val scientific_name: String, val favorite: Boolean)
 data class LibraryPhoto(val url: String, val source: String, val author: String, val license: String, val license_url: String)
+
+data class LibrarySummary(val label: String, val items: List<BotanyFact>)

@@ -1,5 +1,10 @@
 # Changelog
 
+## Biblioteca botânica em escala internacional
+
+- Importação automatizada do GBIF Backbone, índice SQLite FTS5, busca de nomes comuns via GBIF, ocorrências e fotografias licenciadas com atribuição. As 23 fichas revisadas são preservadas.
+- Seleção de destaques de fontes citadas pelo Gemini sob demanda, com autorização, medição e cache.
+
 ## Planos Gratuito, Plus e Premium
 
 - Franquias mensais de 3 e 50 consultas, Premium sem teto mensal com política de uso justo, controles de acesso no servidor e créditos extras concedidos a contas Plus com auditoria.

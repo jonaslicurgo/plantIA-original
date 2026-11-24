@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · Identificação",
   "commercial.setting.premium_identify": "Contas Premium · Identificação",
   "commercial.setting.premium_diagnosis": "Contas Premium · Diagnóstico",
-  "commercial.setting.premium_assistant": "Contas Premium · Assistente"
+  "commercial.setting.premium_assistant": "Contas Premium · Assistente",
+  "library.basic": "Registro taxonômico básico",
+  "library.lineage": "Classificação taxonômica",
+  "library.synonyms": "Sinônimos científicos",
+  "library.observations": "Países com ocorrências registradas (não indica origem nativa)",
+  "library.ai_summary": "Destaques selecionados pelo Gemini a partir das fontes citadas"
 }

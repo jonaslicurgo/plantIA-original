@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · 鉴定",
   "commercial.setting.premium_identify": "高级账户 · 鉴定",
   "commercial.setting.premium_diagnosis": "高级账户 · 诊断",
-  "commercial.setting.premium_assistant": "高级账户 · 助理"
+  "commercial.setting.premium_assistant": "高级账户 · 助理",
+  "library.basic": "基础分类记录",
+  "library.lineage": "分类体系",
+  "library.synonyms": "科学异名",
+  "library.observations": "有出现记录的国家（不表示原生范围）",
+  "library.ai_summary": "Gemini 从引用来源中选出的要点"
 }

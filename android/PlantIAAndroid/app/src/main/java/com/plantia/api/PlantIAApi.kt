@@ -3,6 +3,7 @@ package com.plantia.api
 import com.plantia.api.models.BotanyFavorite
 import com.plantia.api.models.BotanyList
 import com.plantia.api.models.LibraryList
+import com.plantia.api.models.LibrarySummary
 import com.plantia.api.models.BotanyProfile
 import com.plantia.api.models.GardenCompletion
 import com.plantia.api.models.GardenOverview
@@ -54,6 +55,9 @@ interface PlantIAApi {
 
     @GET("api/biblioteca/{id}")
     suspend fun libraryProfile(@Path("id") id: String): BotanyProfile
+
+    @POST("api/biblioteca/{id}/resumo")
+    suspend fun librarySummary(@Path("id") id: String): LibrarySummary
 
     @PATCH("api/biblioteca/{id}/favorito")
     suspend fun libraryFavorite(@Path("id") id: String, @Body favorite: BotanyFavorite): BotanyFavorite

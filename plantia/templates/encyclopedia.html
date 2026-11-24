@@ -28,6 +28,7 @@
             <strong>{{ plant.common_name if global_catalog else plant.nombre_comun }}</strong>
             {% set scientific = plant.scientific_name if global_catalog else plant.nombre_cientifico %}
             {% if scientific %}<i>{{ scientific }}</i>{% endif %}
+            {% if plant.kind is defined and plant.kind == "taxonomy" %}<small>{{ tr("library.basic") }}</small>{% endif %}
             {% set saved = plant.favorite if global_catalog else plant.encyclopedia_favorite %}
             {% if saved %}<span aria-label="{{ tr('botany.favorites') }}">★</span>{% endif %}
         </a>

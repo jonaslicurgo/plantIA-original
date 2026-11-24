@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · تحديد الهوية",
   "commercial.setting.premium_identify": "حسابات متميزة · تحديد الهوية",
   "commercial.setting.premium_diagnosis": "حسابات متميزة · التشخيص",
-  "commercial.setting.premium_assistant": "حسابات متميزة · مساعد"
+  "commercial.setting.premium_assistant": "حسابات متميزة · مساعد",
+  "library.basic": "سجل تصنيفي أساسي",
+  "library.lineage": "التصنيف العلمي",
+  "library.synonyms": "المرادفات العلمية",
+  "library.observations": "دول فيها سجلات وجود (لا تدل على الموطن الأصلي)",
+  "library.ai_summary": "معلومات اختارها Gemini من المصادر المذكورة"
 }

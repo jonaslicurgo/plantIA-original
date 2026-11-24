@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · पहचान",
   "commercial.setting.premium_identify": "प्रीमियम खाते · पहचान",
   "commercial.setting.premium_diagnosis": "प्रीमियम खाते · निदान",
-  "commercial.setting.premium_assistant": "प्रीमियम खाते · सहायक"
+  "commercial.setting.premium_assistant": "प्रीमियम खाते · सहायक",
+  "library.basic": "बुनियादी वर्गिकी रिकॉर्ड",
+  "library.lineage": "वर्गीकरण",
+  "library.synonyms": "वैज्ञानिक पर्याय",
+  "library.observations": "दर्ज उपस्थिति वाले देश (मूल क्षेत्र नहीं)",
+  "library.ai_summary": "उद्धृत स्रोतों से Gemini द्वारा चुने गए तथ्य"
 }

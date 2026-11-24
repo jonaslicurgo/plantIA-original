@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · Identification",
   "commercial.setting.premium_identify": "Premium accounts · Identification",
   "commercial.setting.premium_diagnosis": "Premium accounts · Diagnosis",
-  "commercial.setting.premium_assistant": "Premium accounts · Assistant"
+  "commercial.setting.premium_assistant": "Premium accounts · Assistant",
+  "library.basic": "Basic taxonomic record",
+  "library.lineage": "Taxonomic classification",
+  "library.synonyms": "Scientific synonyms",
+  "library.observations": "Countries with recorded occurrences (not native range)",
+  "library.ai_summary": "Highlights selected by Gemini from the cited sources"
 }

@@ -36,6 +36,9 @@ def initialize_accounts():
             purpose TEXT NOT NULL, expires INTEGER NOT NULL)"""))
         if "email_verified" not in {row[1] for row in db.exec_driver_sql("PRAGMA table_info(accounts)")}:
             db.exec_driver_sql("ALTER TABLE accounts ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0")
+        db.exec_driver_sql("""CREATE TABLE IF NOT EXISTS botanical_source_cache (
+            key TEXT PRIMARY KEY, payload TEXT NOT NULL, expires INTEGER NOT NULL)""")
+        db.exec_driver_sql("CREATE INDEX IF NOT EXISTS botanical_cache_expiry ON botanical_source_cache(expires)")
         db.exec_driver_sql("""CREATE TABLE IF NOT EXISTS botanical_favorites (
             account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
             species_id TEXT NOT NULL, PRIMARY KEY(account_id, species_id))""")

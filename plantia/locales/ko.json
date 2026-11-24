@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · 신분증",
   "commercial.setting.premium_identify": "프리미엄 계정 · 신분증",
   "commercial.setting.premium_diagnosis": "프리미엄 계정 · 진단",
-  "commercial.setting.premium_assistant": "프리미엄 계정 · 어시스턴트"
+  "commercial.setting.premium_assistant": "프리미엄 계정 · 어시스턴트",
+  "library.basic": "기본 분류 기록",
+  "library.lineage": "분류 체계",
+  "library.synonyms": "학명 이명",
+  "library.observations": "출현 기록이 있는 국가(자생 범위를 뜻하지 않음)",
+  "library.ai_summary": "인용한 출처에서 Gemini가 선택한 주요 정보"
 }

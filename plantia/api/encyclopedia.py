@@ -6,6 +6,7 @@ from pydantic import BaseModel, StrictBool
 
 from plantia.i18n import locale_for, translations
 from plantia.services import botanical_catalog as library
+from plantia.services import ai_meter, botanical_summary
 from plantia.services.botany import FILTERS, SPECIES, profile
 from plantia.utils.taxon import normalize
 from plantia.services.planta_service import PlantaService
@@ -105,7 +106,7 @@ def _library_results(request, q, category, favorite, page):
 
 
 def _species(species_id):
-    item = library.CATALOG.get(species_id)
+    item = library.find(species_id)
     if item is None:
         raise HTTPException(404, "Not found")
     return item
@@ -123,10 +124,13 @@ def library_api(request: Request, q: str = Query("", max_length=150),
 def species_profile(request: Request, species_id: str):
     item = _species(species_id)
     result = library.profile(item, request.state.account_id, locale_for(request), translations(request)["tr"])
+    result["summary_label"] = translations(request)["tr"]("library.ai_summary")
+    result["summary_available"] = ai_meter.available_features(request.state.account_id)["assistant"]
     if request.url.path.startswith("/api/"):
         return result
     from plantia.api.routes import templates
-    return templates.TemplateResponse(request, "botany_profile.html", {"profile": result, "global_catalog": True})
+    return templates.TemplateResponse(request, "botany_profile.html", {"profile": result, "global_catalog": True,
+        "summary_available": result["summary_available"]})
 
 
 @router.post("/enciclopedia/especies/{species_id}/favorito")
@@ -141,3 +145,19 @@ def species_favorite(request: Request, species_id: str, update: FavoriteUpdate):
     _species(species_id)
     library.set_favorite(request.state.account_id, species_id, update.favorite)
     return {"favorite": update.favorite}
+
+@router.post("/enciclopedia/especies/{species_id}/resumo")
+@router.post("/api/biblioteca/{species_id}/resumo")
+def species_summary(request: Request, species_id: str):
+    owner = request.state.account_id
+    ai_meter.check_access(owner, "assistant")
+    item = _species(species_id)
+    tr = translations(request)["tr"]
+    locale = locale_for(request)
+    profile = library.profile(item, owner, locale, tr)
+    selected = botanical_summary.summarize(owner, species_id, profile, locale)
+    if request.url.path.startswith("/api/"):
+        return {"label": tr("library.ai_summary"), "items": selected}
+    from plantia.api.routes import templates
+    return templates.TemplateResponse(request, "botany_profile.html", {
+        "profile": profile, "global_catalog": True, "summary_available": True, "summary": selected})

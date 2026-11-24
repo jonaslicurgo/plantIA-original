@@ -37,6 +37,7 @@ import com.plantia.api.PlantIAClient
 import com.plantia.api.models.BotanyFavorite
 import com.plantia.api.models.LibraryList
 import com.plantia.api.models.LibraryItem
+import com.plantia.api.models.LibrarySummary
 import com.plantia.api.models.BotanyProfile
 import com.plantia.ui.components.ErrorBanner
 import com.plantia.ui.components.PlantTopBar
@@ -170,6 +171,8 @@ fun BotanicalProfileScreen(id: String, global: Boolean = false, onBack: () -> Un
     var error by remember(id) { mutableStateOf<String?>(null) }
     var retry by remember(id) { mutableStateOf(0) }
     var saving by remember(id) { mutableStateOf(false) }
+    var summary by remember(id) { mutableStateOf<LibrarySummary?>(null) }
+    var summarizing by remember(id) { mutableStateOf(false) }
     LaunchedEffect(id, retry) {
         error = null
         try {
@@ -191,7 +194,7 @@ fun BotanicalProfileScreen(id: String, global: Boolean = false, onBack: () -> Un
             if (current != null) {
                 item {
                     current.photo?.let { photo ->
-                        AsyncImage(model = PlantIAClient.baseUrl(context) + photo.url.removePrefix("/"),
+                        AsyncImage(model = if (photo.url.startsWith("https://")) photo.url else PlantIAClient.baseUrl(context) + photo.url.removePrefix("/"),
                             contentDescription = id.replace('-', ' '),
                             modifier = Modifier.fillMaxWidth().heightIn(max = 340.dp))
                         TextButton(onClick = { uri.openUri(photo.source) }) { Text(photo.author) }
@@ -215,6 +218,29 @@ fun BotanicalProfileScreen(id: String, global: Boolean = false, onBack: () -> Un
                             }
                         }
                     }) { Text(stringResource(if (current.favorite) R.string.botany_unfavorite else R.string.botany_favorite)) }
+                    current.license?.let { license ->
+                        TextButton(onClick = { uri.openUri(license) }) { Text("GBIF Backbone Taxonomy · CC BY 4.0") }
+                    }
+                    if (global && current.summary_available) {
+                        OutlinedButton(enabled = !summarizing, onClick = {
+                            summarizing = true
+                            scope.launch {
+                                try {
+                                    summary = api.librarySummary(id)
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (e: Exception) {
+                                    error = e.userMessage(context, context.getString(R.string.botany_error))
+                                } finally {
+                                    summarizing = false
+                                }
+                            }
+                        }) { Text(current.summary_label) }
+                    }
+                    summary?.items?.forEach { fact ->
+                        Text("${fact.label} · ${fact.value.orEmpty()}")
+                        fact.source?.let { source -> TextButton(onClick = { uri.openUri(source.url) }) { Text(source.label) } }
+                    }
                     current.notices.forEach { Text(it, modifier = Modifier.padding(vertical = 4.dp)) }
                 }
                 items(current.groups, key = { it.key }) { group ->

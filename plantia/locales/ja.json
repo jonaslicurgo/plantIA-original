@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · 識別",
   "commercial.setting.premium_identify": "プレミアムアカウント · 識別",
   "commercial.setting.premium_diagnosis": "プレミアムアカウント · 診断",
-  "commercial.setting.premium_assistant": "プレミアムアカウント · アシスタント"
+  "commercial.setting.premium_assistant": "プレミアムアカウント · アシスタント",
+  "library.basic": "基本分類レコード",
+  "library.lineage": "分類体系",
+  "library.synonyms": "学名の異名",
+  "library.observations": "出現記録がある国（原産地を示すものではありません）",
+  "library.ai_summary": "引用資料からGeminiが選んだ要点"
 }

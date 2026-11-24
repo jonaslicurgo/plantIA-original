@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · Identifikasi",
   "commercial.setting.premium_identify": "Akun premium · Identifikasi",
   "commercial.setting.premium_diagnosis": "Akun premium · Diagnosa",
-  "commercial.setting.premium_assistant": "Akun premium · Asisten"
+  "commercial.setting.premium_assistant": "Akun premium · Asisten",
+  "library.basic": "Catatan taksonomi dasar",
+  "library.lineage": "Klasifikasi taksonomi",
+  "library.synonyms": "Sinonim ilmiah",
+  "library.observations": "Negara dengan catatan keberadaan (bukan wilayah asal)",
+  "library.ai_summary": "Sorotan yang dipilih Gemini dari sumber yang dikutip"
 }

@@ -3,13 +3,14 @@
 {% block content %}
 <a href="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}">{{ tr("botany.title") }}</a>
 <header class="page-header">
-    <h1>{{ profile.groups[0]["items"][0].value or tr("botany.title") }}</h1>
+    <h1>{{ profile.groups[0]["items"][0].value or profile.groups[0]["items"][1].value or tr("botany.title") }}</h1>
     {% set scientific = profile.groups[0]["items"][1] %}
+    {% if profile.license %}<p><a href="{{ profile.license }}">GBIF Backbone Taxonomy · CC BY 4.0</a></p>{% endif %}
     {% if scientific.value %}<p><i>{{ scientific.value }}</i></p>{% endif %}
 </header>
 {% if global_catalog and profile.photo %}
 <figure class="library-photo">
-    <img src="{{ profile.photo.url }}" alt="{{ scientific.value }}" loading="lazy">
+    <img src="{{ profile.photo.url }}" alt="{{ scientific.value }}" loading="lazy" referrerpolicy="no-referrer">
     <figcaption><a href="{{ profile.photo.source }}">{{ profile.photo.author }}</a> ·
         <a href="{{ profile.photo.license_url }}">{{ profile.photo.license }}</a></figcaption>
 </figure>
@@ -21,6 +22,19 @@
         <button class="btn btn-outline">{{ tr("botany.unfavorite" if profile.favorite else "botany.favorite") }}</button>
     </form>
 </div>
+{% if summary_available %}
+<form action="/enciclopedia/especies/{{ profile.id }}/resumo" method="post">
+    <button class="btn btn-outline">{{ tr("library.ai_summary") }}</button>
+</form>
+{% endif %}
+{% if summary is defined %}
+<section class="botany-group">
+<h2>{{ tr("library.ai_summary") }}</h2>
+{% for item in summary %}
+<p>{{ item.label }} · {{ item.value }} · <a href="{{ item.source.url }}">{{ item.source.label }}</a></p>
+{% else %}<p>{{ tr("botany.evidence.unknown") }}</p>{% endfor %}
+</section>
+{% endif %}
 <aside class="botany-notices" aria-label="{{ tr('botany.group.risks') }}">
     {% for notice in profile.notices %}<p>{{ notice }}</p>{% endfor %}
 </aside>

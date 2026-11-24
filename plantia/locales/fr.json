@@ -599,5 +599,10 @@
   "commercial.setting.plus_identify": "Plus · Identification",
   "commercial.setting.premium_identify": "Comptes premium · Identification",
   "commercial.setting.premium_diagnosis": "Comptes premium · Diagnostic",
-  "commercial.setting.premium_assistant": "Comptes premium · Assistante"
+  "commercial.setting.premium_assistant": "Comptes premium · Assistante",
+  "library.basic": "Fiche taxonomique de base",
+  "library.lineage": "Classification taxonomique",
+  "library.synonyms": "Synonymes scientifiques",
+  "library.observations": "Pays avec des signalements (hors notion d’aire indigène)",
+  "library.ai_summary": "Points sélectionnés par Gemini à partir des sources citées"
 }
