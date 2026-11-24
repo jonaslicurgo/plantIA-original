@@ -216,7 +216,7 @@ def delete_account(owner, password):
         for table in ("account_tokens", "checkout_pending", "ai_meter"):
             db.exec_driver_sql(f"DELETE FROM {table} WHERE account_id=?", (owner,))
         db.execute(text("UPDATE billing_events SET account_id=NULL WHERE account_id=:id"), params)
-        db.execute(text("DELETE FROM commercial_audit WHERE target=:target AND action='account.edit'"), {"target": str(owner)})
+        db.execute(text("DELETE FROM commercial_audit WHERE target=:target AND action IN ('account.edit','credits.grant')"), {"target": str(owner)})
         db.execute(text("DELETE FROM accounts WHERE id=:id"), params)
     clean_deleted_photos()
     return True

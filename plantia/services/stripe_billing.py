@@ -119,7 +119,7 @@ def _same_price(provider_price, local_price):
     return (
         provider_price.get("unit_amount") == local_price["amount"]
         and provider_price.get("currency") == local_price["currency"].lower()
-        and recurring.get("interval") == ("year" if local_price["plan"] == "annual" else "month")
+        and recurring.get("interval") == ("year" if local_price["plan"] in {"annual", "plus_annual"} else "month")
         and recurring.get("interval_count") == 1
         and provider_price.get("livemode") is not True
     )

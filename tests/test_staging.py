@@ -20,6 +20,15 @@ class Staging(unittest.TestCase):
         self.client = TestClient(fixture.app, base_url="https://testserver")
 
     def test_verified_signup_to_private_garden_and_account_erasure(self):
+        from plantia import commercial
+        with commercial.transaction() as db:
+            original = commercial.rules(db)
+            db.execute(text("UPDATE commercial_rules SET payload=:value"), {
+                "value": original.model_copy(update={"free_diagnosis": True}).model_dump_json()})
+        def restore():
+            with commercial.transaction() as db:
+                db.execute(text("UPDATE commercial_rules SET payload=:value"), {"value": original.model_dump_json()})
+        self.addCleanup(restore)
         email = "stage-member@example.com"
         login = {"email": email, "password": fixture.PASSWORD}
         other = {"email": "stage-other@example.com", "password": fixture.PASSWORD}
@@ -65,7 +74,7 @@ class Staging(unittest.TestCase):
             self.assertEqual(task.status_code, 201, task.text)
             self.assertEqual(self.client.post(f"/api/jardim/{plant}/tarefas/{task.json()['id']}/concluir",
                 headers=a).status_code, 200)
-            self.assertEqual(self.client.get("/api/assinatura", headers=a).json()["usage"]["remaining"], 48)
+            self.assertEqual(self.client.get("/api/assinatura", headers=a).json()["usage"]["remaining"], 1)
             self.assertEqual(self.client.get("/admin/comercial", headers=a).status_code, 403)
             self.assertEqual(self.client.post("/api/auth/delete", data={"password": fixture.PASSWORD}, headers=a).status_code, 400)
             self.assertEqual(self.client.post("/api/auth/delete", data={"password": fixture.NEW_PASSWORD, "confirm": True}, headers=a).status_code, 403)

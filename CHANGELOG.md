@@ -1,5 +1,10 @@
 # Changelog
 
+## Planos Gratuito, Plus e Premium
+
+- Franquias mensais de 3 e 50 consultas, Premium sem teto mensal com política de uso justo, controles de acesso no servidor e créditos extras concedidos a contas Plus com auditoria.
+- Preços brasileiros e ofertas internacionais administráveis. Stripe permanece em modo de teste. O painel diferencia operações, chamadas ao Gemini e tokens reportados.
+
 ## Biblioteca botânica global
 
 - Catálogo compartilhado com 23 espécies e 12 fotografias atribuídas, pesquisa multilíngue, filtros, fichas com fontes e favoritos privados. Web e Android mantêm acesso separado às fichas pessoais.

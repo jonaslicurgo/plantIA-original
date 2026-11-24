@@ -105,6 +105,11 @@ fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onScheduleReview: (Stri
     }
     val current = history
     fun tr(key: String) = current?.labels?.get("health.$key") ?: ""
+    val canDiagnose = current?.benefits?.get("diagnosis") != false
+    val canAssist = current?.benefits?.get("assistant") != false
+    LaunchedEffect(canDiagnose, canAssist) {
+        if ((mode == "assess" && !canDiagnose) || (mode == "assistant" && !canAssist)) mode = "follow"
+    }
     Scaffold(topBar = { PlantTopBar(title = stringResource(R.string.health_title), onBack = onBack) }) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding).padding(horizontal = 16.dp),
@@ -117,9 +122,9 @@ fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onScheduleReview: (Stri
                     Text(tr("notice"))
                     Text("${tr("usage")} ${current.usage.attempts} / ${current.usage.hourly_limit}")
                     OutlinedButton(onClick = onOpenBotany) { Text(tr("encyclopedia")) }
-                    OutlinedButton(onClick = { mode = "assistant" }, enabled = !busy && mode != "assistant") { Text(tr("assistant")) }
+                    if (canAssist) OutlinedButton(onClick = { mode = "assistant" }, enabled = !busy && mode != "assistant") { Text(tr("assistant")) }
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        OutlinedButton(onClick = { mode = "assess" }, enabled = !busy && mode != "assess", modifier = Modifier.weight(1f)) { Text(tr("assess")) }
+                        if (canDiagnose) OutlinedButton(onClick = { mode = "assess" }, enabled = !busy && mode != "assess", modifier = Modifier.weight(1f)) { Text(tr("assess")) }
                         OutlinedButton(onClick = { mode = "follow" }, enabled = !busy && mode != "follow", modifier = Modifier.weight(1f)) { Text(tr("follow")) }
                     }
                     if (mode == "assess") {
@@ -148,8 +153,8 @@ fun PlantHealthScreen(id: Int, onOpenBotany: () -> Unit, onScheduleReview: (Stri
                         Text((if (upload != null) "✓ " else "") + tr("photo"))
                     }
                     val valid = when (mode) {
-                        "assess" -> upload != null
-                        "assistant" -> question.isNotBlank()
+                        "assess" -> canDiagnose && upload != null
+                        "assistant" -> canAssist && question.isNotBlank()
                         else -> true
                     }
                     Button(enabled = !busy && valid, onClick = {

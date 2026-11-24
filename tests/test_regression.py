@@ -49,6 +49,16 @@ def photo():
     return {"file": ("leaf.jpg", buffer.getvalue(), "image/jpeg")}
 
 
+def grant_fixture_subscription(owner, plan, *, checked_at=1, status="active", period_end=None, external_id=None):
+    from time import time
+    from plantia import commercial
+    with commercial.transaction() as db:
+        commercial.apply_subscription(db, commercial.SubscriptionSnapshot(
+            provider="fixture", external_id=external_id or f"test-plan-{owner}", account_id=owner,
+            plan=plan, status=status, period_end=period_end if period_end is not None else int(time()) + 86400,
+            cancel_pending=False, currency="BRL", amount=1990, market="BR", checked_at=checked_at))
+
+
 class Regression(unittest.TestCase):
     def setUp(self):
         self.a = TestClient(app, base_url="https://testserver")
@@ -209,6 +219,7 @@ class Regression(unittest.TestCase):
 
     def test_inconclusive_does_not_save_a_record_or_photo(self):
         a = self.account(self.a, "uncertain@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         photos_before = set(UPLOADS_DIR.iterdir())
         for result in (
             IdentificacionGemini(estado_identificacion="inconclusive"),
@@ -273,6 +284,7 @@ class Regression(unittest.TestCase):
 
     def test_health_assessment_and_followup_are_private(self):
         a = self.account(self.a, "health-owner@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         b = self.account(self.b, "health-other@example.com")
         plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
         path = f"/api/plantas/{plant}/saude"
@@ -310,6 +322,7 @@ class Regression(unittest.TestCase):
 
     def test_health_rejects_invalid_input_and_unsafe_provider_output(self):
         a = self.account(self.a, "health-validation@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
         path = f"/api/plantas/{plant}/saude/avaliar"
         bad = {"photo": ("sample.jpg", b"not an image", "image/jpeg")}
@@ -330,6 +343,7 @@ class Regression(unittest.TestCase):
 
     def test_health_comparison_context_and_assistant_usage(self):
         a = self.account(self.a, "p3-owner@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         b = self.account(self.b, "p3-other@example.com")
         plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
         path = f"/api/plantas/{plant}/saude"
@@ -394,6 +408,7 @@ class Regression(unittest.TestCase):
         from plantia.services import health_usage
 
         a = self.account(self.a, "p3-reserve@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         owner = accounts.account_for(a["Authorization"].split()[1])
         plant_id = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
         key = health_usage.fingerprint("assess", "gemini-3.1-flash-lite", {"watering":"weekly"}, b"photo")
@@ -457,6 +472,7 @@ class Regression(unittest.TestCase):
 
     def test_garden_prefills_health_review_without_creating_task(self):
         a = self.account(self.a, "garden-review@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         plant = self.a.post("/api/plantas/identificar", files=photo(), headers=a).json()["id"]
         with patch("plantia.services.health.analyze", return_value=Triage(
             status="possible", concern="high", signs=["spots"], findings=["fungal"]
@@ -482,7 +498,7 @@ class Regression(unittest.TestCase):
         owner = accounts.account_for(a["Authorization"].split()[1])
         with commercial.transaction() as db:
             baseline = commercial.rules(db)
-            config = baseline.model_copy(update={"free_limit":1, "monthly_limit":3,
+            config = baseline.model_copy(update={"free_limit":1,
                 "request_micro_brl":20, "input_per_million_micro_brl":1_000_000})
             db.execute(text("UPDATE commercial_rules SET payload=:value"), {"value":config.model_dump_json()})
         def reset():
@@ -506,10 +522,13 @@ class Regression(unittest.TestCase):
         with commercial.transaction() as db:
             commercial.apply_subscription(db, snapshot)
         with ai_meter.measure(owner, "assistant"):
+            ai_meter.provider_attempt("gemini-3.1-flash-lite")
             ai_meter.capture(SimpleNamespace(usage_metadata=SimpleNamespace(
                 prompt_token_count=500, candidates_token_count=100, thoughts_token_count=20)))
         datum = self.a.get("/api/assinatura", headers=a).json()
-        self.assertEqual(datum["usage"], {"plan":"monthly","limit":3,"used":2,"remaining":1})
+        self.assertEqual(datum["usage"]["tier"], "premium")
+        self.assertEqual(datum["usage"]["used"], 2)
+        self.assertIsNone(datum["usage"]["remaining"])
         self.assertTrue(datum["subscription"]["cancel_pending"])
         with get_engine().connect() as db:
             accounted = db.execute(text("""SELECT input_tokens,output_tokens,estimated_cost FROM ai_meter
@@ -525,6 +544,7 @@ class Regression(unittest.TestCase):
         from plantia import commercial
 
         a = self.account(self.a, "commercial-admin@example.com")
+        grant_fixture_subscription(accounts.account_for(a["Authorization"].split()[1]), "monthly")
         b = self.account(self.b, "commercial-auditor@example.com")
         owner = accounts.account_for(a["Authorization"].split()[1])
         other = accounts.account_for(b["Authorization"].split()[1])

@@ -83,6 +83,7 @@ _IDENTIFICATION_LOCKS = tuple(Lock() for _ in range(32))
 
 
 def _identify(content, mime_type, owner, locale):
+    ai_meter.check_access(owner, "identify")
     prepared, actual_type = GeminiService.preparar_imagen(content, mime_type)
     try:
         model = get_gemini_model()
@@ -152,10 +153,12 @@ def private_upload(request: Request, filename: str):
 
 @router.get("/", response_class=HTMLResponse)
 async def pagina_inicio(request: Request):
+    owner = request.state.account_id
+    identify_available = owner is not None and (await run_in_threadpool(ai_meter.available_features, owner))["identify"]
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"planta": None, "error": None, "mensaje": None, "focus_cuaderno": False},
+        {"planta": None, "error": None, "mensaje": None, "focus_cuaderno": False, "identify_available": identify_available},
     )
 
 
@@ -165,7 +168,7 @@ async def identificar_planta(request: Request, file: UploadFile = File(...)):
         content, mime_type = await _leer_imagen(file)
         planta = await run_in_threadpool(_identify, content, mime_type, request.state.account_id, locale_for(request))
         return templates.TemplateResponse(
-            request, "index.html", {"planta": planta, "focus_cuaderno": True}
+            request, "index.html", {"planta": planta, "focus_cuaderno": True, "identify_available": True}
         )
     except HTTPException:
         raise

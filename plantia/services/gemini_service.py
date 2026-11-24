@@ -233,8 +233,10 @@ class GeminiService:
         try:
             for attempt in range(max_attempts):
                 try:
+                    model = get_gemini_model()
+                    ai_meter.provider_attempt(model)
                     response = client.models.generate_content(
-                        model=get_gemini_model(),
+                        model=model,
                         contents=[PROMPT + f"\nWrite all user-facing prose in {language}.", image_part],
                         config=types.GenerateContentConfig(
                             temperature=0.2,

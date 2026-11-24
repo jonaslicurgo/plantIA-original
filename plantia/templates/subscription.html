@@ -8,8 +8,13 @@
 {% if operator %}<p><a href="/admin/comercial">{{ tr("commercial.dashboard") }}</a></p>{% endif %}
 <section class="commercial-panel">
     <h2>{{ tr("commercial.current") }} · {{ tr("commercial.plan." ~ usage.plan) }}</h2>
-    <p>{{ tr("commercial.remaining") }} <strong>{{ usage.remaining }} / {{ usage.limit }}</strong></p>
+    {% if usage.limit is none %}
+    <p>{{ tr("commercial.unlimited") }}</p>
+    {% else %}
+    <p>{{ tr("commercial.remaining") }} <strong>{{ [0, usage.limit - usage.used] | max }} / {{ usage.limit }}</strong></p>
+    {% if usage.credits %}<p>{{ tr("commercial.credits") }} <strong>{{ usage.credits }}</strong></p>{% endif %}
     <p>{{ tr("commercial.reset") }}</p>
+    {% endif %}
     {% if subscription %}
     <p>{{ tr("commercial.status." ~ subscription.status) }}
         {% if subscription.cancel_pending %} · {{ tr("commercial.cancel_pending") }}{% endif %}
@@ -27,17 +32,30 @@
     </label>
     <button class="btn btn-outline">{{ tr("commercial.show_prices") }}</button>
 </form>
+<details class="botany-group" open>
+    <summary>{{ tr("commercial.fair_title") }}</summary>
+    <p>{{ tr("commercial.fair_policy") }}</p>
+</details>
+{% macro features(level) %}
+<ul>{% for feature, allowed in benefits[level].items() if allowed %}
+    <li>{{ tr("commercial.feature." ~ feature) }}</li>
+{% endfor %}
+{% if level == "plus" and plus_credits_enabled %}<li>{{ tr("commercial.credits") }}</li>{% endif %}
+</ul>
+{% endmacro %}
 <div class="commercial-plans">
     <section class="commercial-panel"><h2>{{ tr("commercial.plan.free") }}</h2>
-        <p>{{ tr("commercial.free") }}</p><p>{{ free_limit }} {{ tr("commercial.requests_month") }}</p>
+        <p>{{ tr("commercial.free") }}</p><p>{{ free_limit }} {{ tr("commercial.requests_month") }}</p>{{ features("free") }}
     </section>
     {% for price in prices %}
     <section class="commercial-panel commercial-paid">
         <h2>{{ tr("commercial.plan." ~ price.plan) }}</h2>
         {% set amount = price.amount if price.currency in ('JPY','KRW') else price.amount / 100 %}
         <p class="commercial-price"><span data-currency="{{ price.currency }}" data-money="{{ amount }}">{{ price.currency }} {{ amount }}</span></p>
-        <p>{{ tr("commercial.term." ~ price.plan) }}</p>
-        <p>{{ price.limit }} {{ tr("commercial.requests_month") }}</p>
+        <p>{{ tr("commercial.term." ~ price.term) }}</p>
+        {% if price.limit is none %}<p>{{ tr("commercial.unlimited") }}</p>
+        {% else %}<p>{{ price.limit }} {{ tr("commercial.requests_month") }}</p>{% endif %}
+        {{ features(price.tier) }}
         {% if price.checkout %}
         <form method="post" action="/assinatura/checkout">
             <input type="hidden" name="price" value="{{ price.id }}">

@@ -341,7 +341,16 @@ private fun SubscriptionSummaryCard() {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(label("title"), style = MaterialTheme.typography.titleMedium)
             Text(label("plan.${result.usage.plan}"))
-            Text("${label("remaining")} ${result.usage.remaining} / ${result.usage.limit}")
+            val limit = result.usage.limit
+            if (limit == null) {
+                Text(label("unlimited"))
+                Text(label("fair_policy"))
+            }
+            else {
+                Text("${label("remaining")} ${(limit - result.usage.used).coerceAtLeast(0)} / $limit")
+                if (result.usage.credits > 0) Text("${label("credits")} ${result.usage.credits}")
+            }
+            result.usage.benefits.filterValues { it }.keys.forEach { Text(label("feature.$it")) }
             result.subscription?.let {
                 Text(label("status.${it.status}"))
                 if (it.cancel_pending) Text(label("cancel_pending"))

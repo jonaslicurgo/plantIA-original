@@ -22,6 +22,7 @@
 <details class="botany-group" open><summary>{{ tr("commercial.features") }}</summary>
 <ul class="commercial-list">{% for row in usage %}<li>
     <strong>{{ tr("commercial.feature." ~ row.feature) }}</strong> · {{ row.requests }} {{ tr("commercial.requests") }}
+    · {{ row.model or "—" }} · {{ row.provider_calls if row.provider_calls is not none else "—" }} {{ tr("commercial.provider_calls") }}
     · {{ row.input_tokens }} / {{ row.output_tokens }} {{ tr("commercial.tokens") }} ({{ row.reports }}/{{ row.requests }})
     · <span data-currency="BRL" data-money="{{ row.cost / 1000000 }}">BRL {{ row.cost / 1000000 }}</span>
     · {{ row.errors }} {{ tr("commercial.errors") }}
@@ -51,6 +52,10 @@
             <label><input type="checkbox" name="suspended" value="true"{% if account.suspended %} checked{% endif %}> {{ tr("commercial.suspend") }}</label>
             <button class="btn btn-outline">{{ tr("commercial.save") }}</button>
         </form>
+        <form class="commercial-controls" method="post" action="/admin/comercial/contas/{{ account.id }}/creditos">
+            <label>{{ tr("commercial.credits") }} <input type="number" name="quantity" min="1" max="100000" required></label>
+            <button class="btn btn-outline">{{ tr("commercial.event.credits.grant") }}</button>
+        </form>
         {% endif %}
     </li>{% endfor %}</ul>
 </details>
@@ -77,7 +82,7 @@
 <form class="commercial-controls commercial-settings" method="post" action="/admin/comercial/preco">
     <label>{{ tr("commercial.market") }} <input required name="market" maxlength="2" pattern="[A-Z]{2}" value="BR"></label>
     <label>{{ tr("commercial.plan") }}
-        <select name="plan"><option value="monthly">{{ tr("commercial.plan.monthly") }}</option><option value="annual">{{ tr("commercial.plan.annual") }}</option></select>
+        <select name="plan"><option value="monthly">{{ tr("commercial.plan.monthly") }}</option><option value="annual">{{ tr("commercial.plan.annual") }}</option><option value="plus_monthly">{{ tr("commercial.plan.plus_monthly") }}</option><option value="plus_annual">{{ tr("commercial.plan.plus_annual") }}</option></select>
     </label>
     <label>{{ tr("commercial.currency") }} <select name="currency">{% for code in currencies %}<option>{{ code }}</option>{% endfor %}</select></label>
     <label>{{ tr("commercial.minor_units") }} <input type="number" name="amount" min="1" required></label>

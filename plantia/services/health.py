@@ -116,8 +116,10 @@ treatments, or links. Findings must be plausible in the visible image and the co
 def _generate(schema, content):
     client = GeminiService._get_client()
     try:
+        model = get_gemini_model()
+        ai_meter.provider_attempt(model)
         response = client.models.generate_content(
-            model=get_gemini_model(), contents=content,
+            model=model, contents=content,
             config=types.GenerateContentConfig(temperature=0, response_mime_type="application/json",
                                                 response_json_schema=schema.model_json_schema()),
         )

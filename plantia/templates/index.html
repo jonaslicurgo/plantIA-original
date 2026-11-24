@@ -17,7 +17,7 @@
 <div class="alert alert-success">{{ tr(mensaje) }}</div>
 {% endif %}
 
-{% if request.state.account_id %}
+{% if identify_available %}
 <div class="upload-card">
     <form id="upload-form" data-invalid="{{ tr('Choose a JPEG, PNG or WebP image') }}" data-loading="{{ tr('Analyzing photo…') }}" action="/identificar" method="post" enctype="multipart/form-data">
         <div id="drop-zone" class="drop-zone">
@@ -38,6 +38,8 @@
     </div>
 </div>
 
+{% elif request.state.account_id %}
+<p><a href="/assinatura">{{ tr("commercial.title") }}</a> · {{ tr("commercial.disabled") }}</p>
 {% else %}
 <div class="planet-actions">
     <a class="btn btn-primary" href="/conta/cadastro">{{ tr("Create account") }}</a>

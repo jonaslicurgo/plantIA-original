@@ -56,6 +56,7 @@ def history(request: Request, plant_id: int, before: int | None = None):
     events = health.history(plant_id, owner, before)
     data = {"plant_id": plant_id, "name": name, "events": events,
             "next_before": events[-1]["id"] if len(events) == 20 else None,
+            "benefits": ai_meter.available_features(owner),
             "comparison": health.comparison(plant_id, owner), "usage": health_usage.totals(owner),
             "action_choices": [item.value for item in health.Action],
             "sources": [{"name": name, "url": url} for name, url in health.SOURCES]}
@@ -76,6 +77,7 @@ async def assess(request: Request, plant_id: int, photo: UploadFile = File(...),
                  temperature: str = Form("unknown"), symptoms: str = Form("", max_length=300),
                  environment: str = Form("", max_length=300)):
     owner, _ = await run_in_threadpool(_owner, request, plant_id)
+    await run_in_threadpool(ai_meter.check_access, owner, "diagnosis")
     try:
         context = health.Context(leaf_change=leaf_change, spreading=spreading, insects_seen=insects_seen,
                                  moisture=moisture, watering=watering, lighting=lighting, location=location,
@@ -135,7 +137,7 @@ def _ai_run(plant_id, owner, operation, kind, context, compute, image=None, mime
             payload = compute()
         event = _save(plant_id, owner, kind, payload, image, mime)
     except HTTPException as exc:
-        health_usage.finish(usage, "rejected" if exc.detail in {"commercial.disabled", "commercial.quota"} else "failed")
+        health_usage.finish(usage, "rejected" if exc.detail in {"commercial.disabled", "commercial.quota", "commercial.concurrent"} else "failed")
         raise
     except GeminiUnavailable:
         health_usage.finish(usage, "failed")
@@ -151,6 +153,7 @@ def _ai_run(plant_id, owner, operation, kind, context, compute, image=None, mime
 @router.post("/api/plantas/{plant_id}/saude/assistente", status_code=201)
 def assistant(request: Request, plant_id: int, question: str = Form(..., max_length=400)):
     owner, _ = _owner(request, plant_id)
+    ai_meter.check_access(owner, "assistant")
     question = question.strip()
     if not question:
         raise HTTPException(422, "Invalid request")

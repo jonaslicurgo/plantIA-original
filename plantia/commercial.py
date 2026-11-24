@@ -12,16 +12,27 @@ from sqlalchemy import text
 from plantia.database import get_engine
 
 FEATURES = ("identify", "diagnosis", "assistant")
-PAID = ("monthly", "annual")
+PAID = ("plus_monthly", "plus_annual", "monthly", "annual")
 ROLES = ("member", "auditor", "admin")
 ACTIVE = ("active", "trialing")
 
 
 class Rules(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    free_limit: int = Field(50, ge=0, le=100_000)
-    monthly_limit: int = Field(500, ge=0, le=100_000)
-    annual_limit: int = Field(500, ge=0, le=100_000)
+    free_limit: int = Field(3, ge=0, le=100_000)
+    plus_limit: int = Field(50, ge=0, le=100_000)
+    free_identify: bool = True
+    free_diagnosis: bool = False
+    free_assistant: bool = False
+    plus_identify: bool = True
+    plus_diagnosis: bool = True
+    plus_assistant: bool = False
+    premium_identify: bool = True
+    premium_diagnosis: bool = True
+    premium_assistant: bool = True
+    plus_credits_enabled: bool = True
+    plus_monthly_enabled: bool = True
+    plus_annual_enabled: bool = True
     identify: bool = True
     diagnosis: bool = True
     assistant: bool = True
@@ -82,7 +93,23 @@ def init():
             db.exec_driver_sql(statement)
         db.execute(text("INSERT OR IGNORE INTO commercial_installation VALUES (1,:ns)"), {"ns": uuid4().hex})
         db.execute(text("INSERT OR IGNORE INTO commercial_rules VALUES (1,:payload)"), {"payload": Rules().model_dump_json()})
-        for plan, amount in {"monthly": 2990, "annual": 19990}.items():
+        db.exec_driver_sql("""CREATE TABLE IF NOT EXISTS plus_credit_ledger (
+            id INTEGER PRIMARY KEY, account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+            amount INTEGER NOT NULL, created_at INTEGER NOT NULL)""")
+        db.exec_driver_sql("CREATE INDEX IF NOT EXISTS plus_credit_account ON plus_credit_ledger(account_id)")
+        meter_columns = {row[1] for row in db.exec_driver_sql("PRAGMA table_info(ai_meter)")}
+        if "provider_calls" not in meter_columns:
+            db.exec_driver_sql("ALTER TABLE ai_meter ADD COLUMN provider_calls INTEGER")
+            db.exec_driver_sql("ALTER TABLE ai_meter ADD COLUMN model TEXT")
+        payload = json.loads(db.exec_driver_sql("SELECT payload FROM commercial_rules WHERE id=1").scalar_one())
+        if "monthly_limit" in payload or "annual_limit" in payload:
+            payload.pop("monthly_limit", None)
+            payload.pop("annual_limit", None)
+            payload["free_limit"] = 3
+            db.execute(text("UPDATE commercial_rules SET payload=:rules WHERE id=1"),
+                       {"rules": Rules.model_validate(payload).model_dump_json()})
+        for plan, amount in {"plus_monthly": 1990, "plus_annual": 14990,
+                             "monthly": 2990, "annual": 19990}.items():
             db.execute(text("""INSERT INTO commercial_prices(market,plan,currency,amount,stripe_price,enabled)
               SELECT 'BR',:plan,'BRL',:amount,NULL,1
               WHERE NOT EXISTS (SELECT 1 FROM commercial_prices WHERE market='BR' AND plan=:plan)"""),
@@ -107,14 +134,45 @@ def month_start():
     return int(datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0).timestamp())
 
 
+def tier(plan):
+    if plan in {"monthly", "annual"}:
+        return "premium"
+    if plan in {"plus_monthly", "plus_annual"}:
+        return "plus"
+    return "free"
+
+
+def active_plan(db, owner):
+    sub = current_subscription(db, owner)
+    return sub["plan"] if entitled(sub) else "free"
+
+
+def benefits(config, level):
+    return {feature: getattr(config, feature) and getattr(config, f"{level}_{feature}")
+            for feature in FEATURES}
+
+
+def credit_balance(db, owner):
+    return db.execute(text("SELECT coalesce(sum(amount),0) FROM plus_credit_ledger WHERE account_id=:owner"),
+                      {"owner": owner}).scalar_one()
+
+
+def add_credits(db, owner, amount):
+    db.execute(text("INSERT INTO plus_credit_ledger(account_id,amount,created_at) VALUES (:owner,:amount,:now)"),
+               {"owner": owner, "amount": amount, "now": int(time())})
+
+
 def allowance(db, owner):
     config = rules(db)
-    sub = current_subscription(db, owner)
-    plan = sub["plan"] if entitled(sub) else "free"
-    limit = getattr(config, plan + "_limit")
+    plan = active_plan(db, owner)
+    level = tier(plan)
+    limit = None if level == "premium" else getattr(config, level + "_limit")
     used = db.execute(text("SELECT count(*) FROM ai_meter WHERE account_id=:owner AND created_at>=:start"),
                       {"owner": owner, "start": month_start()}).scalar_one()
-    return {"plan": plan, "limit": limit, "used": used, "remaining": max(0, limit - used)}
+    credits = credit_balance(db, owner) if level == "plus" and config.plus_credits_enabled else 0
+    return {"plan": plan, "tier": level, "limit": limit, "used": used, "credits": credits,
+            "remaining": None if limit is None else max(0, limit - used) + credits,
+            "benefits": benefits(config, level)}
 
 
 def audit(db, actor, action, target, details):

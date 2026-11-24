@@ -8,6 +8,7 @@ data class PlantHealthHistory(
     val comparison: PlantHealthComparison,
     val sources: List<PlantHealthSource>,
     val labels: Map<String, String>,
+    val benefits: Map<String, Boolean> = emptyMap(),
 )
 
 data class PlantHealthEvent(
