@@ -181,7 +181,6 @@
   "Siguiente →": "Siguiente →",
   "Sin anotaciones aún": "Sin anotaciones aún",
   "Spearmint": "menta verde",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.",
   "Suelo": "Suelo",
   "Temperatura": "Temperatura",
   "The flowers attract butterflies and other pollinators.": "Las flores atraen mariposas y otros polinizadores.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCA clasifica la especie como no tóxica para perros y gatos. Esto no recomienda su consumo.",
   "enrichment.water_monstera": "Riega bien y deja secar la capa superior entre riegos.",
   "enrichment.water_aloe": "Deja secar el sustrato entre riegos y evita el encharcamiento.",
-  "enrichment.castor_fertilization": "La fuente recomienda fertilización regular para el cultivo ornamental."
+  "enrichment.castor_fertilization": "La fuente recomienda fertilización regular para el cultivo ornamental.",
+  "intro.watch": "Conoce PLANET-IA",
+  "intro.url": "Enlace al vídeo de presentación",
+  "intro.help": "Usa un enlace público HTTPS directo a un archivo MP4 o WebM. Déjalo vacío para ocultar el vídeo.",
+  "intro.invalid": "Introduce un enlace HTTPS directo a un archivo MP4 o WebM.",
+  "commercial.event.video.edit": "Vídeo de presentación actualizado"
 }

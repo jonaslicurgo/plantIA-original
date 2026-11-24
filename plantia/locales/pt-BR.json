@@ -82,7 +82,7 @@
   "Fertilización": "Fertilização",
   "File or request too large": "Arquivar ou solicitar muito grande",
   "Floreció por primera vez": "Floresceu pela primeira vez",
-  "Gemini ha identificado tu planta.": "Gêmeos identificou sua planta.",
+  "Gemini ha identificado tu planta.": "O Gemini identificou sua planta.",
   "Gibosa creciente": "Crescendo giboso",
   "Gibosa menguante": "minguante",
   "Golden pothos": "Jiboia",
@@ -181,7 +181,6 @@
   "Siguiente →": "Próximo →",
   "Sin anotaciones aún": "Ainda não há notas",
   "Spearmint": "Hortelã-verde",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "Faça upload de uma foto e Gêmeos lhe dirá que planta é e como cuidar dela.",
   "Suelo": "chão",
   "Temperatura": "Temperatura",
   "The flowers attract butterflies and other pollinators.": "As flores atraem borboletas e outros polinizadores.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "A ASPCA classifica a espécie como não tóxica para cães e gatos. Isso não é recomendação de consumo.",
   "enrichment.water_monstera": "Regue bem e deixe a camada superior do substrato secar entre regas.",
   "enrichment.water_aloe": "Deixe o substrato secar entre regas e evite encharcamento.",
-  "enrichment.castor_fertilization": "A fonte recomenda adubação regular para o cultivo ornamental."
+  "enrichment.castor_fertilization": "A fonte recomenda adubação regular para o cultivo ornamental.",
+  "intro.watch": "Conheça o PLANET-IA",
+  "intro.url": "Link do vídeo de apresentação",
+  "intro.help": "Use um link público HTTPS direto para MP4 ou WebM. Deixe vazio para ocultar o vídeo.",
+  "intro.invalid": "Informe um link HTTPS direto para MP4 ou WebM.",
+  "commercial.event.video.edit": "Vídeo de apresentação atualizado"
 }

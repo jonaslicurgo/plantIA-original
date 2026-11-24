@@ -15,7 +15,7 @@
   "An annual succulent with fleshy leaves, low reddish stems and small yellow flowers.": "نبات عصاري سنوي بأوراق لحمية وسيقان منخفضة حمراء وأزهار صفراء صغيرة.",
   "An evergreen shrub with narrow leaves and fragrant flower spikes.": "شجيرة دائمة الخضرة ذات أوراق ضيقة وأزهار ذات رائحة عطرة.",
   "An evergreen succulent with thick leaves.": "نبات عصاري دائم الخضرة ذو أوراق سميكة.",
-  "Analizando tu planta con Gemini…": "تحليل النبات الخاص بك مع الجوزاء ...",
+  "Analizando tu planta con Gemini…": "يحلّل Gemini نباتك…",
   "Analyzing photo…": "جارٍ تحليل الصورة…",
   "Anotaciones guardadas": "التعليقات التوضيحية المحفوظة",
   "Aplicar": "تطبيق",
@@ -82,7 +82,7 @@
   "Fertilización": "التسميد",
   "File or request too large": "الملف أو الطلب كبير جدًا",
   "Floreció por primera vez": "لقد أزهرت لأول مرة",
-  "Gemini ha identificado tu planta.": "لقد حددت الجوزاء نباتك.",
+  "Gemini ha identificado tu planta.": "حدّد Gemini نباتك.",
   "Gibosa creciente": "تزايد الأحدب",
   "Gibosa menguante": "يتضاءل الأحدب",
   "Golden pothos": "بوثوس الذهبي",
@@ -181,7 +181,6 @@
   "Siguiente →": "التالي →",
   "Sin anotaciones aún": "لا توجد ملاحظات حتى الآن",
   "Spearmint": "النعناع",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "قم بتحميل صورة وسيخبرك الجوزاء بنوع النبات وكيفية العناية به.",
   "Suelo": "أرض",
   "Temperatura": "درجة الحرارة",
   "The flowers attract butterflies and other pollinators.": "تجذب الأزهار الفراشات والملقحات الأخرى.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "تصنف ASPCA النوع على أنه غير سام للكلاب والقطط. هذا ليس توصية بالأكل.",
   "enrichment.water_monstera": "اسقِ جيدًا واترك الطبقة العلوية تجف بين مرات الري.",
   "enrichment.water_aloe": "اترك وسط الزراعة يجف بين الريات وتجنب تشبعه بالماء.",
-  "enrichment.castor_fertilization": "يوصي المصدر بالتسميد المنتظم في زراعة الزينة."
+  "enrichment.castor_fertilization": "يوصي المصدر بالتسميد المنتظم في زراعة الزينة.",
+  "intro.watch": "تعرّف على PLANET-IA",
+  "intro.url": "رابط الفيديو التعريفي",
+  "intro.help": "استخدم رابط HTTPS عامًا ومباشرًا لملف MP4 أو WebM. اترك الحقل فارغًا لإخفاء الفيديو.",
+  "intro.invalid": "أدخل رابط HTTPS مباشرًا لملف MP4 أو WebM.",
+  "commercial.event.video.edit": "تم تحديث الفيديو التعريفي"
 }

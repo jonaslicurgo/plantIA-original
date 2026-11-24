@@ -82,7 +82,7 @@
   "Fertilización": "受精",
   "File or request too large": "ファイルまたはリクエストが大きすぎます",
   "Floreció por primera vez": "初めて咲きました",
-  "Gemini ha identificado tu planta.": "ジェミニはあなたの植物を特定しました。",
+  "Gemini ha identificado tu planta.": "Geminiが植物を特定しました。",
   "Gibosa creciente": "巨大な成長",
   "Gibosa menguante": "衰退する巨大な",
   "Golden pothos": "ゴールデンポトス",
@@ -181,7 +181,6 @@
   "Siguiente →": "次へ →",
   "Sin anotaciones aún": "まだメモはありません",
   "Spearmint": "スペアミント",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "Upload a photo and Gemini will tell you what plant it is and how to care for it.",
   "Suelo": "地面",
   "Temperatura": "温度",
   "The flowers attract butterflies and other pollinators.": "花は蝶や他の花粉媒介者を引き寄せます。",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCAは犬と猫に無毒と分類しています。食用を推奨するものではありません。",
   "enrichment.water_monstera": "十分に水を与え、次の水やりまでに表層を乾かします。",
   "enrichment.water_aloe": "次の水やりまで用土を乾かし、過湿を避けます。",
-  "enrichment.castor_fertilization": "資料は観賞用栽培で定期的な施肥を勧めています。"
+  "enrichment.castor_fertilization": "資料は観賞用栽培で定期的な施肥を勧めています。",
+  "intro.watch": "PLANET-IAを知る",
+  "intro.url": "紹介動画のURL",
+  "intro.help": "MP4またはWebMファイルへの公開HTTPS直リンクを入力してください。空欄にすると動画を非表示にします。",
+  "intro.invalid": "MP4またはWebMファイルへのHTTPS直リンクを入力してください。",
+  "commercial.event.video.edit": "紹介動画を更新しました"
 }

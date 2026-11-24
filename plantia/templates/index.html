@@ -6,7 +6,17 @@
 <section class="hero planet-hero">
     <h1>PLANET-IA</h1>
     <p class="planet-slogan">{{ tr("Everything you want to know about plants, in the palm of your hand.") }}</p>
-    <p class="subtitle">{{ tr("Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.") }}</p>
+    {% if introduction_video %}
+    <details class="planet-intro">
+        <summary class="btn btn-outline planet-intro-toggle">
+            <span class="planet-intro-icon" aria-hidden="true"></span>{{ tr("intro.watch") }}
+        </summary>
+        <video class="planet-intro-player" controls playsinline preload="none" aria-label="{{ tr('intro.watch') }}">
+            <source src="{{ introduction_video }}">
+            <a href="{{ introduction_video }}">{{ tr("intro.watch") }}</a>
+        </video>
+    </details>
+    {% endif %}
 </section>
 
 {% if error %}

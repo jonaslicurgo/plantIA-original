@@ -181,7 +181,6 @@
   "Siguiente →": "Next →",
   "Sin anotaciones aún": "No notes yet",
   "Spearmint": "Spearmint",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "Upload a photo and Gemini will tell you what plant it is and how to care for it.",
   "Suelo": "ground",
   "Temperatura": "Temperature",
   "The flowers attract butterflies and other pollinators.": "The flowers attract butterflies and other pollinators.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCA lists the species as non-toxic to dogs and cats. This is not a recommendation to eat it.",
   "enrichment.water_monstera": "Water thoroughly and let the upper layer dry between waterings.",
   "enrichment.water_aloe": "Let the growing medium dry between waterings and avoid waterlogging.",
-  "enrichment.castor_fertilization": "The source recommends regular fertilization for ornamental cultivation."
+  "enrichment.castor_fertilization": "The source recommends regular fertilization for ornamental cultivation.",
+  "intro.watch": "Meet PLANET-IA",
+  "intro.url": "Introduction video URL",
+  "intro.help": "Use a public, direct HTTPS link to an MP4 or WebM file. Leave it blank to hide the video.",
+  "intro.invalid": "Enter a direct HTTPS link to an MP4 or WebM file.",
+  "commercial.event.video.edit": "Introduction video updated"
 }

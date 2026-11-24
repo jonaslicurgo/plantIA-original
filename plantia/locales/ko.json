@@ -82,7 +82,7 @@
   "Fertilización": "수정",
   "File or request too large": "파일 또는 요청이 너무 큼",
   "Floreció por primera vez": "처음으로 꽃이 피었어요",
-  "Gemini ha identificado tu planta.": "쌍둥이자리가 당신의 식물을 확인했습니다.",
+  "Gemini ha identificado tu planta.": "Gemini가 식물을 식별했습니다.",
   "Gibosa creciente": "성장하는 거대한",
   "Gibosa menguante": "쇠약해지는",
   "Golden pothos": "골든 포토스",
@@ -181,7 +181,6 @@
   "Siguiente →": "다음 →",
   "Sin anotaciones aún": "아직 메모가 없습니다.",
   "Spearmint": "스피어민트",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "사진을 업로드하면 Gemini가 해당 식물이 무엇인지, 어떻게 관리해야 하는지 알려드립니다.",
   "Suelo": "땅",
   "Temperatura": "온도",
   "The flowers attract butterflies and other pollinators.": "꽃은 나비와 다른 수분매개자를 유인합니다.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCA는 개와 고양이에게 독성이 없는 종으로 분류합니다. 섭취 권장은 아닙니다.",
   "enrichment.water_monstera": "충분히 물을 주고 다음 물주기 전에 윗부분이 마르도록 합니다.",
   "enrichment.water_aloe": "물을 주기 전에 배양토를 말리고 과습을 피합니다.",
-  "enrichment.castor_fertilization": "출처는 관상 재배에 정기적인 시비를 권장합니다."
+  "enrichment.castor_fertilization": "출처는 관상 재배에 정기적인 시비를 권장합니다.",
+  "intro.watch": "PLANET-IA 소개",
+  "intro.url": "소개 영상 링크",
+  "intro.help": "MP4 또는 WebM 파일의 공개 HTTPS 직링크를 사용하세요. 빈칸으로 두면 영상이 숨겨집니다.",
+  "intro.invalid": "MP4 또는 WebM 파일의 HTTPS 직링크를 입력하세요.",
+  "commercial.event.video.edit": "소개 영상이 업데이트되었습니다"
 }

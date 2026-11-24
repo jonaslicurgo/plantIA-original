@@ -181,7 +181,6 @@
   "Siguiente →": "Weiter →",
   "Sin anotaciones aún": "Noch keine Notizen",
   "Spearmint": "Grüne Minze",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "Laden Sie ein Foto hoch und Gemini sagt Ihnen, um welche Pflanze es sich handelt und wie Sie sie pflegen müssen.",
   "Suelo": "Boden",
   "Temperatura": "Temperatur",
   "The flowers attract butterflies and other pollinators.": "Die Blüten locken Schmetterlinge und andere Bestäuber an.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "Die ASPCA führt die Art als ungiftig für Hunde und Katzen. Daraus folgt keine Verzehrempfehlung.",
   "enrichment.water_monstera": "Gründlich gießen und die obere Substratschicht zwischen den Wassergaben trocknen lassen.",
   "enrichment.water_aloe": "Das Substrat zwischen Wassergaben trocknen lassen und Staunässe vermeiden.",
-  "enrichment.castor_fertilization": "Die Quelle empfiehlt regelmäßige Düngung für den Zieranbau."
+  "enrichment.castor_fertilization": "Die Quelle empfiehlt regelmäßige Düngung für den Zieranbau.",
+  "intro.watch": "PLANET-IA kennenlernen",
+  "intro.url": "Link zum Einführungsvideo",
+  "intro.help": "Verwenden Sie einen öffentlichen direkten HTTPS-Link zu einer MP4- oder WebM-Datei. Lassen Sie das Feld leer, um das Video auszublenden.",
+  "intro.invalid": "Geben Sie einen direkten HTTPS-Link zu einer MP4- oder WebM-Datei ein.",
+  "commercial.event.video.edit": "Einführungsvideo aktualisiert"
 }

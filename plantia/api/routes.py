@@ -151,6 +151,11 @@ def private_upload(request: Request, filename: str):
 # --- Páginas HTML ---
 
 
+def _introduction_video():
+    with get_engine().connect() as db:
+        return commercial.introduction_video(db)
+
+
 @router.get("/", response_class=HTMLResponse)
 async def pagina_inicio(request: Request):
     owner = request.state.account_id
@@ -158,7 +163,8 @@ async def pagina_inicio(request: Request):
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"planta": None, "error": None, "mensaje": None, "focus_cuaderno": False, "identify_available": identify_available},
+        {"planta": None, "error": None, "mensaje": None, "focus_cuaderno": False, "identify_available": identify_available,
+         "introduction_video": await run_in_threadpool(_introduction_video)},
     )
 
 
@@ -168,7 +174,8 @@ async def identificar_planta(request: Request, file: UploadFile = File(...)):
         content, mime_type = await _leer_imagen(file)
         planta = await run_in_threadpool(_identify, content, mime_type, request.state.account_id, locale_for(request))
         return templates.TemplateResponse(
-            request, "index.html", {"planta": planta, "focus_cuaderno": True, "identify_available": True}
+            request, "index.html", {"planta": planta, "focus_cuaderno": True, "identify_available": True,
+             "introduction_video": await run_in_threadpool(_introduction_video)}
         )
     except HTTPException:
         raise

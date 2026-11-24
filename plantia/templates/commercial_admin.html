@@ -64,6 +64,19 @@
     {% if more %}<a href="?page={{ page + 1 }}">{{ tr("garden.next") }}</a>{% endif %}
 </nav>
 {% if editable %}
+<details class="botany-group" open>
+    <summary>{{ tr("intro.watch") }}</summary>
+    <form class="commercial-controls commercial-settings" method="post" action="/admin/comercial/video">
+        <label>{{ tr("intro.url") }}
+            <input type="url" name="url" maxlength="2048" placeholder="https://example.com/video.mp4"
+                   value="{{ introduction_video or '' }}" dir="ltr">
+        </label>
+        <p>{{ tr("intro.help") }}</p>
+        <button class="btn btn-primary">{{ tr("commercial.save") }}</button>
+    </form>
+</details>
+{% endif %}
+{% if editable %}
 <details class="botany-group"><summary>{{ tr("commercial.settings") }}</summary>
 <form class="commercial-controls commercial-settings" method="post" action="/admin/comercial/configuracao">
     {% for key,value in config.items() %}

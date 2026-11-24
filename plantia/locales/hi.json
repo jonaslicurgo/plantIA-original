@@ -15,7 +15,7 @@
   "An annual succulent with fleshy leaves, low reddish stems and small yellow flowers.": "मांसल पत्तियों, कम लाल तने और छोटे पीले फूलों वाला एक वार्षिक रसीला पौधा।",
   "An evergreen shrub with narrow leaves and fragrant flower spikes.": "संकरी पत्तियों और सुगंधित फूलों की स्पाइक्स वाली एक सदाबहार झाड़ी।",
   "An evergreen succulent with thick leaves.": "मोटी पत्तियों वाला एक सदाबहार रसीला पौधा।",
-  "Analizando tu planta con Gemini…": "मिथुन राशि वाले आपके पौधे का विश्लेषण...",
+  "Analizando tu planta con Gemini…": "Gemini आपके पौधे का विश्लेषण कर रहा है…",
   "Analyzing photo…": "फ़ोटो का विश्लेषण किया जा रहा है...",
   "Anotaciones guardadas": "सहेजे गए एनोटेशन",
   "Aplicar": "आवेदन करें",
@@ -82,7 +82,7 @@
   "Fertilización": "निषेचन",
   "File or request too large": "फ़ाइल या अनुरोध बहुत बड़ा है",
   "Floreció por primera vez": "यह पहली बार खिला",
-  "Gemini ha identificado tu planta.": "मिथुन ने आपके पौधे की पहचान कर ली है।",
+  "Gemini ha identificado tu planta.": "Gemini ने आपके पौधे की पहचान की।",
   "Gibosa creciente": "बढ़ता हुआ गिब्बस",
   "Gibosa menguante": "घटता हुआ गिब्बस",
   "Golden pothos": "सुनहरे गड्ढे",
@@ -181,7 +181,6 @@
   "Siguiente →": "अगला →",
   "Sin anotaciones aún": "अभी तक कोई नोट नहीं",
   "Spearmint": "पुदीना",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "एक फोटो अपलोड करें और मिथुन आपको बताएगा कि यह कौन सा पौधा है और इसकी देखभाल कैसे करें।",
   "Suelo": "ज़मीन",
   "Temperatura": "तापमान",
   "The flowers attract butterflies and other pollinators.": "फूल तितलियों और अन्य परागणकों को आकर्षित करते हैं।",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCA इस प्रजाति को कुत्तों और बिल्लियों के लिए गैर-विषैला बताती है। यह खाने की सलाह नहीं है।",
   "enrichment.water_monstera": "अच्छी तरह पानी दें और अगली सिंचाई से पहले ऊपरी परत सूखने दें।",
   "enrichment.water_aloe": "दो सिंचाइयों के बीच माध्यम सूखने दें और जल जमाव से बचें।",
-  "enrichment.castor_fertilization": "स्रोत सजावटी खेती में नियमित खाद देने की सलाह देता है।"
+  "enrichment.castor_fertilization": "स्रोत सजावटी खेती में नियमित खाद देने की सलाह देता है।",
+  "intro.watch": "PLANET-IA को जानें",
+  "intro.url": "परिचय वीडियो का लिंक",
+  "intro.help": "MP4 या WebM फ़ाइल का सार्वजनिक और सीधा HTTPS लिंक दें। वीडियो छिपाने के लिए इसे खाली छोड़ें।",
+  "intro.invalid": "MP4 या WebM फ़ाइल का सीधा HTTPS लिंक दें।",
+  "commercial.event.video.edit": "परिचय वीडियो अपडेट किया गया"
 }

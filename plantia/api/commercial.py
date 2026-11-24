@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 import re
 from typing import Literal
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Form, HTTPException, Query, Request
 from pydantic import ValidationError
@@ -161,8 +162,9 @@ def dashboard(request: Request, page: int = Query(1, ge=1, le=100_000)):
         prices = db.execute(text("""SELECT market,plan,currency,amount,stripe_price,enabled
             FROM commercial_prices WHERE enabled=1 ORDER BY market,plan""")).mappings().all()
         config = billing.rules(db).model_dump()
+        introduction_video = billing.introduction_video(db) if role == "admin" else None
     return _render(request, "commercial_admin.html", {
-        "editable": role == "admin", "stats": stats, "revenue": revenue, "usage": usage, "cost_brl": costs / 1e6,
+        "editable": role == "admin", "introduction_video": introduction_video, "stats": stats, "revenue": revenue, "usage": usage, "cost_brl": costs / 1e6,
         "margin_brl": None if buying_other_currency else brl - costs / 1e6,
         "margin_percent": (brl - costs / 1e6) / brl if brl > 0 and not buying_other_currency else None,
         "users": users[:40], "history": history, "audit": audit, "prices": prices, "config": config,
@@ -237,4 +239,23 @@ def grant_credits(request: Request, owner: int, quantity: int = Form(..., ge=1, 
             raise HTTPException(409, "commercial.credits_plus")
         billing.add_credits(db, owner, quantity)
         billing.audit(db, actor, "credits.grant", owner, {"quantity": quantity})
+    return RedirectResponse("/admin/comercial", 303)
+
+@router.post("/admin/comercial/video")
+def edit_video(request: Request, url: str = Form("", max_length=2048)):
+    url = url.strip()
+    with billing.transaction() as db:
+        actor, _ = _require(db, request, write=True)
+        if url:
+            try:
+                parts = urlsplit(url)
+                valid = (parts.scheme == "https" and parts.hostname and parts.username is None
+                         and parts.port in (None, 443) and not parts.fragment
+                         and not any(c.isspace() or ord(c) < 32 or c == "\\" for c in url)
+                         and parts.path.lower().endswith((".mp4", ".webm")))
+            except ValueError:
+                valid = False
+            if not valid:
+                raise HTTPException(400, "intro.invalid")
+        billing.set_introduction_video(db, actor, url)
     return RedirectResponse("/admin/comercial", 303)

@@ -181,7 +181,6 @@
   "Siguiente →": "Selanjutnya →",
   "Sin anotaciones aún": "Belum ada catatan",
   "Spearmint": "tanaman mint",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "Unggah foto dan Gemini akan memberi tahu Anda tanaman apa itu dan cara merawatnya.",
   "Suelo": "tanah",
   "Temperatura": "Suhu",
   "The flowers attract butterflies and other pollinators.": "Bunganya menarik kupu-kupu dan penyerbuk lainnya.",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCA menggolongkan spesies ini tidak beracun bagi anjing dan kucing. Ini bukan anjuran konsumsi.",
   "enrichment.water_monstera": "Siram merata dan biarkan lapisan atas mengering di antara penyiraman.",
   "enrichment.water_aloe": "Biarkan media kering sebelum menyiram lagi dan hindari genangan.",
-  "enrichment.castor_fertilization": "Sumber menganjurkan pemupukan rutin untuk budidaya hias."
+  "enrichment.castor_fertilization": "Sumber menganjurkan pemupukan rutin untuk budidaya hias.",
+  "intro.watch": "Kenali PLANET-IA",
+  "intro.url": "Tautan video pengantar",
+  "intro.help": "Gunakan tautan HTTPS publik dan langsung ke berkas MP4 atau WebM. Kosongkan untuk menyembunyikan video.",
+  "intro.invalid": "Masukkan tautan HTTPS langsung ke berkas MP4 atau WebM.",
+  "commercial.event.video.edit": "Video pengantar diperbarui"
 }

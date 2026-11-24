@@ -2266,3 +2266,20 @@ nav {
     .species-hero--photo { grid-template-columns: minmax(0, 1fr); }
     .species-photo img { block-size: clamp(12rem, 62vw, 22rem); }
 }
+
+.planet-intro { margin: 1.4rem auto 0; max-inline-size: min(100%, 44rem); }
+.planet-intro-toggle {
+    display: inline-flex; align-items: center; justify-content: center; gap: .65rem;
+    min-block-size: 44px; padding-inline: 1.25rem; border-radius: 999px;
+    background: var(--surface); cursor: pointer; list-style: none;
+}
+.planet-intro-toggle::-webkit-details-marker { display: none; }
+.planet-intro-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.planet-intro-icon {
+    inline-size: .75rem; block-size: .85rem; background: currentColor;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.planet-intro-player {
+    display: block; inline-size: 100%; aspect-ratio: 16 / 9; margin-block-start: 1rem;
+    border-radius: .9rem; background: #101614; object-fit: contain;
+}

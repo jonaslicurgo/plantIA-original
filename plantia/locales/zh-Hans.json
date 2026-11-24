@@ -82,7 +82,7 @@
   "Fertilización": "施肥",
   "File or request too large": "文件或请求太大",
   "Floreció por primera vez": "它第一次开花",
-  "Gemini ha identificado tu planta.": "双子座已经识别出你的植物。",
+  "Gemini ha identificado tu planta.": "Gemini 已识别出你的植物。",
   "Gibosa creciente": "生长凸凸",
   "Gibosa menguante": "渐亏凸凸",
   "Golden pothos": "金绿萝",
@@ -181,7 +181,6 @@
   "Siguiente →": "下一页 →",
   "Sin anotaciones aún": "还没有笔记",
   "Spearmint": "留兰香",
-  "Sube una fotografía y Gemini te dirá qué planta es y cómo cuidarla.": "上传照片，双子座会告诉您这是什么植物以及如何照顾它。",
   "Suelo": "地面",
   "Temperatura": "温度",
   "The flowers attract butterflies and other pollinators.": "这些花吸引蝴蝶和其他传粉者。",
@@ -645,5 +644,10 @@
   "enrichment.basil_pets": "ASPCA将该物种列为对犬猫无毒。这不是食用建议。",
   "enrichment.water_monstera": "浇透后，在两次浇水间让基质表层干燥。",
   "enrichment.water_aloe": "两次浇水之间让基质干燥并避免积水。",
-  "enrichment.castor_fertilization": "资料建议观赏栽培时定期施肥。"
+  "enrichment.castor_fertilization": "资料建议观赏栽培时定期施肥。",
+  "intro.watch": "了解 PLANET-IA",
+  "intro.url": "介绍视频链接",
+  "intro.help": "请使用指向 MP4 或 WebM 文件的公开 HTTPS 直链。留空可隐藏视频。",
+  "intro.invalid": "请输入指向 MP4 或 WebM 文件的 HTTPS 直链。",
+  "commercial.event.video.edit": "介绍视频已更新"
 }

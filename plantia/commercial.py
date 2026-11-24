@@ -80,6 +80,8 @@ def init():
             """CREATE TABLE IF NOT EXISTS checkout_pending (
                 account_id INTEGER PRIMARY KEY REFERENCES accounts(id), price_id INTEGER NOT NULL,
                 request_key TEXT NOT NULL, expires INTEGER NOT NULL, url TEXT)""",
+            """CREATE TABLE IF NOT EXISTS site_media (
+                key TEXT PRIMARY KEY, url TEXT NOT NULL)""",
             """CREATE TABLE IF NOT EXISTS commercial_audit (
                 id INTEGER PRIMARY KEY, actor INTEGER NOT NULL, action TEXT NOT NULL,
                 target TEXT NOT NULL, details TEXT NOT NULL, created_at INTEGER NOT NULL)""",
@@ -128,6 +130,19 @@ def current_subscription(db, owner):
 
 def entitled(subscription):
     return bool(subscription and subscription["status"] in ACTIVE and subscription["period_end"] > int(time()))
+
+
+def introduction_video(db):
+    return db.execute(text("SELECT url FROM site_media WHERE key='introduction'")).scalar()
+
+
+def set_introduction_video(db, actor, url):
+    if url:
+        db.execute(text("""INSERT INTO site_media VALUES ('introduction', :url)
+            ON CONFLICT(key) DO UPDATE SET url=excluded.url"""), {"url": url})
+    else:
+        db.execute(text("DELETE FROM site_media WHERE key='introduction'"))
+    audit(db, actor, "video.edit", "introduction", {"enabled": bool(url)})
 
 
 def month_start():
