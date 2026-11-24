@@ -4,7 +4,8 @@ from fastapi import APIRouter, Form, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, StrictBool
 
-from plantia.i18n import translations
+from plantia.i18n import locale_for, translations
+from plantia.services import botanical_catalog as library
 from plantia.services.botany import FILTERS, SPECIES, profile
 from plantia.utils.taxon import normalize
 from plantia.services.planta_service import PlantaService
@@ -37,10 +38,17 @@ def _profile(request, plant_id):
 
 
 @router.get("/enciclopedia")
+@router.get("/enciclopedia/pessoal")
 def encyclopedia(request: Request, q: str = Query("", max_length=150),
                  category: str = Query("", max_length=30), favorite: bool = False,
-                 page: int = Query(1, ge=1, le=100_000)):
+                 page: int = Query(1, ge=1, le=100_000), personal: bool = False):
     from plantia.api.routes import templates
+    if not personal and not request.url.path.endswith("/pessoal"):
+        return templates.TemplateResponse(request, "encyclopedia.html", {
+            "results": _library_results(request, q, category, favorite, page),
+            "q": q, "category": category, "favorite": favorite, "global_catalog": True,
+            "filters": library.CATEGORIES,
+        })
     results = _results(request, q, category, favorite, page)
     return templates.TemplateResponse(request, "encyclopedia.html", {
         "results": results, "q": q, "category": category, "favorite": favorite, "filters": FILTERS,
@@ -83,4 +91,53 @@ def encyclopedia_plant_api(request: Request, plant_id: int):
 def favorite_api(request: Request, plant_id: int, update: FavoriteUpdate):
     if not PlantaService.set_favorite(plant_id, request.state.account_id, update.favorite):
         raise HTTPException(404, "Not found")
+    return {"favorite": update.favorite}
+
+
+def _library_results(request, q, category, favorite, page):
+    if category and category not in library.CATEGORIES:
+        raise HTTPException(400, "botany.invalid_category")
+    result = library.search(request.state.account_id, locale_for(request), q, category, favorite, page)
+    tr = translations(request)["tr"]
+    result.update(catalog_label=tr("library.catalog"), personal_label=tr("library.personal"))
+    result["categories"] = [{"key": key, "label": library.category_label(tr, key)} for key in library.CATEGORIES]
+    return result
+
+
+def _species(species_id):
+    item = library.CATALOG.get(species_id)
+    if item is None:
+        raise HTTPException(404, "Not found")
+    return item
+
+
+@router.get("/api/biblioteca")
+def library_api(request: Request, q: str = Query("", max_length=150),
+                category: str = Query("", max_length=30), favorite: bool = False,
+                page: int = Query(1, ge=1, le=100_000)):
+    return _library_results(request, q, category, favorite, page)
+
+
+@router.get("/enciclopedia/especies/{species_id}")
+@router.get("/api/biblioteca/{species_id}")
+def species_profile(request: Request, species_id: str):
+    item = _species(species_id)
+    result = library.profile(item, request.state.account_id, locale_for(request), translations(request)["tr"])
+    if request.url.path.startswith("/api/"):
+        return result
+    from plantia.api.routes import templates
+    return templates.TemplateResponse(request, "botany_profile.html", {"profile": result, "global_catalog": True})
+
+
+@router.post("/enciclopedia/especies/{species_id}/favorito")
+def species_favorite_form(request: Request, species_id: str, favorite: bool = Form(...)):
+    _species(species_id)
+    library.set_favorite(request.state.account_id, species_id, favorite)
+    return RedirectResponse(f"/enciclopedia/especies/{species_id}", 303)
+
+
+@router.patch("/api/biblioteca/{species_id}/favorito")
+def species_favorite(request: Request, species_id: str, update: FavoriteUpdate):
+    _species(species_id)
+    library.set_favorite(request.state.account_id, species_id, update.favorite)
     return {"favorite": update.favorite}

@@ -1,5 +1,9 @@
 # Changelog
 
+## Biblioteca botânica global
+
+- Catálogo compartilhado com 23 espécies e 12 fotografias atribuídas, pesquisa multilíngue, filtros, fichas com fontes e favoritos privados. Web e Android mantêm acesso separado às fichas pessoais.
+
 ## Envio de e-mails via Resend
 
 - Verificação de cadastro, reenvio e recuperação usam o Resend via HTTPS. Mantidos os códigos de uso único, a expiração e os limites. Staging requer `PLANET_RESEND_API_KEY` e `PLANET_RESEND_FROM`.

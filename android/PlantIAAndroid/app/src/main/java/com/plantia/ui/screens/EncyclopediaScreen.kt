@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
+import coil.compose.AsyncImage
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -33,7 +35,8 @@ import androidx.compose.ui.unit.dp
 import com.plantia.R
 import com.plantia.api.PlantIAClient
 import com.plantia.api.models.BotanyFavorite
-import com.plantia.api.models.BotanyList
+import com.plantia.api.models.LibraryList
+import com.plantia.api.models.LibraryItem
 import com.plantia.api.models.BotanyProfile
 import com.plantia.ui.components.ErrorBanner
 import com.plantia.ui.components.PlantTopBar
@@ -45,22 +48,35 @@ private data class EncyclopediaQuery(val text: String = "", val category: String
                                     val favorite: Boolean = false, val page: Int = 1)
 
 @Composable
-fun EncyclopediaScreen(onOpenPlant: (Int) -> Unit) {
+fun EncyclopediaScreen(onOpenPlant: (Int) -> Unit, onOpenSpecies: (String) -> Unit) {
     val context = LocalContext.current
     val api = PlantIAClient.api(context)
     var draft by remember { mutableStateOf(EncyclopediaQuery()) }
     var query by remember { mutableStateOf(EncyclopediaQuery()) }
     var retry by remember { mutableStateOf(0) }
+    var personal by remember { mutableStateOf(false) }
+    var personalLabel by remember { mutableStateOf("") }
+    var catalogLabel by remember { mutableStateOf("") }
     var showCategories by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(true) }
-    var results by remember { mutableStateOf<BotanyList?>(null) }
+    var results by remember { mutableStateOf<LibraryList?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(query, retry) {
+    LaunchedEffect(query, retry, personal) {
         loading = true
         error = null
         try {
-            results = api.encyclopedia(query.text, query.category, query.favorite, query.page)
+            results = if (personal) {
+                val old = api.encyclopedia(query.text, query.category, query.favorite, query.page)
+                LibraryList(old.total, old.page, old.total_pages, old.categories, old.items.map {
+                    LibraryItem(it.id.toString(), it.common_name, it.scientific_name, it.favorite)
+                })
+            } else {
+                api.botanicalLibrary(query.text, query.category, query.favorite, query.page).also {
+                    personalLabel = it.personal_label
+                    catalogLabel = it.catalog_label
+                }
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -76,6 +92,11 @@ fun EncyclopediaScreen(onOpenPlant: (Int) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
+                if (personalLabel.isNotBlank()) TextButton(onClick = {
+                    personal = !personal
+                    draft = EncyclopediaQuery()
+                    query = draft
+                }) { Text(if (personal) catalogLabel else personalLabel) }
                 OutlinedTextField(
                     value = draft.text,
                     onValueChange = { draft = draft.copy(text = it.take(150)) },
@@ -114,7 +135,7 @@ fun EncyclopediaScreen(onOpenPlant: (Int) -> Unit) {
                 results?.items.isNullOrEmpty() -> item { Text(stringResource(R.string.botany_empty)) }
                 else -> {
                     items(results?.items.orEmpty(), key = { it.id }) { plant ->
-                        OutlinedButton(onClick = { onOpenPlant(plant.id) }, modifier = Modifier.fillMaxWidth()) {
+                        OutlinedButton(onClick = { if (personal) onOpenPlant(plant.id.toInt()) else onOpenSpecies(plant.id) }, modifier = Modifier.fillMaxWidth()) {
                             Column(Modifier.fillMaxWidth()) {
                                 Text((if (plant.favorite) "★ " else "") + plant.common_name)
                                 Text(plant.scientific_name, style = MaterialTheme.typography.bodySmall)
@@ -140,7 +161,7 @@ fun EncyclopediaScreen(onOpenPlant: (Int) -> Unit) {
 }
 
 @Composable
-fun BotanicalProfileScreen(id: Int, onBack: () -> Unit) {
+fun BotanicalProfileScreen(id: String, global: Boolean = false, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val uri = LocalUriHandler.current
@@ -152,7 +173,7 @@ fun BotanicalProfileScreen(id: Int, onBack: () -> Unit) {
     LaunchedEffect(id, retry) {
         error = null
         try {
-            profile = api.botanicalProfile(id)
+            profile = if (global) api.libraryProfile(id) else api.botanicalProfile(id.toInt())
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -169,12 +190,21 @@ fun BotanicalProfileScreen(id: Int, onBack: () -> Unit) {
             if (error != null) item { ErrorBanner(error.orEmpty(), onRetry = { retry++ }) }
             if (current != null) {
                 item {
+                    current.photo?.let { photo ->
+                        AsyncImage(model = PlantIAClient.baseUrl(context) + photo.url.removePrefix("/"),
+                            contentDescription = id.replace('-', ' '),
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 340.dp))
+                        TextButton(onClick = { uri.openUri(photo.source) }) { Text(photo.author) }
+                        TextButton(onClick = { uri.openUri(photo.license_url) }) { Text(photo.license) }
+                    }
                     Button(enabled = !saving, onClick = {
                         saving = true
                         error = null
                         scope.launch {
                             try {
-                                val result = api.botanicalFavorite(id, BotanyFavorite(!current.favorite))
+                                val update = BotanyFavorite(!current.favorite)
+                                val result = if (global) api.libraryFavorite(id, update)
+                                             else api.botanicalFavorite(id.toInt(), update)
                                 profile = current.copy(favorite = result.favorite)
                             } catch (e: CancellationException) {
                                 throw e

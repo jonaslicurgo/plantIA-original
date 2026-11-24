@@ -1,0 +1,766 @@
+[
+  {
+    "id": "lavandula-angustifolia",
+    "name": "Lavandula angustifolia",
+    "source": "https://plants.ces.ncsu.edu/plants/lavandula-angustifolia/",
+    "labels": {
+      "zh": "狹葉薰衣草",
+      "es": "Lavandula angustifolia",
+      "ar": "خزامى ضيقة الأوراق",
+      "it": "Lavandula angustifolia",
+      "de": "Echter Lavendel",
+      "en": "Lavandula angustifolia",
+      "fr": "Lavandula angustifolia",
+      "pt": "Lavanda",
+      "ja": "真正ラベンダー",
+      "ko": "라벤더",
+      "zh-hans": "狭叶薰衣草",
+      "id": "Lavender"
+    },
+    "family": "",
+    "categories": [
+      "flower",
+      "herb"
+    ]
+  },
+  {
+    "id": "epipremnum-aureum",
+    "name": "Epipremnum aureum",
+    "source": "https://plants.ces.ncsu.edu/plants/epipremnum-aureum/",
+    "labels": {
+      "hi": "मनी प्लांट",
+      "zh-hans": "绿萝",
+      "pt": "Jiboia",
+      "fr": "Epipremnum aureus",
+      "es": "Epipremnum aureum",
+      "en": "Epipremnum aureum",
+      "de": "Efeutute",
+      "id": "Sirih gading",
+      "ja": "ポトス",
+      "zh": "绿萝",
+      "it": "Epipremnum aureum",
+      "ar": "بوتس",
+      "ko": "스킨답서스"
+    },
+    "family": "",
+    "categories": [
+      "foliage"
+    ],
+    "photo": {
+      "url": "/static/botany/epipremnum-aureum.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Money_Plant_(Epipremnum_aureum)_4.jpg",
+      "author": "Mokkie",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+    }
+  },
+  {
+    "id": "aloe-vera",
+    "name": "Aloe vera",
+    "source": "https://plants.ces.ncsu.edu/plants/aloe-vera/",
+    "labels": {
+      "zh": "庫拉索蘆薈",
+      "es": "Aloe vera",
+      "ar": "صبر حقيقي",
+      "pt": "Babosa",
+      "it": "Aloe vera",
+      "id": "Lidah buaya",
+      "ja": "アロエベラ",
+      "hi": "घृत कुमारी",
+      "fr": "Aloe vera",
+      "zh-hans": "库拉索芦荟",
+      "en": "Aloe vera",
+      "de": "Echte Aloe",
+      "ko": "알로에 베라"
+    },
+    "family": "",
+    "categories": [
+      "succulent"
+    ],
+    "photo": {
+      "url": "/static/botany/aloe-vera.png",
+      "source": "https://commons.wikimedia.org/wiki/File:Aloe_vera_flower_inset.png",
+      "author": "Collage by en:User:MidgleyDJ, original images from Wikimedia commons (Image:Aloe_vera_offsets.jpg and Image:Aloe_vera_C.jpg)",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+    }
+  },
+  {
+    "id": "lantana-camara",
+    "name": "Lantana camara",
+    "source": "https://plants.ces.ncsu.edu/plants/lantana-camara/",
+    "labels": {
+      "zh-hans": "马樱丹",
+      "fr": "Lantana camara",
+      "es": "Lantana camara",
+      "it": "Lantana camara",
+      "de": "Wandelröschen",
+      "id": "Saliara",
+      "ja": "ランタナ",
+      "ar": "لانتانا مقوسة",
+      "pt": "Cambará",
+      "en": "Lantana camara",
+      "zh": "馬櫻丹"
+    },
+    "family": "",
+    "categories": [
+      "flower"
+    ]
+  },
+  {
+    "id": "mentha-spicata",
+    "name": "Mentha spicata",
+    "source": "https://plants.ces.ncsu.edu/plants/mentha-spicata/",
+    "labels": {
+      "zh-hans": "留兰香",
+      "es": "Mentha spicata",
+      "it": "Mentha spicata",
+      "de": "Grüne Minze",
+      "ja": "スペアミント",
+      "ar": "نعناع مدبب",
+      "pt": "Hortelã-verde",
+      "en": "Mentha spicata",
+      "fr": "Mentha spicata",
+      "zh": "留蘭香",
+      "ko": "스피어민트",
+      "id": "Bijanggut domba"
+    },
+    "family": "",
+    "categories": [
+      "herb"
+    ]
+  },
+  {
+    "id": "portulaca-oleracea",
+    "name": "Portulaca oleracea",
+    "source": "https://plants.ces.ncsu.edu/plants/portulaca-oleracea/",
+    "labels": {
+      "zh-hans": "马齿苋",
+      "ko": "쇠비름",
+      "es": "Portulaca oleracea",
+      "it": "Portulaca oleracea",
+      "id": "Gelang biasa",
+      "de": "Portulak",
+      "ja": "スベリヒユ",
+      "ar": "رجلة",
+      "en": "Portulaca oleracea",
+      "fr": "Portulaca oleracea",
+      "zh": "马齿苋",
+      "pt": "Beldroega",
+      "hi": "पोर्टुलाका ओलेरासिया या पर्सलेन"
+    },
+    "family": "",
+    "categories": [
+      "herb",
+      "succulent"
+    ],
+    "photo": {
+      "url": "/static/botany/portulaca-oleracea.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Common_Purslane,_United_States_imported_from_iNaturalist_photo_541953905.jpg",
+      "author": "(c) Tyler Ekholm, some rights reserved (CC BY)",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0"
+    }
+  },
+  {
+    "id": "dionaea-muscipula",
+    "name": "Dionaea muscipula",
+    "source": "https://plants.ces.ncsu.edu/plants/dionaea-muscipula/",
+    "labels": {
+      "zh-hans": "捕蝇草",
+      "fr": "Dionée attrape-mouche",
+      "ko": "파리지옥",
+      "es": "Dionaea muscipula",
+      "it": "Dionaea muscipula",
+      "de": "Venusfliegenfalle",
+      "ja": "ハエトリグサ",
+      "en": "Dionaea muscipula",
+      "ar": "خناق الذباب",
+      "pt": "Dioneia",
+      "zh": "捕蠅草",
+      "id": "Perangkap lalat Venus",
+      "hi": "डायोनिया मस्किपुला"
+    },
+    "family": "",
+    "categories": [
+      "flower"
+    ]
+  },
+  {
+    "id": "helianthus-annuus",
+    "name": "Helianthus annuus",
+    "source": "https://plants.ces.ncsu.edu/plants/helianthus-annuus/",
+    "labels": {
+      "en": "Common sunflower",
+      "ar": "دوار الشمس",
+      "de": "Sonnenblume",
+      "es": "girasol",
+      "fr": "tournesol",
+      "hi": "सूरजमुखी",
+      "id": "bunga matahari",
+      "it": "girasole",
+      "ja": "ヒマワリ",
+      "ko": "해바라기",
+      "pt": "Girassol",
+      "zh": "向日葵"
+    },
+    "family": "Asteraceae",
+    "categories": [
+      "flower",
+      "ornamental",
+      "edible"
+    ],
+    "light": "sun",
+    "food": "seeds"
+  },
+  {
+    "id": "ocimum-basilicum",
+    "name": "Ocimum basilicum",
+    "source": "https://plants.ces.ncsu.edu/plants/ocimum-basilicum/",
+    "labels": {
+      "zh": "羅勒",
+      "es": "Ocimum basilicum",
+      "ar": "ريحان",
+      "pt": "Manjericão",
+      "ko": "바질",
+      "fr": "basilic",
+      "it": "Ocimum basilicum",
+      "id": "Selasih",
+      "de": "Basilikum",
+      "ja": "バジル",
+      "en": "basil",
+      "hi": "बेसिल"
+    },
+    "family": "Lamiaceae",
+    "categories": [
+      "herb",
+      "edible",
+      "seasoning"
+    ],
+    "light": "sunshade",
+    "food": "leavesflowers",
+    "photo": {
+      "url": "/static/botany/ocimum-basilicum.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Ocimum_basilicum_8zz.jpg",
+      "author": "Photo by David J. Stang",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    }
+  },
+  {
+    "id": "salvia-rosmarinus",
+    "name": "Salvia rosmarinus",
+    "source": "https://plants.ces.ncsu.edu/plants/salvia-rosmarinus/",
+    "labels": {
+      "en": "Salvia rosmarinus",
+      "de": "Salvia rosmarinus",
+      "it": "Salvia rosmarinus",
+      "es": "Salvia rosmarinus",
+      "fr": "Romarin",
+      "pt": "Alecrim",
+      "zh": "迷迭香",
+      "ar": "إكليل الجبل",
+      "ja": "ローズマリー",
+      "hi": "गुलमेंहदी",
+      "id": "Rosemari",
+      "ko": "로즈메리",
+      "zh-hans": "迷迭香"
+    },
+    "family": "Lamiaceae",
+    "categories": [
+      "herb",
+      "edible",
+      "seasoning"
+    ],
+    "aliases": [
+      "Rosmarinus officinalis"
+    ],
+    "light": "sun",
+    "food": "leaves",
+    "photo": {
+      "url": "/static/botany/salvia-rosmarinus.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Rosemary_in_bloom.JPG",
+      "author": "Margalob",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    }
+  },
+  {
+    "id": "thymus-vulgaris",
+    "name": "Thymus vulgaris",
+    "source": "https://plants.ces.ncsu.edu/plants/thymus-vulgaris/",
+    "labels": {
+      "es": "Thymus vulgaris",
+      "it": "Thymus vulgaris",
+      "de": "Echter Thymian",
+      "pt": "Tomilho",
+      "en": "Thymus vulgaris",
+      "fr": "Thymus vulgaris",
+      "zh": "普通百里香",
+      "ar": "زعتر شائع",
+      "id": "Herba timi",
+      "ko": "타임",
+      "ja": "タチジャコウソウ",
+      "zh-hans": "普通百里香",
+      "hi": "थाइमस वल्गारिस"
+    },
+    "family": "Lamiaceae",
+    "categories": [
+      "herb",
+      "edible",
+      "seasoning"
+    ],
+    "light": "sun",
+    "food": "leaves"
+  },
+  {
+    "id": "salvia-officinalis",
+    "name": "Salvia officinalis",
+    "source": "https://plants.ces.ncsu.edu/plants/salvia-officinalis/",
+    "labels": {
+      "zh-hans": "鼠尾草",
+      "ko": "세이지",
+      "fr": "sauge officinale",
+      "es": "Salvia officinalis",
+      "it": "Salvia officinalis",
+      "de": "Echter Salbei",
+      "ja": "セージ",
+      "ar": "مريمية",
+      "pt": "Sálvia",
+      "en": "Salvia officinalis",
+      "zh": "鼠尾草",
+      "id": "Salvia officinalis"
+    },
+    "family": "Lamiaceae",
+    "categories": [
+      "herb",
+      "edible",
+      "seasoning"
+    ],
+    "light": "sunshade",
+    "food": "leaves",
+    "photo": {
+      "url": "/static/botany/salvia-officinalis.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:(MHNT)_Salvia_officinalis_flowers.jpg",
+      "author": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    }
+  },
+  {
+    "id": "malus-domestica",
+    "name": "Malus domestica",
+    "source": "https://plants.ces.ncsu.edu/plants/malus-domestica/",
+    "labels": {
+      "en": "apple",
+      "fr": "pomme",
+      "it": "mela",
+      "de": "Apfel",
+      "ja": "リンゴ",
+      "es": "manzana",
+      "ar": "تفاح",
+      "hi": "सेब",
+      "id": "apel",
+      "ko": "사과",
+      "pt": "Macieira",
+      "zh": "苹果",
+      "zh-hans": "苹果"
+    },
+    "family": "Rosaceae",
+    "categories": [
+      "tree",
+      "fruit",
+      "edible"
+    ],
+    "light": "sunshade",
+    "food": "fruit"
+  },
+  {
+    "id": "citrus-limon",
+    "name": "Citrus × limon",
+    "source": "https://plants.ces.ncsu.edu/plants/citrus-x-limon/",
+    "labels": {
+      "en": "Lemon",
+      "fr": "citronnier",
+      "it": "Citrus × limon",
+      "es": "limonero",
+      "de": "Zitrone",
+      "ar": "ليمون حامض",
+      "hi": "नीबू",
+      "id": "sitrun",
+      "ja": "レモン",
+      "ko": "레몬",
+      "pt": "Limoeiro",
+      "zh": "柠檬",
+      "zh-hans": "柠檬"
+    },
+    "family": "Rutaceae",
+    "categories": [
+      "tree",
+      "fruit",
+      "edible"
+    ],
+    "aliases": [
+      "Citrus limon"
+    ],
+    "light": "sun",
+    "food": "fruit",
+    "photo": {
+      "url": "/static/botany/citrus-limon.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:P1030323.JPG",
+      "author": "Elena Chochkova",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    }
+  },
+  {
+    "id": "ficus-carica",
+    "name": "Ficus carica",
+    "source": "https://plants.ces.ncsu.edu/plants/ficus-carica/",
+    "labels": {
+      "zh": "無花果",
+      "es": "Ficus carica",
+      "ar": "تين",
+      "pt": "Figueira",
+      "ko": "무화과나무",
+      "it": "Ficus carica",
+      "id": "Tin",
+      "de": "Echte Feige",
+      "ja": "イチジク",
+      "hi": "अंजीर",
+      "en": "Ficus carica",
+      "fr": "Ficus carica",
+      "zh-hans": "无花果"
+    },
+    "family": "Moraceae",
+    "categories": [
+      "tree",
+      "fruit",
+      "edible"
+    ],
+    "light": "sunshade",
+    "food": "fruit",
+    "facts": {
+      "exposure": {
+        "message": "fig_sap",
+        "publisher": "NC State Extension",
+        "url": "https://plants.ces.ncsu.edu/plants/ficus-carica/",
+        "evidence": "botanical"
+      }
+    }
+  },
+  {
+    "id": "opuntia-ficus-indica",
+    "name": "Opuntia ficus-indica",
+    "source": "https://www.gbif.org/species/5384064",
+    "labels": {
+      "de": "Opuntia ficus-indica",
+      "ar": "صبير التين الهندي",
+      "en": "Opuntia ficus-indica",
+      "es": "Opuntia ficus-indica",
+      "fr": "figuier de Barbarie",
+      "it": "Opuntia ficus-indica",
+      "pt": "Palma-forrageira",
+      "zh": "梨果仙人掌",
+      "ja": "オオガタホウケン",
+      "ko": "보검선인장",
+      "id": "Kaktus pir berduri",
+      "hi": "ओपंशिया फ़िकस-इंडिका"
+    },
+    "family": "Cactaceae",
+    "categories": [
+      "cactus",
+      "succulent"
+    ],
+    "photo": {
+      "url": "/static/botany/opuntia-ficus-indica.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Dikenli_%C4%B0ncir_(Opuntia_ficus-indica)_Gaziantep_Turkey.IMG_1104.jpg",
+      "author": "YG01",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0"
+    }
+  },
+  {
+    "id": "crassula-ovata",
+    "name": "Crassula ovata",
+    "source": "https://plants.ces.ncsu.edu/plants/crassula-ovata/",
+    "labels": {
+      "hi": "जेड पौधा",
+      "zh-hans": "翡翠木",
+      "en": "Crassula ovata",
+      "es": "Crassula ovata",
+      "it": "Crassula ovata",
+      "de": "Geldbaum",
+      "ja": "フチベニベンケイ",
+      "fr": "Crassula ovata",
+      "ar": "كرسول بيضوي",
+      "zh": "翡翠木",
+      "pt": "Planta-jade",
+      "ko": "염자",
+      "id": "Tanaman giok"
+    },
+    "family": "Crassulaceae",
+    "categories": [
+      "succulent",
+      "ornamental",
+      "toxic"
+    ],
+    "light": "sunshade",
+    "facts": {
+      "animal_toxicity": {
+        "message": "pet_warning",
+        "publisher": "ASPCA Poison Control",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/toxic-and-non-toxic-plants/jade-plant",
+        "evidence": "botanical"
+      }
+    }
+  },
+  {
+    "id": "kalanchoe-blossfeldiana",
+    "name": "Kalanchoe blossfeldiana",
+    "source": "https://plants.ces.ncsu.edu/plants/kalanchoe-blossfeldiana/",
+    "labels": {
+      "pt": "Flor-da-fortuna",
+      "zh-hans": "长寿花",
+      "es": "Kalanchoe blossfeldiana",
+      "en": "Kalanchoe blossfeldiana",
+      "it": "Kalanchoe blossfeldiana",
+      "de": "Kalanchoe blossfeldiana",
+      "ja": "ベニベンケイ",
+      "ar": "ألماسة",
+      "fr": "Kalanchoe blossfeldiana",
+      "zh": "长寿花",
+      "id": "Cocor bebek berbunga"
+    },
+    "family": "Crassulaceae",
+    "categories": [
+      "succulent",
+      "flower",
+      "ornamental",
+      "toxic"
+    ],
+    "light": "shade",
+    "photo": {
+      "url": "/static/botany/kalanchoe-blossfeldiana.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Kalanchoe_blossfeldiana_3.jpg",
+      "author": "বাক্যবাগীশ",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "facts": {
+      "human_toxicity": {
+        "message": "kalanchoe_warning",
+        "publisher": "NC State Extension",
+        "url": "https://plants.ces.ncsu.edu/plants/kalanchoe-blossfeldiana/",
+        "evidence": "botanical"
+      },
+      "animal_toxicity": {
+        "message": "pet_warning",
+        "publisher": "ASPCA Poison Control",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/toxic-and-non-toxic-plants/kalanchoe",
+        "evidence": "botanical"
+      }
+    }
+  },
+  {
+    "id": "nerium-oleander",
+    "name": "Nerium oleander",
+    "source": "https://plants.ces.ncsu.edu/plants/nerium-oleander/",
+    "labels": {
+      "zh-hans": "夹竹桃",
+      "es": "Nerium oleander",
+      "ar": "دفلى",
+      "pt": "Espirradeira",
+      "fr": "Laurier rose",
+      "ko": "협죽도",
+      "it": "Nerium oleander",
+      "id": "Bunga jepun",
+      "de": "Oleander",
+      "ja": "キョウチクトウ",
+      "en": "Nerium oleander",
+      "hi": "कनेर",
+      "zh": "夾竹桃"
+    },
+    "family": "Apocynaceae",
+    "categories": [
+      "flower",
+      "ornamental",
+      "toxic"
+    ],
+    "light": "sunshade",
+    "facts": {
+      "animal_toxicity": {
+        "message": "pet_warning",
+        "publisher": "ASPCA Poison Control",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/toxic-and-non-toxic-plants/oleander",
+        "evidence": "botanical"
+      },
+      "human_toxicity": {
+        "message": "cardiac_warning",
+        "publisher": "NC State Extension",
+        "url": "https://plants.ces.ncsu.edu/plants/nerium-oleander/",
+        "evidence": "botanical"
+      }
+    }
+  },
+  {
+    "id": "digitalis-purpurea",
+    "name": "Digitalis purpurea",
+    "source": "https://plants.ces.ncsu.edu/plants/digitalis-purpurea/",
+    "labels": {
+      "es": "Digitalis purpurea",
+      "it": "Digitalis purpurea",
+      "de": "Roter Fingerhut",
+      "ar": "قمعية أرجوانية",
+      "pt": "Dedaleira",
+      "en": "Digitalis purpurea",
+      "fr": "Digitalis purpurea",
+      "zh": "毛地黄",
+      "id": "Digitalis purpurea",
+      "ja": "キツネノテブクロ",
+      "ko": "디기탈리스",
+      "zh-hans": "毛地黄",
+      "hi": "डिजिटैलिस पर्प्यूरिया"
+    },
+    "family": "Plantaginaceae",
+    "categories": [
+      "flower",
+      "ornamental",
+      "toxic"
+    ],
+    "light": "sunshade",
+    "facts": {
+      "animal_toxicity": {
+        "message": "pet_warning",
+        "publisher": "ASPCA Poison Control",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/toxic-and-non-toxic-plants/foxglove",
+        "evidence": "botanical"
+      },
+      "human_toxicity": {
+        "message": "cardiac_warning",
+        "publisher": "NC State Extension",
+        "url": "https://plants.ces.ncsu.edu/plants/digitalis-purpurea/",
+        "evidence": "botanical"
+      }
+    }
+  },
+  {
+    "id": "camellia-sinensis",
+    "name": "Camellia sinensis",
+    "source": "https://plants.ces.ncsu.edu/plants/camellia-sinensis/",
+    "labels": {
+      "zh-hans": "茶树",
+      "es": "Camellia sinensis",
+      "pt": "Planta-do-chá",
+      "ko": "차나무",
+      "fr": "théier",
+      "it": "Camellia sinensis",
+      "id": "Camellia sinensis",
+      "de": "Tee",
+      "ja": "チャノキ",
+      "en": "Camellia sinensis",
+      "hi": "कामेल्या सीनेन्सीस्",
+      "zh": "茶樹",
+      "ar": "كاميليا صينية"
+    },
+    "family": "Theaceae",
+    "categories": [
+      "herb",
+      "edible"
+    ],
+    "light": "sunshade",
+    "food": "leaves",
+    "photo": {
+      "url": "/static/botany/camellia-sinensis.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Csinensis.jpg",
+      "author": "AxelBoldt at en.wikipedia",
+      "license": "Public domain",
+      "license_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+    }
+  },
+  {
+    "id": "calendula-officinalis",
+    "name": "Calendula officinalis",
+    "source": "https://plants.ces.ncsu.edu/plants/calendula-officinalis/",
+    "labels": {
+      "zh-hans": "金盏花",
+      "fr": "Souci officinal",
+      "es": "Botón de oro",
+      "it": "Calendula officinalis",
+      "de": "Ringelblume",
+      "ja": "キンセンカ",
+      "ar": "بكورية طبية",
+      "pt": "Calêndula",
+      "en": "Calendula officinalis",
+      "zh": "金盞花",
+      "id": "Calendula officinalis",
+      "ko": "카렌듈라",
+      "hi": "कैलेंडुला ऑफिसिनैलिस"
+    },
+    "family": "Asteraceae",
+    "categories": [
+      "flower",
+      "herb",
+      "edible",
+      "ornamental"
+    ],
+    "light": "sunshade",
+    "food": "flowers",
+    "photo": {
+      "url": "/static/botany/calendula-officinalis.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Calendula_officinalis,_pot_marigold.JPG",
+      "author": "Betty Cai",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    }
+  },
+  {
+    "id": "matricaria-chamomilla",
+    "name": "Matricaria chamomilla",
+    "source": "https://plants.ces.ncsu.edu/plants/matricaria-chamomilla/",
+    "labels": {
+      "zh": "德國洋甘菊",
+      "es": "Matricaria chamomilla",
+      "ar": "بابونج ألماني",
+      "pt": "Camomila",
+      "it": "Matricaria chamomilla",
+      "id": "Chamomile",
+      "de": "Echte Kamille",
+      "ja": "カモミール",
+      "en": "Matricaria chamomilla",
+      "fr": "Matricaria chamomilla",
+      "ko": "저먼캐모마일",
+      "zh-hans": "母菊"
+    },
+    "family": "Asteraceae",
+    "categories": [
+      "flower",
+      "herb",
+      "edible",
+      "medicinal"
+    ],
+    "light": "sun",
+    "food": "flowers",
+    "photo": {
+      "url": "/static/botany/matricaria-chamomilla.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Matricaria_February_2008-1.jpg",
+      "author": "Alvesgaspar",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+    },
+    "facts": {
+      "medicinal": {
+        "message": "traditional_chamomile",
+        "publisher": "NIH · NCCIH",
+        "url": "https://www.nccih.nih.gov/health/chamomile",
+        "evidence": "traditional"
+      },
+      "contraindications": {
+        "message": "chamomile_risk",
+        "publisher": "NIH · NCCIH",
+        "url": "https://www.nccih.nih.gov/health/chamomile",
+        "evidence": "limited"
+      }
+    }
+  }
+]

@@ -130,8 +130,8 @@ def service_worker():
 def set_language(request: Request, language: str = Form(...), page: str = Form("/")):
     if language not in LANGUAGES:
         raise HTTPException(400, "Invalid language")
-    allowed = {"/", "/plantas", "/enciclopedia", "/jardim", "/assinatura", "/admin/comercial", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir", "/conta/verificar", "/privacidade"}
-    response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:(?:plantas|enciclopedia|jardim)/[0-9]+|plantas/[0-9]+/saude)", page) else "/", 303)
+    allowed = {"/", "/plantas", "/enciclopedia", "/enciclopedia/pessoal", "/jardim", "/assinatura", "/admin/comercial", "/conta/entrar", "/conta/cadastro", "/conta/recuperar", "/conta/redefinir", "/conta/verificar", "/privacidade"}
+    response = RedirectResponse(page if page in allowed or re.fullmatch(r"/(?:(?:plantas|enciclopedia|jardim)/[0-9]+|plantas/[0-9]+/saude|enciclopedia/especies/[a-z-]+)", page) else "/", 303)
     response.set_cookie("planet_language", language, max_age=31536000, httponly=True,
                         secure=secure_cookie(), samesite="lax")
     return response

@@ -3,29 +3,33 @@
 {% block content %}
 <header class="page-header">
     <h1>{{ tr("botany.title") }}</h1>
-    <p>{{ tr("botany.intro") }}</p>
+    <p>{{ tr("library.intro" if global_catalog else "botany.intro") }}</p>
+    <a href="{{ '/enciclopedia/pessoal' if global_catalog else '/enciclopedia' }}">{{ tr("library.personal" if global_catalog else "library.catalog") }}</a>
 </header>
-<form class="botany-filters" method="get" action="/enciclopedia">
+<form class="botany-filters" method="get" action="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}">
     <label>{{ tr("botany.search") }}<input type="search" name="q" maxlength="150" value="{{ q }}"></label>
     <label>{{ tr("botany.category") }}
         <select name="category">
             <option value="">{{ tr("botany.all") }}</option>
             {% for item in filters %}
-            <option value="{{ item }}"{% if item == category %} selected{% endif %}>{{ tr("botany.field." ~ item) }}</option>
+            <option value="{{ item }}"{% if item == category %} selected{% endif %}>{{ (results.categories | selectattr("key", "equalto", item) | first).label if global_catalog else tr("botany.field." ~ item) }}</option>
             {% endfor %}
         </select>
     </label>
     <label class="botany-check"><input type="checkbox" name="favorite" value="true"{% if favorite %} checked{% endif %}> {{ tr("botany.favorites") }}</label>
     <button class="btn btn-primary">{{ tr("botany.apply") }}</button>
 </form>
-{% if results.items %}
+{% set plants = results["items"] if global_catalog else results.items %}
+{% if plants %}
 <ul class="botany-results">
-    {% for plant in results.items %}
+    {% for plant in plants %}
     <li>
-        <a href="/enciclopedia/{{ plant.id }}">
-            <strong>{{ plant.nombre_comun }}</strong>
-            {% if plant.nombre_cientifico %}<i>{{ plant.nombre_cientifico }}</i>{% endif %}
-            {% if plant.encyclopedia_favorite %}<span aria-label="{{ tr('botany.favorites') }}">★</span>{% endif %}
+        <a href="/enciclopedia/{{ 'especies/' if global_catalog else '' }}{{ plant.id }}">
+            <strong>{{ plant.common_name if global_catalog else plant.nombre_comun }}</strong>
+            {% set scientific = plant.scientific_name if global_catalog else plant.nombre_cientifico %}
+            {% if scientific %}<i>{{ scientific }}</i>{% endif %}
+            {% set saved = plant.favorite if global_catalog else plant.encyclopedia_favorite %}
+            {% if saved %}<span aria-label="{{ tr('botany.favorites') }}">★</span>{% endif %}
         </a>
     </li>
     {% endfor %}
@@ -33,12 +37,12 @@
 {% if results.total_pages > 1 %}
 <nav class="pagination" aria-label="{{ tr('botany.title') }}">
     {% set params = {'q': q, 'category': category, 'favorite': 'true' if favorite else 'false'} | urlencode %}
-    {% if results.page > 1 %}<a class="btn btn-outline" href="?{{ params }}&amp;page={{ results.page - 1 }}">{{ tr("botany.previous") }}</a>{% endif %}
+    {% if results.page > 1 %}<a class="btn btn-outline" href="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}?{{ params }}&amp;page={{ results.page - 1 }}">{{ tr("botany.previous") }}</a>{% endif %}
     <span>{{ results.page }} / {{ results.total_pages }}</span>
-    {% if results.page < results.total_pages %}<a class="btn btn-outline" href="?{{ params }}&amp;page={{ results.page + 1 }}">{{ tr("botany.next") }}</a>{% endif %}
+    {% if results.page < results.total_pages %}<a class="btn btn-outline" href="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}?{{ params }}&amp;page={{ results.page + 1 }}">{{ tr("botany.next") }}</a>{% endif %}
 </nav>
 {% endif %}
 {% else %}
-<p class="empty-state">{{ tr("botany.empty") }}</p>
+<p class="empty-state">{{ tr("library.empty" if global_catalog else "botany.empty") }}</p>
 {% endif %}
 {% endblock %}

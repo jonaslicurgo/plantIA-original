@@ -1,15 +1,22 @@
 {% extends "base.html" %}
 {% block title %}{{ tr("botany.title") }} · PLANET-IA{% endblock %}
 {% block content %}
-<a href="/enciclopedia">{{ tr("botany.title") }}</a>
+<a href="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}">{{ tr("botany.title") }}</a>
 <header class="page-header">
     <h1>{{ profile.groups[0]["items"][0].value or tr("botany.title") }}</h1>
     {% set scientific = profile.groups[0]["items"][1] %}
     {% if scientific.value %}<p><i>{{ scientific.value }}</i></p>{% endif %}
 </header>
+{% if global_catalog and profile.photo %}
+<figure class="library-photo">
+    <img src="{{ profile.photo.url }}" alt="{{ scientific.value }}" loading="lazy">
+    <figcaption><a href="{{ profile.photo.source }}">{{ profile.photo.author }}</a> ·
+        <a href="{{ profile.photo.license_url }}">{{ profile.photo.license }}</a></figcaption>
+</figure>
+{% endif %}
 <div class="botany-actions">
-    <a class="btn btn-outline" href="/plantas/{{ profile.id }}">{{ tr("botany.record") }}</a>
-    <form action="/enciclopedia/{{ profile.id }}/favorito" method="post">
+    {% if not global_catalog %}<a class="btn btn-outline" href="/plantas/{{ profile.id }}">{{ tr("botany.record") }}</a>{% endif %}
+    <form action="/enciclopedia/{{ 'especies/' if global_catalog else '' }}{{ profile.id }}/favorito" method="post">
         <input type="hidden" name="favorite" value="{{ 'false' if profile.favorite else 'true' }}">
         <button class="btn btn-outline">{{ tr("botany.unfavorite" if profile.favorite else "botany.favorite") }}</button>
     </form>

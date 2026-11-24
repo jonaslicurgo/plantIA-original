@@ -51,6 +51,9 @@ sealed class Screen(val route: String, val label: Int) {
         fun route(id: Int) = "health/$id"
     }
     data object Encyclopedia : Screen("encyclopedia", R.string.botany_title)
+    data object LibraryProfile : Screen("library/{id}", R.string.botany_open) {
+        fun route(id: String) = "library/$id"
+    }
     data object BotanicalProfile : Screen("botanical/{id}", R.string.botany_open) {
         fun route(id: Int) = "botanical/$id"
     }
@@ -160,11 +163,18 @@ fun PlantIAApp(
                     onScheduleReview = { date -> navController.navigate(Screen.GardenPlant.route(id, date)) }) { navController.popBackStack() }
             }
             composable(Screen.Encyclopedia.route) {
-                EncyclopediaScreen { id -> navController.navigate(Screen.BotanicalProfile.route(id)) }
+                EncyclopediaScreen(
+                    onOpenPlant = { navController.navigate(Screen.BotanicalProfile.route(it)) },
+                    onOpenSpecies = { navController.navigate(Screen.LibraryProfile.route(it)) },
+                )
             }
             composable(Screen.BotanicalProfile.route, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
                 val id = entry.arguments?.getInt("id") ?: return@composable
-                BotanicalProfileScreen(id) { navController.popBackStack() }
+                BotanicalProfileScreen(id.toString()) { navController.popBackStack() }
+            }
+            composable(Screen.LibraryProfile.route, arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
+                val id = entry.arguments?.getString("id") ?: return@composable
+                BotanicalProfileScreen(id, global = true) { navController.popBackStack() }
             }
             composable(Screen.Camera.route) {
                 CameraScreen(

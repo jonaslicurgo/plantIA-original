@@ -2,6 +2,7 @@ package com.plantia.api
 
 import com.plantia.api.models.BotanyFavorite
 import com.plantia.api.models.BotanyList
+import com.plantia.api.models.LibraryList
 import com.plantia.api.models.BotanyProfile
 import com.plantia.api.models.GardenCompletion
 import com.plantia.api.models.GardenOverview
@@ -44,6 +45,18 @@ interface PlantIAApi {
 
     @POST("api/auth/logout")
     suspend fun logout()
+
+    @GET("api/biblioteca")
+    suspend fun botanicalLibrary(
+        @Query("q") query: String, @Query("category") category: String,
+        @Query("favorite") favorite: Boolean, @Query("page") page: Int,
+    ): LibraryList
+
+    @GET("api/biblioteca/{id}")
+    suspend fun libraryProfile(@Path("id") id: String): BotanyProfile
+
+    @PATCH("api/biblioteca/{id}/favorito")
+    suspend fun libraryFavorite(@Path("id") id: String, @Body favorite: BotanyFavorite): BotanyFavorite
 
     @GET("api/enciclopedia")
     suspend fun encyclopedia(

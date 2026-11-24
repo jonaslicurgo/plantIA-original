@@ -2216,3 +2216,7 @@ nav {
     display: block; width: 100%; min-width: 0; padding: .45rem;
     background: var(--surface); color: inherit; border: 1px solid var(--border); border-radius: .4rem;
 }
+
+.library-photo { margin: 1rem auto; max-inline-size: 32rem; overflow-wrap: anywhere; }
+.library-photo img { display: block; max-inline-size: 100%; max-block-size: 26rem; margin-inline: auto; object-fit: contain; }
+.library-photo figcaption { margin-block-start: .5rem; }
