@@ -25,3 +25,9 @@ O índice de aproximadamente 203 MiB permanece intacto. O teto de cache comparti
 4. Abra as cinco fichas prioritárias e confira os avisos, a seção de lacunas e as fontes. Para validar Gemini real, use a chave e o modelo já configurados no staging e confira a medição da chamada.
 
 A cobertura de cultivo, toxicidade, alimentação, medicina, cosméticos, alergias e contraindicações varia por espécie. A automação amplia sobretudo taxonomia, distribuição e horticultura. Alguns nomes científicos, topônimos e termos do WCVP são exibidos como publicados pela fonte.
+
+## Pendências após a revisão visual das fichas web e PWA
+
+- Ampliar a cobertura de fontes científicas, verificando a procedência e a licença de cada fonte.
+- Enriquecer o conteúdo botânico das fichas com evidências por espécie e referências por informação.
+- Atualizar a interface Android nativa para acompanhar a apresentação das fichas web e PWA.

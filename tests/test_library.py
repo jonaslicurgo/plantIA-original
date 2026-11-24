@@ -1,6 +1,8 @@
 """Global catalog journeys. Botanical data and licensed images are local fixtures."""
 from pathlib import Path
 import unittest
+import re
+from unittest.mock import patch
 from urllib.parse import urlsplit
 
 from fastapi.testclient import TestClient
@@ -87,3 +89,47 @@ class BotanicalLibrary(unittest.TestCase):
         self.assertEqual(facts["animal_toxicity"]["source"]["label"], "ASPCA Poison Control")
         self.assertIsNotNone(facts["human_toxicity"]["source"])
         self.assertIsNone(facts["medicinal"]["value"])
+
+    def test_twenty_species_profiles_preserve_navigation_and_evidence(self):
+        curated = (
+            "lavandula-angustifolia", "epipremnum-aureum", "aloe-vera", "lantana-camara",
+            "mentha-spicata", "portulaca-oleracea", "dionaea-muscipula", "helianthus-annuus",
+            "ocimum-basilicum", "salvia-rosmarinus", "thymus-vulgaris", "salvia-officinalis",
+            "malus-domestica", "citrus-limon", "ficus-carica", "digitalis-purpurea", "nerium-oleander",
+        )
+        indexed = {
+            "gbif-2868241": ("Monstera deliciosa", "Araceae"),
+            "gbif-5380041": ("Ricinus communis", "Euphorbiaceae"),
+            "gbif-2878688": ("Quercus robur", "Fagaceae"),
+        }
+        def lookup(key):
+            if key not in indexed:
+                return None
+            name, family = indexed[key]
+            return {"id": key, "name": name, "family": family, "gbif": int(key.split("-")[1]),
+                    "labels": {}, "aliases": [], "lineage": ["Plantae"],
+                    "source": "https://www.gbif.org/species/" + key.split("-")[1]}
+        owner = self.login("library-profiles@example.com")
+        with patch.object(library.backbone, "lookup", side_effect=lookup), patch.object(
+            library.backbone, "enrich", return_value={}
+        ):
+            for species in (*curated, *indexed):
+                with self.subTest(species=species):
+                    for locale, direction in (("pt-BR", "ltr"), ("ar", "rtl")):
+                        response = self.client.get(f"/enciclopedia/especies/{species}",
+                                                   headers={**owner, "Accept-Language": locale})
+                        self.assertEqual(response.status_code, 200)
+                        html = response.text
+                        self.assertIn(f'dir="{direction}"', html)
+                        self.assertIn('class="species-identity"', html)
+                        self.assertEqual(html.count('id="species-risks"'), 1)
+                        self.assertIn(f'/enciclopedia/especies/{species}/favorito', html)
+                        self.assertTrue(all(f'id="{target}"' in html for target in
+                                            re.findall(r'href="#(species-[a-z]+)"', html)))
+                        self.assertEqual(html.count(fixture.catalog(locale)["enrichment.gap_notice"]), 1)
+                        if species == "gbif-2868241" and locale == "pt-BR":
+                            self.assertIn("<h1>Costela-de-adão</h1>", html)
+                            self.assertIn("oxalato de cálcio", html)
+                            self.assertIn("aspca.org", html)
+                        if species == "epipremnum-aureum":
+                            self.assertIn("creativecommons.org", html)

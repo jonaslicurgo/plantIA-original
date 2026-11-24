@@ -1,66 +1,87 @@
 {% extends "base.html" %}
-{% block title %}{{ tr("botany.title") }} · PLANET-IA{% endblock %}
+{% set identity = profile.groups[0]["items"] %}
+{% set scientific = identity[1] %}
+{% set name = identity[0].value or scientific.value or tr("botany.title") %}
+{% block title %}{{ name }} · PLANET-IA{% endblock %}
 {% block content %}
-<a href="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}">{{ tr("botany.title") }}</a>
-<header class="page-header">
-    <h1>{{ profile.groups[0]["items"][0].value or profile.groups[0]["items"][1].value or tr("botany.title") }}</h1>
-    {% set scientific = profile.groups[0]["items"][1] %}
-    {% if profile.license %}<p><a href="{{ profile.license }}">GBIF Backbone Taxonomy · CC BY 4.0</a></p>{% endif %}
-    {% if scientific.value %}<p><i>{{ scientific.value }}</i></p>{% endif %}
+<article class="species-profile">
+<a class="species-back" href="{{ '/enciclopedia' if global_catalog else '/enciclopedia/pessoal' }}">{{ tr("botany.title") }}</a>
+<header class="species-hero{% if global_catalog and profile.photo %} species-hero--photo{% endif %}">
+    <div class="species-identity">
+        <h1>{{ name }}</h1>
+        {% if scientific.value and scientific.value != name %}<p class="species-scientific"><i>{{ scientific.value }}</i></p>{% endif %}
+        {% for fact in identity if fact.key == "family" and fact.value %}
+            <p class="species-family">{{ fact.label }} · {{ fact.value }}</p>
+        {% endfor %}
+        {% if profile.license %}<p><a href="{{ profile.license }}">GBIF Backbone Taxonomy · CC BY 4.0</a></p>{% endif %}
+        <div class="botany-actions">
+            {% if not global_catalog %}<a class="btn btn-outline" href="/plantas/{{ profile.id }}">{{ tr("botany.record") }}</a>{% endif %}
+            <form action="/enciclopedia/{{ 'especies/' if global_catalog else '' }}{{ profile.id }}/favorito" method="post">
+                <input type="hidden" name="favorite" value="{{ 'false' if profile.favorite else 'true' }}">
+                <button class="btn btn-outline">{{ tr("botany.unfavorite" if profile.favorite else "botany.favorite") }}</button>
+            </form>
+        </div>
+    </div>
+    {% if global_catalog and profile.photo %}
+    <figure class="species-photo">
+        <img src="{{ profile.photo.url }}" alt="{{ scientific.value or name }}" referrerpolicy="no-referrer">
+        <figcaption><a href="{{ profile.photo.source }}">{{ profile.photo.author }}</a> ·
+            <a href="{{ profile.photo.license_url }}">{{ profile.photo.license }}</a></figcaption>
+    </figure>
+    {% endif %}
 </header>
-{% if global_catalog and profile.photo %}
-<figure class="library-photo">
-    <img src="{{ profile.photo.url }}" alt="{{ scientific.value }}" loading="lazy" referrerpolicy="no-referrer">
-    <figcaption><a href="{{ profile.photo.source }}">{{ profile.photo.author }}</a> ·
-        <a href="{{ profile.photo.license_url }}">{{ profile.photo.license }}</a></figcaption>
-</figure>
-{% endif %}
-<div class="botany-actions">
-    {% if not global_catalog %}<a class="btn btn-outline" href="/plantas/{{ profile.id }}">{{ tr("botany.record") }}</a>{% endif %}
-    <form action="/enciclopedia/{{ 'especies/' if global_catalog else '' }}{{ profile.id }}/favorito" method="post">
-        <input type="hidden" name="favorite" value="{{ 'false' if profile.favorite else 'true' }}">
-        <button class="btn btn-outline">{{ tr("botany.unfavorite" if profile.favorite else "botany.favorite") }}</button>
-    </form>
+{% macro fact_card(item) %}
+<div class="species-fact">
+    <dt>{{ item.label }}</dt>
+    <dd>
+        <p>{{ item.value }}</p>
+        <small>{{ item.evidence }}{% if item.source %} ·
+            <a href="{{ item.source.url }}" rel="noreferrer noopener" target="_blank">{{ item.source.label }}</a>
+        {% endif %}</small>
+    </dd>
 </div>
-{% if summary_available %}
-<form action="/enciclopedia/especies/{{ profile.id }}/resumo" method="post">
-    <button class="btn btn-outline">{{ tr("library.ai_summary") }}</button>
-</form>
-{% endif %}
-{% if summary is defined %}
-<section class="botany-group">
-<h2>{{ tr("library.ai_summary") }}</h2>
-{% for item in summary %}
-<p>{{ item.label }} · {{ item.value }} · <a href="{{ item.source.url }}">{{ item.source.label }}</a></p>
-{% else %}<p>{{ tr("botany.evidence.unknown") }}</p>{% endfor %}
-</section>
-{% endif %}
-<aside class="botany-notices" aria-label="{{ tr('botany.group.risks') }}">
+{% endmacro %}
+{% set risks = profile.groups | selectattr("key", "equalto", "risks") | first %}
+{% set risks_known = risks["items"] | selectattr("value") | list %}
+<aside id="species-risks" class="species-safety" aria-labelledby="species-safety-title">
+    <h2 id="species-safety-title">{{ risks.title }}</h2>
+    {% if risks_known %}
+    <dl class="species-facts">{% for item in risks_known %}{{ fact_card(item) }}{% endfor %}</dl>
+    {% endif %}
     {% for notice in profile.notices %}<p>{{ notice }}</p>{% endfor %}
 </aside>
 {% set missing = namespace(any=false) %}
-{% for group in profile.groups %}
+<nav class="species-sections" aria-label="{{ tr('botany.title') }}">
+    {% for group in profile.groups %}
+        {% set known = group["items"] | selectattr("value") | list %}
+        {% if known | length < group["items"] | length %}{% set missing.any = true %}{% endif %}
+        {% if known or group.key == "risks" %}<a href="#species-{{ group.key }}">{{ group.title }}</a>{% endif %}
+    {% endfor %}
+    {% if missing.any %}<a href="#species-gaps">{{ tr("enrichment.gaps") }}</a>{% endif %}
+</nav>
+{% if summary is defined %}
+<section class="botany-group species-summary">
+    <h2>{{ tr("library.ai_summary") }}</h2>
+    {% if summary %}<dl class="species-facts">{% for item in summary %}{{ fact_card(item) }}{% endfor %}</dl>
+    {% else %}<p>{{ tr("botany.evidence.unknown") }}</p>{% endif %}
+</section>
+{% endif %}
+{% if summary_available %}
+<form class="species-summary" action="/enciclopedia/especies/{{ profile.id }}/resumo" method="post">
+    <button class="btn btn-outline">{{ tr("library.ai_summary") }}</button>
+</form>
+{% endif %}
+{% for group in profile.groups if group.key != "risks" %}
 {% set known = group["items"] | selectattr("value") | list %}
-{% if known | length < group["items"] | length %}{% set missing.any = true %}{% endif %}
 {% if known %}
-<details class="botany-group"{% if loop.first or group.key == "risks" %} open{% endif %}>
-    <summary>{{ group.title }}</summary>
-    <dl>
-        {% for item in known %}
-        <dt>{{ item.label }}</dt>
-        <dd>
-            <p>{{ item.value }}</p>
-            <small>{{ item.evidence }}{% if item.source %} ·
-                <a href="{{ item.source.url }}" rel="noreferrer noopener" target="_blank">{{ item.source.label }}</a>
-            {% endif %}</small>
-        </dd>
-        {% endfor %}
-    </dl>
-</details>
+<section id="species-{{ group.key }}" class="botany-group species-content">
+    <h2>{{ group.title }}</h2>
+    <dl class="species-facts">{% for item in known %}{{ fact_card(item) }}{% endfor %}</dl>
+</section>
 {% endif %}
 {% endfor %}
 {% if missing.any %}
-<details class="botany-group">
+<details id="species-gaps" class="botany-group species-gaps">
     <summary>{{ tr("enrichment.gaps") }}</summary>
     <p>{{ tr("enrichment.gap_notice") }}</p>
     <ul>
@@ -71,4 +92,5 @@
     </ul>
 </details>
 {% endif %}
+</article>
 {% endblock %}

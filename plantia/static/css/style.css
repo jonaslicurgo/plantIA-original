@@ -2220,3 +2220,49 @@ nav {
 .library-photo { margin: 1rem auto; max-inline-size: 32rem; overflow-wrap: anywhere; }
 .library-photo img { display: block; max-inline-size: 100%; max-block-size: 26rem; margin-inline: auto; object-fit: contain; }
 .library-photo figcaption { margin-block-start: .5rem; }
+
+/* Botanical profile. Keep source attribution with each fact. */
+.species-profile { max-inline-size: 68rem; margin-inline: auto; overflow-wrap: anywhere; }
+.species-profile [id] { scroll-margin-block-start: 6rem; }
+.species-back { display: inline-block; margin-block-end: .8rem; }
+.species-hero {
+    display: grid; align-items: center; gap: clamp(1rem, 4vw, 2.75rem);
+    padding: clamp(1rem, 4vw, 2.5rem); border: 1px solid var(--border);
+    border-radius: 1.25rem; background: var(--surface);
+}
+.species-hero--photo { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+.species-identity h1 { font-size: clamp(1.8rem, 5vw, 3.4rem); line-height: 1.12; margin-block: 0 .55rem; }
+.species-identity p { margin-block: .45rem; }
+.species-scientific { font-size: 1.15em; }
+.species-family { font-weight: 650; }
+.species-identity .botany-actions { margin-block: 1rem 0; }
+.species-photo { margin: 0; min-inline-size: 0; }
+.species-photo img {
+    display: block; inline-size: 100%; block-size: clamp(11rem, 32vw, 23rem);
+    object-fit: contain; background: var(--surface); border-radius: .75rem;
+}
+.species-photo figcaption { margin-block-start: .5rem; font-size: .82rem; }
+.species-safety {
+    margin-block: 1.25rem; padding: 1rem; border: 1px solid var(--border);
+    border-inline-start: .3rem solid #bd782c; border-radius: .85rem; background: var(--surface);
+}
+.species-profile h2 { font-size: clamp(1.18rem, 3vw, 1.5rem); margin-block: 0 .75rem; }
+.species-sections { display: flex; flex-wrap: wrap; gap: .5rem; margin-block-end: 1.25rem; }
+.species-sections a {
+    display: inline-flex; align-items: center; min-block-size: 44px; padding: .45rem .7rem;
+    background: var(--surface); border: 1px solid var(--border); border-radius: .55rem;
+}
+.species-content, .species-summary { padding: 1rem; margin-block: 1rem; }
+.species-profile .species-facts {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+    gap: .75rem 1rem; margin: 0; padding: 0;
+}
+.species-fact { min-inline-size: 0; border-block-start: 1px solid var(--border); padding-block: .65rem; }
+.species-fact dd { margin: 0; }
+.species-fact small { display: block; }
+.species-gaps > p, .species-gaps > ul { margin-inline: 1rem; }
+.species-gaps > ul { padding-inline-start: 1.1rem; }
+@media (max-width: 640px) {
+    .species-hero--photo { grid-template-columns: minmax(0, 1fr); }
+    .species-photo img { block-size: clamp(12rem, 62vw, 22rem); }
+}
