@@ -48,7 +48,10 @@ def subscription(request: Request, market: str = Query("BR", pattern=r"^[A-Z]{2}
                 "prices": [{**billing.public_price(p), "limit": config.plus_limit if billing.tier(p["plan"]) == "plus" else None,
                             "tier": billing.tier(p["plan"]),
                             "term": "annual" if p["plan"].endswith("annual") else "monthly",
-                            "checkout": bool(ready and p["stripe_price"] and not (
+                            "premium_intro": stripe.premium_intro(p),
+                            "intro_amount": 2990 if stripe.premium_intro(p) else None,
+                            "checkout": bool(ready and p["stripe_price"] and (not stripe.premium_intro(p)
+                                or stripe.premium_intro_coupon()) and not (
                                 sub and sub["status"] in stripe.BLOCK_CHECKOUT))}
                            for p in prices if getattr(config, p["plan"] + "_enabled")],
                 "free_limit": config.free_limit, "test_mode": True,
@@ -65,7 +68,8 @@ def subscription(request: Request, market: str = Query("BR", pattern=r"^[A-Z]{2}
         messages = catalog(locale_for(request))
         data["labels"] = {key: value for key, value in messages.items() if key.startswith("commercial.") and (
             key.startswith(("commercial.plan.", "commercial.status.", "commercial.feature.")) or key in {
-                "commercial.title", "commercial.remaining", "commercial.cancel_pending", "commercial.unlimited", "commercial.credits", "commercial.fair_policy"
+                "commercial.title", "commercial.remaining", "commercial.cancel_pending", "commercial.unlimited", "commercial.credits", "commercial.fair_policy",
+                "commercial.intro_period", "commercial.intro_renewal", "commercial.intro_accept"
             })}
     return _render(request, "subscription.html", data)
 
@@ -81,8 +85,8 @@ def _payment(function, *args):
 
 
 @router.post("/assinatura/checkout")
-def checkout(request: Request, price: int = Form(...)):
-    return _payment(stripe.checkout, request.state.account_id, price)
+def checkout(request: Request, price: int = Form(...), accept_intro: bool = Form(False)):
+    return _payment(stripe.checkout, request.state.account_id, price, accept_intro)
 
 
 @router.post("/assinatura/portal")

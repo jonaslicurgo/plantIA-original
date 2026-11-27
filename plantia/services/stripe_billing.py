@@ -17,7 +17,8 @@ from sqlalchemy import text
 from plantia.commercial import SubscriptionSnapshot, apply_subscription, current_subscription, entitled, rules, transaction
 from plantia.database import get_engine
 
-EVENTS = {
+INVOICE_EVENTS = {"invoice.paid", "invoice.payment_failed"}
+EVENTS = INVOICE_EVENTS | {
     "customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted",
     "customer.subscription.paused", "customer.subscription.resumed",
 }
@@ -125,7 +126,31 @@ def _same_price(provider_price, local_price):
     )
 
 
-def checkout(owner, price_id):
+def premium_intro(price):
+    return (price["market"], price["plan"], price["currency"], price["amount"]) == (
+        "BR", "monthly", "BRL", 3990,
+    )
+
+
+def premium_intro_coupon():
+    coupon_id = os.getenv("PLANET_STRIPE_PREMIUM_INTRO_COUPON", "")
+    return coupon_id if re.fullmatch(r"[A-Za-z0-9_-]{1,80}", coupon_id) else None
+
+
+def _check_intro_coupon(coupon_id, product):
+    coupon = send("/coupons/" + coupon_id + "?expand%5B%5D=applies_to")
+    if (
+        coupon.get("id") != coupon_id or coupon.get("livemode") is not False
+        or coupon.get("valid") is not True or coupon.get("amount_off") != 1000
+        or coupon.get("currency") != "brl" or coupon.get("duration") != "repeating"
+        or coupon.get("duration_in_months") != 3 or not product
+        or (coupon.get("applies_to") or {}).get("products") != [product]
+        or coupon.get("max_redemptions") is not None or coupon.get("redeem_by") is not None
+    ):
+        raise BillingError
+
+
+def checkout(owner, price_id, accept_intro=False):
     public = origin()
     with LOCKS[owner % len(LOCKS)]:
         now = int(time())
@@ -136,6 +161,12 @@ def checkout(owner, price_id):
             price = db.execute(text("SELECT * FROM commercial_prices WHERE id=:id AND enabled=1"),
                                {"id": price_id}).mappings().first()
             if not price or not price["stripe_price"] or not getattr(rules(db), price["plan"] + "_enabled"):
+                raise BillingError
+            intro = premium_intro(price)
+            coupon_id = premium_intro_coupon() if intro else None
+            if intro and not accept_intro:
+                raise BillingConflict
+            if intro and not coupon_id:
                 raise BillingError
             pending = db.execute(text("SELECT * FROM checkout_pending WHERE account_id=:owner AND expires>:now"),
                                  {"owner": owner, "now": now}).mappings().first()
@@ -154,12 +185,17 @@ def checkout(owner, price_id):
         configured = send("/prices/" + price["stripe_price"])
         if not configured.get("active") or not _same_price(configured, price):
             raise BillingError
-        result = send("/checkout/sessions", {
+        params = {
             "mode": "subscription", "customer": customer(owner), "expires_at": expires,
             "billing_address_collection": "required", "line_items[0][price]": price["stripe_price"],
             "line_items[0][quantity]": 1, "success_url": public + "/assinatura",
             "cancel_url": public + "/assinatura",
-        }, request_key)
+        }
+        if intro:
+            _check_intro_coupon(coupon_id, configured.get("product"))
+            params["discounts[0][coupon]"] = coupon_id
+            params["subscription_data[metadata][planet_offer]"] = "br-premium-monthly-2990x3-3990-v1"
+        result = send("/checkout/sessions", params, request_key)
         url = redirect_url(result, "checkout.stripe.com")
         with transaction() as db:
             db.execute(text("UPDATE checkout_pending SET url=:url WHERE account_id=:owner AND request_key=:key"),
@@ -205,10 +241,17 @@ def webhook(event):
     if not isinstance(kind, str) or kind not in EVENTS:
         return
     try:
-        identifier = event["data"]["object"]["id"]
-        if not re.fullmatch(r"sub_[A-Za-z0-9]+", identifier):
+        obj = event["data"]["object"]
+        if kind in INVOICE_EVENTS:
+            identifier = ((obj.get("parent") or {}).get("subscription_details") or {}).get("subscription")
+            identifier = identifier or obj.get("subscription")
+            if identifier is None:
+                return  # A standalone invoice does not change subscription access.
+        else:
+            identifier = obj["id"]
+        if not isinstance(identifier, str) or not re.fullmatch(r"sub_[A-Za-z0-9]+", identifier):
             raise InvalidEvent
-    except (KeyError, TypeError) as exc:
+    except (AttributeError, KeyError, TypeError) as exc:
         raise InvalidEvent from exc
     with get_engine().connect() as db:
         if _seen(db, event["id"]):
@@ -254,7 +297,8 @@ def webhook(event):
         ))
         db.execute(text("INSERT INTO billing_events VALUES ('stripe',:event,:owner,:kind,:status,:now)"),
                    dict(event=event["id"], owner=owner, kind=kind, status=status, now=int(time())))
-        db.execute(text("DELETE FROM checkout_pending WHERE account_id=:owner"), {"owner": owner})
+        if kind not in INVOICE_EVENTS:
+            db.execute(text("DELETE FROM checkout_pending WHERE account_id=:owner"), {"owner": owner})
 
 
 def _seen(db, event_id):
