@@ -2175,6 +2175,9 @@ nav {
 .plant-health label { overflow-wrap: anywhere; }
 .plant-health input, .plant-health select, .plant-health textarea { max-width: 100%; color: inherit; }
 .plant-health textarea { display: block; width: 100%; background: var(--surface); }
+.health-diagnosis-fields { display: grid; gap: .55rem; }
+#health-diagnosis p { margin: 0; overflow-wrap: anywhere; }
+#health-diagnosis details > summary { padding-inline: 0; }
 .health-event { padding: 1rem; overflow-wrap: anywhere; }
 .health-event ul { padding-inline-start: 1.3rem; }
 .health-event img { display: block; max-width: 100%; max-height: 24rem; margin-block-start: .5rem; }
