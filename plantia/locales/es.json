@@ -500,6 +500,8 @@
   "health.trend.improving": "Mejorando",
   "health.trend.stable": "Estable",
   "health.trend.worsening": "Empeoramiento",
+  "health.diagnosis_unavailable_for_account": "El diagnóstico de enfermedades y plagas no está disponible para tu cuenta.",
+  "health.assistant_unavailable_for_account": "El asistente de cuidados no está disponible para tu cuenta.",
   "health.unavailable": "La evaluación fitosanitaria no está disponible temporalmente.",
   "health.usage": "Solicitudes de IA en la última hora",
   "health.watering": "Frecuencia de riego",

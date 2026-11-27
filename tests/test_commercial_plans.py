@@ -38,6 +38,21 @@ class CommercialPlans(unittest.TestCase):
             ident = self.api.post("/api/plantas/identificar", files=fixture.photo(), headers=headers)
         self.assertEqual(ident.status_code, 200, ident.text)
         path = f"/api/plantas/{ident.json()['id']}/saude"
+        web_path = path.removeprefix("/api")
+
+        def assert_health_presentation(diagnosis, assistant):
+            for locale in fixture.LANGUAGES:
+                with self.subTest(locale=locale, diagnosis=diagnosis, assistant=assistant):
+                    response = self.api.get(web_path, headers={**headers, "Accept-Language": locale})
+                    self.assertEqual(response.status_code, 200)
+                    messages = fixture.catalog(locale)
+                    self.assertEqual(messages["health.diagnosis_unavailable_for_account"] in response.text, not diagnosis)
+                    self.assertEqual(messages["health.assistant_unavailable_for_account"] in response.text, not assistant)
+                    self.assertEqual(f'action="{web_path}/avaliar"' in response.text, diagnosis)
+                    self.assertEqual(f'action="{web_path}/assistente"' in response.text, assistant)
+                    self.assertNotIn(messages["commercial.disabled"], response.text)
+
+        assert_health_presentation(diagnosis=False, assistant=False)
         upload = {"photo": fixture.photo()["file"]}
         question = {"question": "What should I do?"}
         with patch("plantia.services.health.analyze", return_value=fixture.Triage(
@@ -50,9 +65,11 @@ class CommercialPlans(unittest.TestCase):
             diagnose.assert_not_called()
             assist.assert_not_called()
             fixture.grant_fixture_subscription(owner, "plus_monthly")
+            assert_health_presentation(diagnosis=True, assistant=False)
             self.assertEqual(self.api.post(path + "/avaliar", files=upload, headers=headers).status_code, 201)
             self.assertEqual(self.api.post(path + "/assistente", data=question, headers=headers).status_code, 403)
             fixture.grant_fixture_subscription(owner, "annual", checked_at=2)
+            assert_health_presentation(diagnosis=True, assistant=True)
             self.assertEqual(self.api.post(path + "/assistente", data=question, headers=headers).status_code, 201)
             fixture.grant_fixture_subscription(owner, "plus_annual", checked_at=3)
             self.assertEqual(self.api.post(path + "/assistente", data=question, headers=headers).status_code, 403)

@@ -500,6 +500,8 @@
   "health.trend.improving": "Verbesserung",
   "health.trend.stable": "Stabil",
   "health.trend.worsening": "Verschlechterung",
+  "health.diagnosis_unavailable_for_account": "Die Diagnose von Krankheiten und Schädlingen ist für dein Konto nicht verfügbar.",
+  "health.assistant_unavailable_for_account": "Der Pflanzenpflege-Assistent ist für dein Konto nicht verfügbar.",
   "health.unavailable": "Die Bewertung der Pflanzengesundheit ist vorübergehend nicht verfügbar.",
   "health.usage": "KI-Anfragen in der letzten Stunde",
   "health.watering": "Bewässerungshäufigkeit",

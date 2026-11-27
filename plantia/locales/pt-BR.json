@@ -500,6 +500,8 @@
   "health.trend.improving": "Melhorando",
   "health.trend.stable": "Estável",
   "health.trend.worsening": "Piorando",
+  "health.diagnosis_unavailable_for_account": "O diagnóstico de doenças e pragas está indisponível para sua conta.",
+  "health.assistant_unavailable_for_account": "O assistente de cuidados está indisponível para sua conta.",
   "health.unavailable": "A avaliação de saúde vegetal está temporariamente indisponível.",
   "health.usage": "Solicitações de IA na última hora",
   "health.watering": "Frequência de rega",

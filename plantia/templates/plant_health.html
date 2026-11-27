@@ -5,9 +5,6 @@
 <h1>{{ tr("health.title") }}</h1>
 <p>{{ tr("health.notice") }}</p>
 <div class="plant-health">
-    {% if not benefits.diagnosis or not benefits.assistant %}
-    <p><a href="/assinatura">{{ tr("commercial.title") }}</a> · {{ tr("commercial.disabled") }}</p>
-    {% endif %}
     {% if benefits.diagnosis %}
     <details class="botany-group" open>
         <summary>{{ tr("health.assess") }}</summary>
@@ -41,6 +38,11 @@
             <button class="btn btn-primary">{{ tr("health.assess") }}</button>
         </form>
     </details>
+    {% else %}
+    <section class="botany-group">
+        <h2>{{ tr("health.assess") }}</h2>
+        <p>{{ tr("health.diagnosis_unavailable_for_account") }} <a href="/assinatura">{{ tr("commercial.title") }}</a></p>
+    </section>
     {% endif %}
     <details class="botany-group">
         <summary>{{ tr("health.follow") }}</summary>
@@ -73,6 +75,11 @@
             <button class="btn btn-primary">{{ tr("health.ask") }}</button>
         </form>
     </details>
+    {% else %}
+    <section class="botany-group">
+        <h2>{{ tr("health.assistant") }}</h2>
+        <p>{{ tr("health.assistant_unavailable_for_account") }} <a href="/assinatura">{{ tr("commercial.title") }}</a></p>
+    </section>
     {% endif %}
 </div>
 <p>{{ tr("health.usage") }} {{ usage.attempts }} / {{ usage.hourly_limit }}</p>

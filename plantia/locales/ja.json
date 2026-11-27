@@ -500,6 +500,8 @@
   "health.trend.improving": "改善する",
   "health.trend.stable": "安定した",
   "health.trend.worsening": "悪化",
+  "health.diagnosis_unavailable_for_account": "病害虫の診断はお使いのアカウントでは利用できません。",
+  "health.assistant_unavailable_for_account": "植物ケアアシスタントはお使いのアカウントでは利用できません。",
   "health.unavailable": "植物の健康状態の評価は一時的に利用できません。",
   "health.usage": "過去 1 時間の AI リクエスト",
   "health.watering": "水やりの頻度",

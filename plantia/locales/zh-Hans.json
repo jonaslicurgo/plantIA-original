@@ -500,6 +500,8 @@
   "health.trend.improving": "改善",
   "health.trend.stable": "稳定",
   "health.trend.worsening": "恶化",
+  "health.diagnosis_unavailable_for_account": "您的账户无法使用病虫害诊断。",
+  "health.assistant_unavailable_for_account": "您的账户无法使用植物养护助手。",
   "health.unavailable": "暂时无法进行植物健康评估。",
   "health.usage": "过去一小时内的 AI 请求",
   "health.watering": "浇水频率",

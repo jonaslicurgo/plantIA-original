@@ -500,6 +500,8 @@
   "health.trend.improving": "개선",
   "health.trend.stable": "안정적",
   "health.trend.worsening": "악화",
+  "health.diagnosis_unavailable_for_account": "이 계정에서는 병해충 진단을 사용할 수 없습니다.",
+  "health.assistant_unavailable_for_account": "이 계정에서는 식물 관리 도우미를 사용할 수 없습니다.",
   "health.unavailable": "식물 상태 평가를 일시적으로 사용할 수 없습니다.",
   "health.usage": "지난 1시간 동안의 AI 요청",
   "health.watering": "급수 빈도",

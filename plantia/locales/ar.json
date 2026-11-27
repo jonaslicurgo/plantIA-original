@@ -500,6 +500,8 @@
   "health.trend.improving": "تحسين",
   "health.trend.stable": "مستقر",
   "health.trend.worsening": "تفاقم",
+  "health.diagnosis_unavailable_for_account": "تشخيص الأمراض والآفات غير متاح لحسابك.",
+  "health.assistant_unavailable_for_account": "مساعد العناية بالنباتات غير متاح لحسابك.",
   "health.unavailable": "تقييم صحة النبات غير متاح مؤقتًا.",
   "health.usage": "طلبات الذكاء الاصطناعي في الساعة الماضية",
   "health.watering": "تردد الري",

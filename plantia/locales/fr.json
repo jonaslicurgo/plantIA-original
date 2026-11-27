@@ -500,6 +500,8 @@
   "health.trend.improving": "Améliorer",
   "health.trend.stable": "Stable",
   "health.trend.worsening": "Aggravation",
+  "health.diagnosis_unavailable_for_account": "Le diagnostic des maladies et des ravageurs est indisponible pour votre compte.",
+  "health.assistant_unavailable_for_account": "L’assistant de soins des plantes est indisponible pour votre compte.",
   "health.unavailable": "L’évaluation phytosanitaire est temporairement indisponible.",
   "health.usage": "Requêtes IA au cours de la dernière heure",
   "health.watering": "Fréquence d'arrosage",

@@ -500,6 +500,8 @@
   "health.trend.improving": "सुधार हो रहा है",
   "health.trend.stable": "स्थिर",
   "health.trend.worsening": "बिगड़ना",
+  "health.diagnosis_unavailable_for_account": "आपके खाते के लिए रोग और कीट निदान उपलब्ध नहीं है।",
+  "health.assistant_unavailable_for_account": "आपके खाते के लिए पौधों की देखभाल का सहायक उपलब्ध नहीं है।",
   "health.unavailable": "पादप स्वास्थ्य मूल्यांकन अस्थायी रूप से अनुपलब्ध है।",
   "health.usage": "अंतिम घंटे में एआई अनुरोध करता है",
   "health.watering": "पानी देने की आवृत्ति",

@@ -500,6 +500,8 @@
   "health.trend.improving": "Meningkatkan",
   "health.trend.stable": "Stabil",
   "health.trend.worsening": "Memburuk",
+  "health.diagnosis_unavailable_for_account": "Diagnosis penyakit dan hama tidak tersedia untuk akun Anda.",
+  "health.assistant_unavailable_for_account": "Asisten perawatan tanaman tidak tersedia untuk akun Anda.",
   "health.unavailable": "Penilaian kesehatan tanaman untuk sementara tidak tersedia.",
   "health.usage": "Permintaan AI dalam satu jam terakhir",
   "health.watering": "Frekuensi penyiraman",

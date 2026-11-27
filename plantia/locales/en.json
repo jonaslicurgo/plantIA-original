@@ -500,6 +500,8 @@
   "health.trend.improving": "Improving",
   "health.trend.stable": "Stable",
   "health.trend.worsening": "Worsening",
+  "health.diagnosis_unavailable_for_account": "Disease and pest diagnosis is unavailable for your account.",
+  "health.assistant_unavailable_for_account": "The plant care assistant is unavailable for your account.",
   "health.unavailable": "Plant health assessment is temporarily unavailable.",
   "health.usage": "AI requests in the last hour",
   "health.watering": "Watering frequency",
