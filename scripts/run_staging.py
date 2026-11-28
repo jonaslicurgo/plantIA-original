@@ -30,8 +30,10 @@ def validate(environ):
         raise ValueError("Set PLANET_REQUIRE_VERIFIED_EMAIL=1 for staging")
     if not all(environ.get(k, "").strip() for k in ("PLANET_RESEND_API_KEY", "PLANET_RESEND_FROM")):
         raise ValueError("Configure Resend credentials and sender before starting email-verified staging")
-    if (environ.get("PLANET_STRIPE_KEY") and
-            not environ["PLANET_STRIPE_KEY"].startswith(("sk_test_", "rk_test_"))):
+    if environ.get("PLANET_STRIPE_MODE", "test") != "test" or environ.get("PLANET_STRIPE_LIVE_ENABLED") == "1":
+        raise ValueError("Staging must keep Stripe in test mode")
+    stripe_key = environ.get("PLANET_STRIPE_TEST_KEY", environ.get("PLANET_STRIPE_KEY", ""))
+    if stripe_key and not stripe_key.startswith(("sk_test_", "rk_test_")):
         raise ValueError("Use only Stripe test credentials in staging")
 
 

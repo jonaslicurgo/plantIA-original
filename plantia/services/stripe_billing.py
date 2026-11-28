@@ -1,4 +1,4 @@
-"""Stripe test-mode adapter. No live API key can pass this boundary."""
+"""Stripe adapter with separate test and explicitly enabled live deployments."""
 
 import hashlib
 import hmac
@@ -46,15 +46,59 @@ class NoRedirect(HTTPRedirectHandler):
 CLIENT = build_opener(NoRedirect())
 
 
+def mode():
+    return os.getenv("PLANET_STRIPE_MODE", "test")
+
+
+def _setting(name):
+    if mode() == "live":
+        return os.getenv("PLANET_STRIPE_LIVE_" + name, "")
+    return os.getenv("PLANET_STRIPE_TEST_" + name, os.getenv("PLANET_STRIPE_" + name, ""))
+
+
 def ready():
-    return bool(re.fullmatch(r"(?:sk|rk)_test_[A-Za-z0-9]+", os.getenv("PLANET_STRIPE_KEY", ""))
-                and os.getenv("PLANET_STRIPE_WEBHOOK_SECRET", "").startswith("whsec_"))
+    selected = mode()
+    deployment = os.getenv("PLANET_DEPLOYMENT", "")
+    railway = os.getenv("RAILWAY_ENVIRONMENT_NAME", "").lower()
+    if selected == "live":
+        if (deployment != "production" or railway not in {"", "production"}
+                or os.getenv("PLANET_STRIPE_LIVE_ENABLED") != "1"):
+            return False
+    elif selected != "test" or deployment == "production" or railway == "production":
+        return False
+    return bool(re.fullmatch(fr"(?:sk|rk)_{selected}_[A-Za-z0-9]+", _setting("KEY"))
+                and _setting("WEBHOOK_SECRET").startswith("whsec_"))
+
+
+def bind_database(db):
+    """Keep provider IDs and price mappings isolated by database, including legacy data."""
+    db.execute(text("""CREATE TABLE IF NOT EXISTS stripe_database_mode (
+        id INTEGER PRIMARY KEY CHECK(id=1), mode TEXT NOT NULL CHECK(mode IN ('test','live')))"""))
+    bound = db.execute(text("SELECT mode FROM stripe_database_mode WHERE id=1")).scalar()
+    selected = mode()
+    if selected not in {"test", "live"}:
+        raise RuntimeError("Invalid Stripe mode")
+    if bound and bound != selected:
+        raise RuntimeError("Stripe database belongs to a different mode")
+    if bound:
+        return
+    if selected == "live" and not ready():
+        return
+    legacy_data = db.execute(text("""SELECT 1 FROM commercial_prices WHERE stripe_price IS NOT NULL
+        UNION ALL SELECT 1 FROM billing_customers WHERE provider='stripe'
+        UNION ALL SELECT 1 FROM subscriptions WHERE provider='stripe'
+        UNION ALL SELECT 1 FROM billing_events WHERE provider='stripe'
+        UNION ALL SELECT 1 FROM checkout_pending LIMIT 1""")).first()
+    if selected == "live" and legacy_data:
+        raise RuntimeError("Unclassified Stripe records require review before enabling live mode")
+    if legacy_data or ready():
+        db.execute(text("INSERT INTO stripe_database_mode VALUES (1,:mode)"), {"mode": selected})
 
 
 def send(path, data=None, idempotency=None):
     if not ready():
         raise BillingError
-    headers = {"Authorization": "Bearer " + os.environ["PLANET_STRIPE_KEY"],
+    headers = {"Authorization": "Bearer " + _setting("KEY"),
                "Stripe-Version": "2025-03-31.basil"}
     payload = None
     if data is not None:
@@ -67,7 +111,7 @@ def send(path, data=None, idempotency=None):
             result = json.loads(res.read(1024 * 1024))
     except (URLError, OSError, ValueError) as exc:
         raise BillingError from exc
-    if not isinstance(result, dict) or result.get("livemode") is True:
+    if not isinstance(result, dict) or ("livemode" in result and result["livemode"] is not (mode() == "live")):
         raise BillingError
     return result
 
@@ -102,7 +146,7 @@ def customer(owner):
         return existing
     with get_engine().connect() as db:
         namespace = db.execute(text("SELECT namespace FROM commercial_installation WHERE id=1")).scalar_one()
-    result = send("/customers", {"metadata[planet_account]": owner}, f"planet-test-customer-{namespace}-{owner}")
+    result = send("/customers", {"metadata[planet_account]": owner}, f"planet-{mode()}-customer-{namespace}-{owner}")
     identifier = result.get("id", "")
     if not re.fullmatch(r"cus_[A-Za-z0-9]+", identifier):
         raise BillingError
@@ -122,7 +166,7 @@ def _same_price(provider_price, local_price):
         and provider_price.get("currency") == local_price["currency"].lower()
         and recurring.get("interval") == ("year" if local_price["plan"] in {"annual", "plus_annual"} else "month")
         and recurring.get("interval_count") == 1
-        and provider_price.get("livemode") is not True
+        and provider_price.get("livemode", False) is (mode() == "live")
     )
 
 
@@ -133,14 +177,14 @@ def premium_intro(price):
 
 
 def premium_intro_coupon():
-    coupon_id = os.getenv("PLANET_STRIPE_PREMIUM_INTRO_COUPON", "")
+    coupon_id = _setting("PREMIUM_INTRO_COUPON")
     return coupon_id if re.fullmatch(r"[A-Za-z0-9_-]{1,80}", coupon_id) else None
 
 
 def _check_intro_coupon(coupon_id, product):
     coupon = send("/coupons/" + coupon_id + "?expand%5B%5D=applies_to")
     if (
-        coupon.get("id") != coupon_id or coupon.get("livemode") is not False
+        coupon.get("id") != coupon_id or coupon.get("livemode") is not (mode() == "live")
         or coupon.get("valid") is not True or coupon.get("amount_off") != 1000
         or coupon.get("currency") != "brl" or coupon.get("duration") != "repeating"
         or coupon.get("duration_in_months") != 3 or not product
@@ -177,7 +221,7 @@ def checkout(owner, price_id, accept_intro=False):
             if pending:
                 request_key, expires = pending["request_key"], pending["expires"]
             else:
-                request_key, expires = f"planet-test-checkout-{uuid4().hex}", now + 3600
+                request_key, expires = f"planet-{mode()}-checkout-{uuid4().hex}", now + 3600
                 db.execute(text("""INSERT INTO checkout_pending VALUES (:owner,:price,:key,:expires,NULL)
                     ON CONFLICT(account_id) DO UPDATE SET price_id=excluded.price_id,
                     request_key=excluded.request_key, expires=excluded.expires, url=NULL"""),
@@ -220,7 +264,7 @@ def verify(body, header):
         raise InvalidEvent
     if abs(int(stamps[0]) - int(time())) > 300:
         raise InvalidEvent
-    digest = hmac.new(os.environ["PLANET_STRIPE_WEBHOOK_SECRET"].encode(),
+    digest = hmac.new(_setting("WEBHOOK_SECRET").encode(),
                       stamps[0].encode() + b"." + body, hashlib.sha256).hexdigest()
     if not any(key == "v1" and re.fullmatch("[a-f0-9]{64}", sig) and hmac.compare_digest(sig, digest)
                for key, sig in fields):
@@ -229,7 +273,7 @@ def verify(body, header):
         event = json.loads(body)
     except (UnicodeError, ValueError) as exc:
         raise InvalidEvent from exc
-    if not isinstance(event, dict) or event.get("livemode") is not False:
+    if not isinstance(event, dict) or event.get("livemode") is not (mode() == "live"):
         raise InvalidEvent
     if not isinstance(event.get("id"), str) or not re.fullmatch(r"evt_[A-Za-z0-9]+", event["id"]):
         raise InvalidEvent
@@ -259,7 +303,7 @@ def webhook(event):
     checked = time_ns()
     # Fetch the current snapshot rather than trusting the delivery order.
     sub = send("/subscriptions/" + identifier)
-    if sub.get("id") != identifier or sub.get("livemode") is not False:
+    if sub.get("id") != identifier or sub.get("livemode") is not (mode() == "live"):
         raise BillingError
     with transaction() as db:
         if _seen(db, event["id"]):

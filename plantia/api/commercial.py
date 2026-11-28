@@ -54,7 +54,7 @@ def subscription(request: Request, market: str = Query("BR", pattern=r"^[A-Z]{2}
                                 or stripe.premium_intro_coupon()) and not (
                                 sub and sub["status"] in stripe.BLOCK_CHECKOUT))}
                            for p in prices if getattr(config, p["plan"] + "_enabled")],
-                "free_limit": config.free_limit, "test_mode": True,
+                "free_limit": config.free_limit, "test_mode": stripe.mode() == "test",
                 "benefits": {level: billing.benefits(config, level) for level in ("free", "plus", "premium")},
                 "plus_credits_enabled": config.plus_credits_enabled,
                 "portal": ready and bool(stripe.account_customer(owner)),
@@ -95,7 +95,11 @@ def portal(request: Request):
 
 
 @router.post("/api/stripe/webhook")
+@router.post("/api/stripe/webhook/live")
 async def webhook(request: Request):
+    endpoint_mode = "live" if request.url.path.endswith("/live") else "test"
+    if stripe.mode() != endpoint_mode:
+        raise HTTPException(404, "Not found")
     payload = bytearray()
     async for chunk in request.stream():
         if len(payload) + len(chunk) > 256 * 1024:

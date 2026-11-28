@@ -10,3 +10,11 @@
 O desconto é uma janela de três meses desde a contratação e funciona como três ciclos no mensal regular. Preserve a data-base de cobrança durante a oferta. Ao término da assinatura, uma nova compra pelo Checkout pode receber a mesma oferta. Reativar um cancelamento agendado mantém a assinatura e sua janela original. As proteções e a política de uso justo da IA continuam vigentes.
 
 Para retirar a oferta para compras futuras, desative o novo preço no catálogo e reative o mapeamento anterior, se aplicável. Sessões Checkout ainda abertas continuam sujeitas à expiração normal. Assinaturas já contratadas mantêm suas condições.
+
+## Separação de ambientes
+
+- Staging usa `PLANET_STRIPE_MODE=test`, `PLANET_STRIPE_LIVE_ENABLED=0` e o webhook `/api/stripe/webhook`. As variáveis `PLANET_STRIPE_TEST_KEY`, `PLANET_STRIPE_TEST_WEBHOOK_SECRET` e `PLANET_STRIPE_TEST_PREMIUM_INTRO_COUPON` são opcionais quando as variáveis legadas de teste já foram configuradas.
+- Para uma futura ativação autorizada, produção deve ter `PLANET_DEPLOYMENT=production`, `PLANET_STRIPE_MODE=live`, `PLANET_STRIPE_LIVE_ENABLED=1` e, no Railway, ambiente chamado `production`. Use apenas `PLANET_STRIPE_LIVE_KEY`, `PLANET_STRIPE_LIVE_WEBHOOK_SECRET` do endpoint `/api/stripe/webhook/live` e `PLANET_STRIPE_LIVE_PREMIUM_INTRO_COUPON`. Cadastre os preços live no catálogo de produção. Nenhuma credencial de teste é usada como fallback do live.
+- Preserve bases e volumes separados. A primeira configuração habilitada associa a base a um modo. Uma base com registros Stripe legados exige revisão antes de habilitar live. Não copie a base de staging para produção. Preserve e revise a base de produção existente antes de habilitar o modo live, sem remover registros ou alterar a associação manualmente.
+- O Stripe usa segredos de assinatura com o mesmo prefixo em ambos os modos. Use o segredo do endpoint correspondente. O backend exige que eventos, assinaturas consultadas e cupons tenham o indicador de modo correto.
+- Mantenha live desabilitado até aprovar a homologação, confirmar a situação cadastral da conta Stripe e autorizar a mudança em produção.

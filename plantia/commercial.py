@@ -116,6 +116,8 @@ def init():
               SELECT 'BR',:plan,'BRL',:amount,NULL,1
               WHERE NOT EXISTS (SELECT 1 FROM commercial_prices WHERE market='BR' AND plan=:plan)"""),
                        {"plan": plan, "amount": amount})
+        from plantia.services.stripe_billing import bind_database
+        bind_database(db)
 
 
 def rules(db):

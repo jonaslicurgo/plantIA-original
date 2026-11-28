@@ -3,7 +3,7 @@
 {% block content %}
 <header class="page-header">
     <h1>{{ tr("commercial.title") }}</h1>
-    <p>{{ tr("commercial.test_mode") }}</p>
+    {% if test_mode %}<p>{{ tr("commercial.test_mode") }}</p>{% endif %}
 </header>
 {% if operator %}<p><a href="/admin/comercial">{{ tr("commercial.dashboard") }}</a></p>{% endif %}
 <section class="commercial-panel">
