@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Erstellen Sie eine neue Stripe-Preiskennung, um diese Zuordnung zu ändern.",
   "commercial.load_error": "Abonnementdetails konnten nicht geladen werden.",
   "commercial.manage": "Abonnement verwalten",
+  "commercial.portal_manage_only": "Im Portal kannst du die Zahlung verwalten oder kündigen. Warte für einen anderen Tarif bis zum Ende deines Abos und kehre dann zu dieser Seite zurück.",
   "commercial.margin": "Geschätzter Beitrag vor Gebühren",
   "commercial.margin_note": "BRL wiederkehrender Umsatz abzüglich erfasster KI-Kosten. Keine Währungsumrechnung, Steuern, Zahlungsgebühren oder andere Kosten.",
   "commercial.market": "Preismarkt",

@@ -31,6 +31,12 @@ class PremiumIntroduction(unittest.TestCase):
             db.execute(text("INSERT INTO billing_customers VALUES (:owner,'stripe','cus_introFixture')"),
                        {"owner": owner})
             old = db.execute(text("SELECT id FROM commercial_prices WHERE market='BR' AND plan='monthly' AND enabled=1")).scalar_one()
+            db.execute(text("UPDATE commercial_prices SET stripe_price='price_introLegacy' WHERE id=:id"), {"id": old})
+        with patch.object(stripe_billing, "send") as provider:
+            blocked = api.post("/assinatura/checkout", headers=headers, follow_redirects=False, data={"price": old})
+            self.assertEqual(blocked.status_code, 409)
+            provider.assert_not_called()
+        with commercial.transaction() as db:
             commercial.put_price(db, 0, "BR", "monthly", "BRL", 3990, "price_introFixture")
             mapping = db.execute(text("SELECT id FROM commercial_prices WHERE stripe_price='price_introFixture'")).scalar_one()
             self.assertEqual(db.execute(text("SELECT amount FROM commercial_prices WHERE id=:id"), {"id": old}).scalar_one(), 2990)
@@ -112,9 +118,28 @@ class PremiumIntroduction(unittest.TestCase):
             self.assertEqual(requests[-1][0]["discounts[0][coupon]"], "introFixture")
             self.assertNotEqual(requests[0][1], requests[-1][1])
 
+    def test_portal_rejects_plan_changes_and_never_falls_back(self):
+        with patch.object(stripe_billing, "account_customer", return_value="cus_fixture"), \
+             patch.object(stripe_billing, "portal_configuration", return_value="bpc_fixture"), \
+             patch.object(stripe_billing, "send") as provider:
+            config = {"id": "bpc_fixture", "active": True, "livemode": False}
+            for updates in (True, None):
+                provider.reset_mock()
+                provider.return_value = {**config, "features": {"subscription_update": {"enabled": updates}}}
+                with self.assertRaises(stripe_billing.BillingError):
+                    stripe_billing.portal(1)
+                provider.assert_called_once_with("/billing_portal/configurations/bpc_fixture")
+            provider.reset_mock()
+            provider.side_effect = [
+                {**config, "features": {"subscription_update": {"enabled": False}}},
+                {"url": "https://billing.stripe.com/p/session/fixture"},
+            ]
+            self.assertTrue(stripe_billing.portal(1).startswith("https://billing.stripe.com/"))
+            self.assertEqual(provider.call_args.args[1]["configuration"], "bpc_fixture")
+
     @staticmethod
     def remove_offer(mapping, old):
         with commercial.transaction() as db:
             db.execute(text("DELETE FROM checkout_pending WHERE price_id=:id"), {"id": mapping})
             db.execute(text("DELETE FROM commercial_prices WHERE id=:id"), {"id": mapping})
-            db.execute(text("UPDATE commercial_prices SET enabled=1 WHERE id=:id"), {"id": old})
+            db.execute(text("UPDATE commercial_prices SET enabled=1, stripe_price=NULL WHERE id=:id"), {"id": old})

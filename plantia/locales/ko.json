@@ -298,6 +298,7 @@
   "commercial.immutable_price": "이 매핑을 변경하려면 새 Stripe 가격 식별자를 만드세요.",
   "commercial.load_error": "구독 세부정보를 로드할 수 없습니다.",
   "commercial.manage": "구독 관리",
+  "commercial.portal_manage_only": "포털에서 결제 수단을 관리하거나 구독을 취소할 수 있습니다. 다른 요금제를 선택하려면 현재 구독이 끝난 뒤 이 페이지로 돌아오세요.",
   "commercial.margin": "수수료 전 예상 기여도",
   "commercial.margin_note": "BRL 반복 수익에서 기록된 AI 비용을 뺀 금액입니다. 통화 변환, 세금, 지불 수수료 또는 기타 비용이 없습니다.",
   "commercial.market": "가격 시장",

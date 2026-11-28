@@ -179,6 +179,16 @@ def premium_intro(price):
     )
 
 
+def new_checkout_price(price):
+    # Legacy Premium prices remain valid for webhook reconciliation only.
+    return (price["market"], price["plan"]) != ("BR", "monthly") or premium_intro(price)
+
+
+def portal_configuration():
+    value = _setting("PORTAL_CONFIGURATION")
+    return value if re.fullmatch(r"bpc_[A-Za-z0-9]+", value) else None
+
+
 def premium_intro_coupon():
     coupon_id = _setting("PREMIUM_INTRO_COUPON")
     return coupon_id if re.fullmatch(r"[A-Za-z0-9_-]{1,80}", coupon_id) else None
@@ -209,6 +219,8 @@ def checkout(owner, price_id, accept_intro=False):
                                {"id": price_id}).mappings().first()
             if not price or not price["stripe_price"] or not getattr(rules(db), price["plan"] + "_enabled"):
                 raise BillingError
+            if not new_checkout_price(price):
+                raise BillingConflict
             intro = premium_intro(price)
             coupon_id = premium_intro_coupon() if intro else None
             if intro and not accept_intro:
@@ -252,9 +264,17 @@ def checkout(owner, price_id, accept_intro=False):
 
 def portal(owner):
     identifier = account_customer(owner)
-    if not identifier:
+    configuration_id = portal_configuration()
+    if not identifier or not configuration_id:
         raise BillingError
-    result = send("/billing_portal/sessions", {"customer": identifier, "return_url": origin() + "/assinatura"})
+    configuration = send("/billing_portal/configurations/" + configuration_id)
+    updates = (configuration.get("features") or {}).get("subscription_update") or {}
+    if (configuration.get("id") != configuration_id or configuration.get("active") is not True
+            or configuration.get("livemode") is not (mode() == "live") or updates.get("enabled") is not False):
+        raise BillingError
+    result = send("/billing_portal/sessions", {
+        "customer": identifier, "configuration": configuration_id, "return_url": origin() + "/assinatura",
+    })
     return redirect_url(result, "billing.stripe.com")
 
 

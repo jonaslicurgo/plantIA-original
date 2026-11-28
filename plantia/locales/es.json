@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Cree un nuevo identificador de precio de Stripe para cambiar esta asignación.",
   "commercial.load_error": "No se pudieron cargar los detalles de la suscripción.",
   "commercial.manage": "Administrar suscripción",
+  "commercial.portal_manage_only": "Usa el portal para gestionar el pago o cancelar. Para contratar otro plan, espera a que termine la suscripción actual y vuelve a esta página.",
   "commercial.margin": "Contribución estimada antes de tarifas",
   "commercial.margin_note": "Ingresos recurrentes en BRL menos costos de IA registrados. Sin conversión de moneda, impuestos, tarifas de pago u otros gastos.",
   "commercial.market": "Mercado de precios",

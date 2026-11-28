@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Buat pengidentifikasi harga Stripe baru untuk mengubah pemetaan ini.",
   "commercial.load_error": "Tidak dapat memuat detail langganan.",
   "commercial.manage": "Kelola langganan",
+  "commercial.portal_manage_only": "Gunakan portal untuk mengelola pembayaran atau membatalkan. Untuk memilih paket lain, tunggu hingga langganan saat ini berakhir, lalu kembali ke halaman ini.",
   "commercial.margin": "Perkiraan kontribusi sebelum biaya",
   "commercial.margin_note": "Pendapatan berulang BRL dikurangi biaya AI yang tercatat. Tidak ada konversi mata uang, pajak, biaya pembayaran, atau biaya lainnya.",
   "commercial.market": "Pasar harga",

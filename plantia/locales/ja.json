@@ -298,6 +298,7 @@
   "commercial.immutable_price": "このマッピングを変更するには、新しい Stripe 価格識別子を作成します。",
   "commercial.load_error": "サブスクリプションの詳細を読み込めませんでした。",
   "commercial.manage": "サブスクリプションの管理",
+  "commercial.portal_manage_only": "支払い方法の管理や解約はポータルで行えます。別のプランを選ぶには、現在の契約が終了してからこのページに戻ってください。",
   "commercial.margin": "手数料前の推定拠出額",
   "commercial.margin_note": "BRL の経常収益から記録された AI コストを差し引いたもの。通貨換算、税金、支払い手数料、その他の費用はかかりません。",
   "commercial.market": "価格市場",

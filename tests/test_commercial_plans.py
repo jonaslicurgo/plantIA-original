@@ -29,7 +29,7 @@ class CommercialPlans(unittest.TestCase):
         account = self.api.get("/api/assinatura", headers=headers).json()
         self.assertEqual(account["usage"]["remaining"], 3)
         self.assertEqual({p["plan"]: p["amount"] for p in account["prices"]}, {
-            "plus_monthly": 1990, "plus_annual": 14990, "monthly": 2990, "annual": 19990,
+            "plus_monthly": 1990, "plus_annual": 14990, "annual": 19990,
         })
         self.assertEqual(self.api.get("/api/assinatura?market=JP", headers=headers).json()["prices"], [])
         with patch.object(fixture.GeminiService, "identificar", return_value=fixture.IdentificacionGemini(

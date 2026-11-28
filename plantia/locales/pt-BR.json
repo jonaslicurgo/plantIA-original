@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Crie outro identificador de preço no Stripe para alterar esse vínculo.",
   "commercial.load_error": "Não foi possível carregar a assinatura.",
   "commercial.manage": "Gerenciar assinatura",
+  "commercial.portal_manage_only": "Use o portal para gerenciar o pagamento ou cancelar. Para contratar outro plano, aguarde o fim da assinatura atual e volte a esta página.",
   "commercial.margin": "Margem estimada antes de taxas",
   "commercial.margin_note": "Receita recorrente em reais menos os custos de IA registrados. O cálculo exclui conversão cambial, impostos, taxas e outras despesas.",
   "commercial.market": "Mercado de cobrança",

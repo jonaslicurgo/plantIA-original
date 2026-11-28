@@ -605,7 +605,8 @@ class Regression(unittest.TestCase):
             commercial.put_price(db, owner, "CA", "monthly", "CAD", 2990, "price_testCA")
         offer = self.a.get("/api/assinatura?market=CA", headers=a).json()["prices"][0]["id"]
         fake_secret = "whsec_fixture_only"
-        values = {"PLANET_STRIPE_KEY":"sk_test_fixture", "PLANET_STRIPE_WEBHOOK_SECRET":fake_secret}
+        values = {"PLANET_STRIPE_KEY":"sk_test_fixture", "PLANET_STRIPE_WEBHOOK_SECRET":fake_secret,
+                  "PLANET_STRIPE_TEST_PORTAL_CONFIGURATION":"bpc_fixture"}
 
         def signed(event, age=0):
             body = json.dumps(event).encode()
@@ -622,8 +623,12 @@ class Regression(unittest.TestCase):
                 self.assertIn("planet-test-checkout-", idempotency)
                 self.assertEqual(data["mode"], "subscription")
                 return {"url":"https://checkout.stripe.com/c/pay/test"}
+            if path == "/billing_portal/configurations/bpc_fixture":
+                return {"id": "bpc_fixture", "active": True, "livemode": False,
+                        "features": {"subscription_update": {"enabled": False}}}
             if path == "/billing_portal/sessions":
                 self.assertEqual(data["customer"], "cus_fixture")
+                self.assertEqual(data["configuration"], "bpc_fixture")
                 return {"url":"https://billing.stripe.com/p/session/test"}
             raise AssertionError(path)
 

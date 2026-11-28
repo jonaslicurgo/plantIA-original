@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Créez un nouvel identifiant de prix Stripe pour modifier ce mappage.",
   "commercial.load_error": "Impossible de charger les détails de l'abonnement.",
   "commercial.manage": "Gérer l'abonnement",
+  "commercial.portal_manage_only": "Utilisez le portail pour gérer le paiement ou résilier. Pour choisir une autre formule, attendez la fin de votre abonnement actuel, puis revenez sur cette page.",
   "commercial.margin": "Contribution estimée avant frais",
   "commercial.margin_note": "Revenus récurrents en BRL moins les coûts d'IA enregistrés. Pas de conversion de devises, taxes, frais de paiement ou autres dépenses.",
   "commercial.market": "Marché des prix",

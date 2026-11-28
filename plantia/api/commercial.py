@@ -54,11 +54,11 @@ def subscription(request: Request, market: str = Query("BR", pattern=r"^[A-Z]{2}
                             "checkout": bool(ready and p["stripe_price"] and (not stripe.premium_intro(p)
                                 or stripe.premium_intro_coupon()) and not (
                                 sub and sub["status"] in stripe.BLOCK_CHECKOUT))}
-                           for p in prices if getattr(config, p["plan"] + "_enabled")],
+                           for p in prices if getattr(config, p["plan"] + "_enabled") and stripe.new_checkout_price(p)],
                 "free_limit": config.free_limit, "test_mode": stripe.mode() == "test",
                 "benefits": {level: billing.benefits(config, level) for level in ("free", "plus", "premium")},
                 "plus_credits_enabled": config.plus_credits_enabled,
-                "portal": ready and bool(stripe.account_customer(owner)),
+                "portal": ready and bool(stripe.portal_configuration() and stripe.account_customer(owner)),
                 "operator": billing.role(db, owner) in {"admin", "auditor"},
                 "subscription": {**{k: sub[k] for k in ("plan", "provider")},
                                  "status": "expired" if sub["status"] in billing.ACTIVE and not billing.entitled(sub) else sub["status"],

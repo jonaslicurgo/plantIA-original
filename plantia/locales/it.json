@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Crea un nuovo identificatore di prezzo Stripe per modificare questa mappatura.",
   "commercial.load_error": "Impossibile caricare i dettagli dell'abbonamento.",
   "commercial.manage": "Gestisci l'abbonamento",
+  "commercial.portal_manage_only": "Usa il portale per gestire il pagamento o annullare. Per scegliere un altro piano, attendi la fine dell’abbonamento attuale e torna a questa pagina.",
   "commercial.margin": "Contributo stimato prima delle commissioni",
   "commercial.margin_note": "Entrate ricorrenti in BRL meno costi AI registrati. Nessuna conversione di valuta, tasse, commissioni di pagamento o altre spese.",
   "commercial.market": "Mercato dei prezzi",

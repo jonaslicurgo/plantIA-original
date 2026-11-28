@@ -298,6 +298,7 @@
   "commercial.immutable_price": "创建一个新的 Stripe 价格标识符来更改此映射。",
   "commercial.load_error": "无法加载订阅详细信息。",
   "commercial.manage": "管理订阅",
+  "commercial.portal_manage_only": "请使用门户管理付款或取消订阅。如需选择其他方案，请等待当前订阅结束后返回此页面。",
   "commercial.margin": "费用前的估计贡献",
   "commercial.margin_note": "经常性收入减去记录的人工智能成本。无货币兑换、税费、付款费用或其他费用。",
   "commercial.market": "定价市场",

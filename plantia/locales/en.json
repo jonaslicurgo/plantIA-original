@@ -298,6 +298,7 @@
   "commercial.immutable_price": "Create a new Stripe price identifier to change this mapping.",
   "commercial.load_error": "Could not load subscription details.",
   "commercial.manage": "Manage subscription",
+  "commercial.portal_manage_only": "Use the portal to manage payment or cancel. To choose another plan, wait for your current subscription to end and return to this page.",
   "commercial.margin": "Estimated contribution before fees",
   "commercial.margin_note": "BRL recurring revenue less recorded AI costs. No currency conversion, taxes, payment fees, or other expenses.",
   "commercial.market": "Pricing market",

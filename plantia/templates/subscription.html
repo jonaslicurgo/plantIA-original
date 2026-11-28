@@ -23,6 +23,7 @@
     </p>
     {% endif %}
     {% if portal %}
+    <p>{{ tr("commercial.portal_manage_only") }}</p>
     <form method="post" action="/assinatura/portal"><button class="btn btn-outline">{{ tr("commercial.manage") }}</button></form>
     {% endif %}
 </section>
