@@ -50,23 +50,31 @@
     {% for price in prices %}
     <section class="commercial-panel commercial-paid">
         <h2>{{ tr("commercial.plan." ~ price.plan) }}</h2>
-        {% if price.premium_intro %}
-        <p class="commercial-price"><span data-currency="BRL" data-money="29.90">R$ 29,90</span> · {{ tr("commercial.intro_period") }}</p>
-        <p><span data-currency="BRL" data-money="39.90">R$ 39,90</span> · {{ tr("commercial.intro_renewal") }}</p>
-        {% else %}
         {% set amount = price.amount if price.currency in ('JPY','KRW') else price.amount / 100 %}
+        {% if price.premium_intro %}
+        <div class="commercial-intro" id="premium-offer-{{ price.id }}">
+            <p class="commercial-price">
+                <span data-currency="{{ price.currency }}" data-money="{{ price.intro_amount / 100 }}">R$ {{ "%.2f"|format(price.intro_amount / 100)|replace(".", ",") }}</span>
+                <span class="commercial-intro-period">{{ tr("commercial.intro_period") }}</span>
+            </p>
+            <p class="commercial-intro-renewal">
+                <strong data-currency="{{ price.currency }}" data-money="{{ amount }}">R$ {{ "%.2f"|format(amount)|replace(".", ",") }}</strong>
+                <span>{{ tr("commercial.intro_renewal") }}</span>
+            </p>
+        </div>
+        {% else %}
         <p class="commercial-price"><span data-currency="{{ price.currency }}" data-money="{{ amount }}">{{ price.currency }} {{ amount }}</span></p>
-        {% endif %}
         <p>{{ tr("commercial.term." ~ price.term) }}</p>
+        {% endif %}
         {% if price.limit is none %}<p>{{ tr("commercial.unlimited") }}</p>
         {% else %}<p>{{ price.limit }} {{ tr("commercial.requests_month") }}</p>{% endif %}
         {{ features(price.tier) }}
         {% if price.checkout %}
         <form method="post" action="/assinatura/checkout">
-            {% if price.premium_intro %}
-            <label><input type="checkbox" name="accept_intro" value="true" required> {{ tr("commercial.intro_accept") }}</label>
-            {% endif %}
             <input type="hidden" name="price" value="{{ price.id }}">
+            {% if price.premium_intro %}
+            <label><input type="checkbox" name="accept_intro" value="true" aria-describedby="premium-offer-{{ price.id }}" required> {{ tr("commercial.intro_accept") }}</label>
+            {% endif %}
             <button class="btn btn-primary">{{ tr("commercial.upgrade") }}</button>
         </form>
         {% endif %}

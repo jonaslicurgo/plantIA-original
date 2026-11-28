@@ -49,7 +49,8 @@ def subscription(request: Request, market: str = Query("BR", pattern=r"^[A-Z]{2}
                             "tier": billing.tier(p["plan"]),
                             "term": "annual" if p["plan"].endswith("annual") else "monthly",
                             "premium_intro": stripe.premium_intro(p),
-                            "intro_amount": 2990 if stripe.premium_intro(p) else None,
+                            "intro_amount": p["amount"] - stripe.PREMIUM_INTRO_DISCOUNT if stripe.premium_intro(p) else None,
+                            "intro_cycles": stripe.PREMIUM_INTRO_CYCLES if stripe.premium_intro(p) else None,
                             "checkout": bool(ready and p["stripe_price"] and (not stripe.premium_intro(p)
                                 or stripe.premium_intro_coupon()) and not (
                                 sub and sub["status"] in stripe.BLOCK_CHECKOUT))}

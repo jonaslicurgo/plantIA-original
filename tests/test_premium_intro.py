@@ -71,8 +71,15 @@ class PremiumIntroduction(unittest.TestCase):
                 page = api.get("/assinatura", headers={**headers, "Accept-Language": locale})
                 self.assertIn("R$ 29,90", page.text)
                 self.assertIn("R$ 39,90", page.text)
+                self.assertIn(f'id="premium-offer-{mapping}"', page.text)
+                self.assertIn(f'aria-describedby="premium-offer-{mapping}"', page.text)
+                self.assertLess(page.text.index("R$ 29,90"), page.text.index("R$ 39,90"))
                 for key in ("intro_period", "intro_renewal", "intro_accept"):
                     self.assertIn(fixture.catalog(locale)["commercial." + key], page.text)
+            catalog = api.get("/api/assinatura", headers=headers).json()["prices"]
+            intro = next(price for price in catalog if price["id"] == mapping)
+            self.assertEqual((intro["intro_amount"], intro["intro_cycles"], intro["amount"]), (2990, 3, 3990))
+            self.assertTrue(all(not price["premium_intro"] for price in catalog if price["id"] != mapping))
             self.assertEqual(checkout().status_code, 409)
             coupon["duration_in_months"] = 2
             self.assertEqual(checkout(True).status_code, 503)

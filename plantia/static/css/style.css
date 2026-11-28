@@ -2210,6 +2210,11 @@ nav {
 .commercial-panel > * + * { margin-block-start: .55rem; }
 .commercial-paid { border-block-start: .25rem solid var(--green-700); }
 .commercial-price { font-size: 1.5rem; font-weight: 700; }
+.commercial-intro { padding: .75rem; border: 1px solid var(--border); border-radius: .75rem; }
+.commercial-intro p { margin: 0; }
+.commercial-intro-period { display: block; font-size: 1rem; font-weight: 600; }
+.commercial-intro .commercial-intro-renewal { margin-block-start: .6rem; }
+.commercial-intro-renewal strong { white-space: nowrap; }
 .commercial-list { padding: .45rem 2rem; overflow-wrap: anywhere; }
 .commercial-list li { margin-block: .5rem; }
 .commercial-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }

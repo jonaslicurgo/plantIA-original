@@ -24,6 +24,9 @@ EVENTS = INVOICE_EVENTS | {
 }
 BLOCK_CHECKOUT = ("unmapped", "active", "trialing", "past_due", "unpaid", "incomplete", "paused")
 LOCKS = tuple(Lock() for _ in range(32))
+PREMIUM_INTRO_BASE_AMOUNT = 3990
+PREMIUM_INTRO_DISCOUNT = 1000
+PREMIUM_INTRO_CYCLES = 3
 
 
 class BillingError(Exception):
@@ -172,7 +175,7 @@ def _same_price(provider_price, local_price):
 
 def premium_intro(price):
     return (price["market"], price["plan"], price["currency"], price["amount"]) == (
-        "BR", "monthly", "BRL", 3990,
+        "BR", "monthly", "BRL", PREMIUM_INTRO_BASE_AMOUNT,
     )
 
 
@@ -185,9 +188,9 @@ def _check_intro_coupon(coupon_id, product):
     coupon = send("/coupons/" + coupon_id + "?expand%5B%5D=applies_to")
     if (
         coupon.get("id") != coupon_id or coupon.get("livemode") is not (mode() == "live")
-        or coupon.get("valid") is not True or coupon.get("amount_off") != 1000
+        or coupon.get("valid") is not True or coupon.get("amount_off") != PREMIUM_INTRO_DISCOUNT
         or coupon.get("currency") != "brl" or coupon.get("duration") != "repeating"
-        or coupon.get("duration_in_months") != 3 or not product
+        or coupon.get("duration_in_months") != PREMIUM_INTRO_CYCLES or not product
         or (coupon.get("applies_to") or {}).get("products") != [product]
         or coupon.get("max_redemptions") is not None or coupon.get("redeem_by") is not None
     ):
